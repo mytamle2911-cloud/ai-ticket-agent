@@ -1,0 +1,92 @@
+{
+  "documents": [
+    {
+      "document_id": "DOC_PM7_001",
+      "source_system": "PM7",
+      "topic": "Request Visibility",
+      "error_messages": [
+        "You are not authorized to view this request."
+      ],
+      "error_codes": [
+        "SYNTH-ACCESS-001"
+      ],
+      "gateway_roles": [
+        {
+          "role_id": "SYNTH_PM7_GATEWAY_01",
+          "description": "Synthetic PM7 Gateway Role"
+        }
+      ],
+      "backend_roles": [
+        {
+          "role_id": "SYNTH_PM7_BACKEND_01",
+          "description": "Synthetic PM7 Backend Role"
+        }
+      ],
+      "troubleshooting": [
+        "Check the source system.",
+        "Check the authorization error.",
+        "Refer to the PM7 role requirements."
+      ]
+    },
+    {
+      "document_id": "DOC_SYSTEM_A_001",
+      "source_system": "SYNTH_SYSTEM_A",
+      "topic": "Request Visibility",
+      "error_messages": [
+        "Access denied",
+        "You are not authorized to view this request."
+      ],
+      "error_codes": [
+        "SYNTH-ACCESS-A-001"
+      ],
+      "gateway_roles": [
+        {
+          "role_id": "SYNTH_A_GATEWAY_01",
+          "description": "Required for System A workflow gateway access"
+        }
+      ],
+      "backend_roles": [
+        {
+          "role_id": "SYNTH_A_BACKEND_01",
+          "description": "Required for viewing System A requests"
+        }
+      ],
+      "troubleshooting": [
+        "Check the source system.",
+        "Check the authorization error.",
+        "Identify the required Gateway and Backend Roles.",
+        "User must request the required roles through the designated access management process."
+      ]
+    },
+    {
+      "document_id": "DOC_SYSTEM_B_001",
+      "source_system": "SYNTH_SYSTEM_B",
+      "topic": "Request Visibility",
+      "error_messages": [
+        "Access denied",
+        "You are not authorized to view this request."
+      ],
+      "error_codes": [
+        "SYNTH-ACCESS-B-001"
+      ],
+      "gateway_roles": [
+        {
+          "role_id": "SYNTH_B_GATEWAY_01",
+          "description": "Required for System B workflow gateway access"
+        }
+      ],
+      "backend_roles": [
+        {
+          "role_id": "SYNTH_B_BACKEND_01",
+          "description": "Required for viewing System B requests"
+        }
+      ],
+      "troubleshooting": [
+        "Check the source system.",
+        "Check the authorization error.",
+        "Identify the required Gateway and Backend Roles.",
+        "User must request the required roles through the designated access management process."
+      ]
+    }
+  ]
+}

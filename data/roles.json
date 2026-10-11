@@ -1,0 +1,65 @@
+{
+    "roles": [
+      {
+        "source_system": "PM7",
+        "gateway_roles": [
+          {
+            "role_id": "SYNTH_PM7_GATEWAY_01",
+            "role_name": "PM7 Workflow Gateway Access",
+            "description": "Synthetic Gateway Role for PM7 workflow access"
+          },
+          {
+            "role_id": "SYNTH_PM7_GATEWAY_02",
+            "role_name": "PM7 Workflow Approval Access",
+            "description": "Synthetic Gateway Role for PM7 approval-related access"
+          }
+        ],
+        "backend_roles": [
+          {
+            "role_id": "SYNTH_PM7_BACKEND_01",
+            "role_name": "PM7 Request Viewer",
+            "description": "Synthetic Backend Role for viewing PM7 requests"
+          },
+          {
+            "role_id": "SYNTH_PM7_BACKEND_02",
+            "role_name": "PM7 Request Processor",
+            "description": "Synthetic Backend Role for processing PM7 requests"
+          }
+        ]
+      },
+      {
+        "source_system": "SYNTH_SYSTEM_A",
+        "gateway_roles": [
+          {
+            "role_id": "SYNTH_A_GATEWAY_01",
+            "role_name": "System A Workflow Gateway Access",
+            "description": "Synthetic Gateway Role for System A"
+          }
+        ],
+        "backend_roles": [
+          {
+            "role_id": "SYNTH_A_BACKEND_01",
+            "role_name": "System A Request Viewer",
+            "description": "Synthetic Backend Role for viewing requests in System A"
+          }
+        ]
+      },
+      {
+        "source_system": "SYNTH_SYSTEM_B",
+        "gateway_roles": [
+          {
+            "role_id": "SYNTH_B_GATEWAY_01",
+            "role_name": "System B Workflow Gateway Access",
+            "description": "Synthetic Gateway Role for System B"
+          }
+        ],
+        "backend_roles": [
+          {
+            "role_id": "SYNTH_B_BACKEND_01",
+            "role_name": "System B Request Viewer",
+            "description": "Synthetic Backend Role for viewing requests in System B"
+          }
+        ]
+      }
+    ]
+  }
