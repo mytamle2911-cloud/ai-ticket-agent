@@ -573,32 +573,41 @@ def chat_with_incident(
         "Current incident evidence (JSON):\n" + json.dumps(context, ensure_ascii=False)
         + "\n\nLatest user question:\n" + user_message.strip()
     )
+    if len(prompt.encode("utf-8")) > 64 * 1024:
+        return {"reply": "", "error": "The ticket context is too large for a safe AI request. Narrow the investigation and retry.",
+                "investigation": result, "ai_provenance": "unavailable"}
     messages = [*history, {"role": "user", "content": prompt}]
+    if len(json.dumps(messages, ensure_ascii=False).encode("utf-8")) > 96 * 1024:
+        return {"reply": "", "error": "The conversation is too large for a safe AI request. Start a new message.",
+                "investigation": result, "ai_provenance": "unavailable"}
     try:
         api = llm_agent._get_client()
     except RuntimeError as exc:
-        # The client factory's missing-key message contains no credential value.
         message = str(exc)
-        if "OPENAI_API_KEY" in message:
-            if "troubleshoot" in user_message.casefold() or "troubleshooting" in user_message.casefold():
-                return {"reply": _deterministic_troubleshooting_reply(ticket, result), "error": message, "investigation": result}
-            return {"reply": "", "error": message, "investigation": result}
-        return {"reply": "", "error": "OpenAI client configuration is unavailable. Check the app configuration and retry.", "investigation": result}
+        is_troubleshooting = "troubleshoot" in user_message.casefold() or "troubleshooting" in user_message.casefold()
+        if is_troubleshooting:
+            return {"reply": _deterministic_troubleshooting_reply(ticket, result), "error": message,
+                    "investigation": result, "ai_provenance": "deterministic_fallback"}
+        return {"reply": "", "error": message, "investigation": result, "ai_provenance": "unavailable"}
     try:
         response = api.responses.create(
             model=llm_agent.MODEL,
             instructions=instructions,
             input=messages,
+            max_output_tokens=llm_agent.MAX_OUTPUT_TOKENS,
         )
         reply = llm_agent._item_value(response, "output_text", "")
         if not isinstance(reply, str) or not reply.strip():
             fallback = _deterministic_troubleshooting_reply(ticket, result) if "troubleshoot" in user_message.casefold() or "troubleshooting" in user_message.casefold() else ""
-            return {"reply": fallback, "error": "The AI copilot returned an empty response. Retry your question.", "investigation": result}
-        return {"reply": reply.strip(), "error": None, "investigation": result}
+            return {"reply": fallback, "error": "The AI copilot returned an empty response. Retry your question.",
+                    "investigation": result, "ai_provenance": "deterministic_fallback" if fallback else "unavailable"}
+        return {"reply": reply.strip(), "error": None, "investigation": result,
+                "ai_provenance": "live_gpt", "model": llm_agent.MODEL}
     except Exception as exc:
         fallback = _deterministic_troubleshooting_reply(ticket, result) if "troubleshoot" in user_message.casefold() or "troubleshooting" in user_message.casefold() else ""
         return {
             "reply": fallback,
             "error": llm_agent._safe_openai_error(exc),
             "investigation": result,
+            "ai_provenance": "deterministic_fallback" if fallback else "unavailable",
         }

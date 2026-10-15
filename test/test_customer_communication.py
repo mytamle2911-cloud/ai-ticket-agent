@@ -124,6 +124,8 @@ class CustomerCommunicationTests(unittest.TestCase):
                 client=fake,
             )
         self.assertEqual(draft["draft_status"], "editable_unverified")
+        self.assertEqual(draft["ai_provenance"], "live_gpt")
+        self.assertEqual(fake.responses.create.call_args.kwargs["max_output_tokens"], llm_agent.MAX_OUTPUT_TOKENS)
         self.assertEqual(fake.responses.create.call_args.kwargs["model"], llm_agent.MODEL)
         prompt = fake.responses.create.call_args.kwargs["input"]
         self.assertNotIn("XX:BACKEND_SD:XX", prompt)

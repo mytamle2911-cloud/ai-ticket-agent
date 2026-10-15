@@ -34,16 +34,16 @@ class AgentTests(unittest.TestCase):
         )
         self.ticket = legacy_ticket_view(raw)
 
-    @patch.object(agent.requests, "get")
-    def test_existing_ticket_lookup(self, get):
+    @patch.object(agent.internal_api, "get")
+    def test_existing_ticket_lookup_uses_internal_flask_service(self, get):
         response = Mock()
         expected = dict(self.ticket, incident_number="INC100002")
         response.json.return_value = expected
         get.return_value = response
         self.assertEqual(agent.get_ticket("inc100002"), expected)
-        get.assert_called_once_with("http://127.0.0.1:5000/api/tickets/INC100002", timeout=10)
+        get.assert_called_once_with("/api/tickets/INC100002", timeout=10)
 
-    @patch.object(agent.requests, "get")
+    @patch.object(agent.internal_api, "get")
     def test_missing_ticket_is_actionable_and_does_not_leak_response(self, get):
         response = Mock(status_code=404)
         response.raise_for_status.side_effect = requests.HTTPError("404 secret response", response=response)
@@ -53,7 +53,7 @@ class AgentTests(unittest.TestCase):
         self.assertNotIn("secret", str(raised.exception))
 
     def test_invalid_incident_number_rejected_before_request(self):
-        with patch.object(agent.requests, "get") as get:
+        with patch.object(agent.internal_api, "get") as get:
             with self.assertRaises(agent.ToolInputError):
                 agent.get_ticket("../../etc/passwd")
             get.assert_not_called()
@@ -353,7 +353,7 @@ class AgentTests(unittest.TestCase):
             update.assert_not_called()
 
     def test_update_helper_requires_approval_and_valid_status(self):
-        with patch.object(agent.requests, "patch") as patch_request:
+        with patch.object(agent.internal_api, "patch") as patch_request:
             with self.assertRaises(PermissionError):
                 agent.update_ticket("INC100002", "On Hold")
             with self.assertRaises(agent.ToolInputError):
@@ -364,17 +364,18 @@ class AgentTests(unittest.TestCase):
         response = Mock()
         response.json.return_value = {"ticket": dict(self.ticket, status="Resolved")}
         with patch.object(agent, "get_ticket", return_value=dict(self.ticket, status="On Hold")), patch.object(
-            agent.requests, "patch", return_value=response,
+            agent.internal_api, "patch", return_value=response,
         ) as patch_request:
             result = agent.update_ticket("INC100002", "Resolved", approved=True)
         self.assertEqual(result["ticket"]["status"], "Resolved")
+        self.assertEqual(patch_request.call_args.args, ("/api/tickets/INC100002",))
         self.assertEqual(patch_request.call_args.kwargs["json"], {
             "status": "Resolved", "expected_current_status": "On Hold", "confirmed": True,
         })
 
     def test_resolved_ticket_cannot_be_moved_to_on_hold(self):
         for terminal_status in ("Resolved", "Closed"):
-            with self.subTest(status=terminal_status), patch.object(agent, "get_ticket", return_value=dict(self.ticket, status=terminal_status)), patch.object(agent.requests, "patch") as patch_request:
+            with self.subTest(status=terminal_status), patch.object(agent, "get_ticket", return_value=dict(self.ticket, status=terminal_status)), patch.object(agent.internal_api, "patch") as patch_request:
                 with self.assertRaisesRegex(PermissionError, "Resolved or Closed"):
                     agent.update_ticket("INC100002", "On Hold", approved=True)
                 patch_request.assert_not_called()

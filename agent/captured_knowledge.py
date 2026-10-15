@@ -6,7 +6,7 @@ import re
 
 import requests
 
-BASE_URL = "http://127.0.0.1:5000"
+from agent import internal_api
 
 
 def search_approved_articles(ticket: dict) -> tuple[list[dict], str | None]:
@@ -19,8 +19,8 @@ def search_approved_articles(ticket: dict) -> tuple[list[dict], str | None]:
         "short_description", "additional_comments", "test_detail", "description", "summary",
     ) if isinstance(ticket.get(key), str))
     try:
-        response = requests.get(
-            f"{BASE_URL}/api/knowledge-articles/search",
+        response = internal_api.get(
+            "/api/knowledge-articles/search",
             params={"source_system": source_system, "issue_category": issue_category, "q": query},
             timeout=5,
         )

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import os
 import re
 from typing import Any
@@ -10,17 +11,40 @@ from typing import Any
 import requests
 from dotenv import load_dotenv
 from openai import OpenAI
+from agent import demo_auth
+from agent import internal_api
 from agent.unified_inbox import investigation_guidance
 from agent.scenario_knowledge import match_scenarios
 
 load_dotenv()
 
-# Mock ServiceNow API
-BASE_URL = "http://127.0.0.1:5000"
-
 # OpenAI configuration
 MODEL = os.getenv("OPENAI_MODEL", "gpt-5.6-luna")
 MAX_ITERATIONS = 10
+
+
+def _model_request_limits() -> tuple[int, float]:
+    try:
+        output_tokens = int(os.getenv("OPENAI_MAX_OUTPUT_TOKENS", "800"))
+        timeout_seconds = float(os.getenv("OPENAI_TIMEOUT_SECONDS", "25"))
+    except ValueError:
+        raise RuntimeError("OpenAI request limits are invalid. Check OPENAI_MAX_OUTPUT_TOKENS and OPENAI_TIMEOUT_SECONDS.") from None
+    if not 128 <= output_tokens <= 2048 or not 5 <= timeout_seconds <= 45:
+        raise RuntimeError("OpenAI request limits are outside supported bounds.")
+    # Leave room for Flask overhead within the configured Vercel Function
+    # duration. Local development retains the configured timeout unchanged.
+    if os.getenv("VERCEL") == "1":
+        timeout_seconds = min(timeout_seconds, 20)
+    return output_tokens, timeout_seconds
+
+
+def _model_iteration_limit() -> int:
+    """Bound hosted tool-use rounds while preserving local investigation behavior."""
+    return min(MAX_ITERATIONS, 2) if os.getenv("VERCEL") == "1" else MAX_ITERATIONS
+
+
+MAX_OUTPUT_TOKENS = 800
+REQUEST_TIMEOUT_SECONDS = 25
 
 # Ticket validation
 ALLOWED_STATUSES = {
@@ -31,6 +55,7 @@ _INCIDENT_PATTERN = re.compile(r"^INC\d{6}$", re.IGNORECASE)
 
 # Initialize only when GPT is requested
 client: Any = None
+_client_key_fingerprint: str | None = None
 
 class ToolInputError(ValueError):
     """Raised when a model supplied tool call does not match its schema."""
@@ -67,9 +92,10 @@ def _safe_api_error(exc: Exception, operation: str) -> str:
 def get_ticket(incident_number: str) -> dict:
     incident_number = _validate_incident_number(incident_number)
     try:
-        response = requests.get(f"{BASE_URL}/api/tickets/{incident_number}", timeout=10)
+        response = internal_api.get(f"/api/tickets/{incident_number}", timeout=10)
         response.raise_for_status()
-        ticket = response.json()
+        payload = response.json()
+        ticket = payload.get("ticket", payload) if isinstance(payload, dict) else payload
     except (requests.RequestException, ValueError) as exc:
         raise RuntimeError(_safe_api_error(exc, "retrieving the ticket")) from None
     if not isinstance(ticket, dict) or ticket.get("incident_number") != incident_number:
@@ -319,8 +345,8 @@ def update_ticket(incident_number: str, status: str, *, approved: bool = False) 
         current = get_ticket(incident_number)
         if status == "On Hold" and current.get("status") in {"Resolved", "Closed"}:
             raise PermissionError("Resolved or Closed tickets cannot be moved to On Hold.")
-        response = requests.patch(
-            f"{BASE_URL}/api/tickets/{incident_number}",
+        response = internal_api.patch(
+            f"/api/tickets/{incident_number}",
             json={"status": status, "expected_current_status": current.get("status"), "confirmed": True},
             timeout=10,
         )
@@ -336,18 +362,25 @@ def update_ticket(incident_number: str, status: str, *, approved: bool = False) 
 
 
 def _get_client() -> Any:
-    global client
+    global client, _client_key_fingerprint, MAX_OUTPUT_TOKENS, REQUEST_TIMEOUT_SECONDS
 
-    if client is None:
-        api_key = os.getenv("OPENAI_API_KEY")
+    if os.getenv("VERCEL") == "1":
+        if not demo_auth.request_is_authenticated():
+            raise RuntimeError("Sign in with the Demo Access Code before using live AI.")
+        if not demo_auth.live_ai_enabled():
+            raise RuntimeError("Live GPT is disabled for this demo. Set ENABLE_LIVE_AI=true to enable it.")
 
-        if not api_key:
-            raise RuntimeError(
-                "OpenAI API key is missing. "
-                "Set OPENAI_API_KEY in your .env file."
-            )
-
-        client = OpenAI(api_key=api_key)
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise RuntimeError(
+            "OpenAI API key is missing. "
+            "Set OPENAI_API_KEY in your .env file."
+        )
+    MAX_OUTPUT_TOKENS, REQUEST_TIMEOUT_SECONDS = _model_request_limits()
+    fingerprint = hashlib.sha256(api_key.encode("utf-8")).hexdigest()
+    if client is None or fingerprint != _client_key_fingerprint:
+        client = OpenAI(api_key=api_key, timeout=REQUEST_TIMEOUT_SECONDS, max_retries=0)
+        _client_key_fingerprint = fingerprint
 
     return client
 
@@ -516,8 +549,18 @@ def _condition_evidence(conditions: list, ticket: dict) -> list[dict]:
 def _same_ticket_verified_resolution(ticket: dict) -> dict | None:
     """Read consultant-verified resolution data scoped to this incident."""
     try:
-        records = _load_json("resolution_records.json", "verified_resolutions")
-    except RuntimeError:
+        from agent import demo_state, internal_api
+
+        if demo_state.has_active_state():
+            response = internal_api.get(
+                f"/api/tickets/{ticket.get('incident_number', '')}/resolutions",
+                timeout=10,
+            )
+            response.raise_for_status()
+            records = response.json().get("resolutions", [])
+        else:
+            records = _load_json("resolution_records.json", "verified_resolutions")
+    except (RuntimeError, requests.RequestException, AttributeError, ValueError):
         return None
     return next((record for record in records if isinstance(record, dict)
                  and record.get("incident_number") == ticket.get("incident_number")
@@ -893,9 +936,10 @@ def run_investigation(incident_number: str, *, use_llm: bool = True) -> dict:
             model_error = str(exc)
 
     if api is not None:
-        for iteration in range(MAX_ITERATIONS):
+        for iteration in range(_model_iteration_limit()):
             try:
-                response = api.responses.create(model=MODEL, instructions=instructions, tools=TOOLS, input=input_items)
+                response = api.responses.create(model=MODEL, instructions=instructions, tools=TOOLS,
+                                                input=input_items, max_output_tokens=MAX_OUTPUT_TOKENS)
             except Exception as exc:
                 model_error = _safe_openai_error(exc)
                 break

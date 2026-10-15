@@ -1,16 +1,25 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Activity, AlertCircle, ArrowDownToLine, ArrowRight, Bot, BookOpen, Check, Copy, Mail,
-  CheckCircle2, ChevronRight, Clock3, FileCheck2, LoaderCircle,
+  CheckCircle2, ChevronRight, Clock3, FileCheck2, LoaderCircle, RotateCcw,
   MessageCircle, Search, Send, ShieldCheck, Sparkles, TicketCheck, UserRound,
   X,
 } from 'lucide-react'
 import { buildEditableResolutionForm, buildResolutionPrefill, canSaveVerifiedResolution } from './resolutionPrefill'
 import { canContactCustomer, formatEmailDraftForCopy, isCustomerCommunicationOpen, updateEmailDraft, updateTicketCommunicationState } from './customerCommunication'
+import { createBrowserDemoApi } from './demoApi'
 
-const api = async (url, options = {}) => {
+const browserDemoApi = createBrowserDemoApi({
+  fetchImpl:(...args) => fetch(...args),
+  storage:window.localStorage,
+  locks:window.navigator?.locks,
+  onUnauthorized:() => window.dispatchEvent(new Event('ticket-agent-auth-required')),
+})
+
+const requestDirectApi = async (url, options = {}) => {
   const response = await fetch(url, {
     cache: options.cache ?? 'no-store',
+    credentials:'same-origin',
     ...options,
     headers: { ...(options.body ? { 'Content-Type': 'application/json' } : {}), ...options.headers },
   })
@@ -23,6 +32,11 @@ const api = async (url, options = {}) => {
   }
   return payload
 }
+
+const api = (url, options = {}) => {
+  if (!import.meta.env.PROD) return requestDirectApi(url, options)
+  return browserDemoApi(url, options)
+}
 const statusLabel = (ticket) => ticket.status_label || (typeof ticket.status === 'number' ? ({ 1:'New',2:'In Progress',3:'On Hold',4:'Resolved',5:'Closed',6:'Cancelled' }[ticket.status] || 'Unknown') : ticket.status)
 const summary = (ticket) => ticket.short_description || ticket.summary || 'Incident details unavailable'
 const source = (ticket) => ticket.source_system || ticket.system || 'Unknown system'
@@ -33,7 +47,32 @@ const titleCase = (value) => value || '—'
 function Badge({ children, tone = 'slate' }) { return <span className={`badge badge-${tone}`}>{children}</span> }
 function Field({ label, value }) { return <div><div className="field-label">{label}</div><div className="field-value">{value || '—'}</div></div> }
 
-function InvestigationResult({ ticket, investigation, onContactCustomer, communicationOpen }) {
+function DemoAccessGate({ onLogin }) {
+  const [code, setCode] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  const submit = async (event) => {
+    event.preventDefault(); setBusy(true); setError('')
+    try { await onLogin(code); setCode('') }
+    catch (err) { setError(err.message) }
+    finally { setBusy(false) }
+  }
+  return <main className="access-screen"><section className="access-card">
+    <div className="access-mark"><Sparkles size={20}/></div>
+    <span className="eyebrow">ACADEMIC DEMONSTRATION</span>
+    <h1>Ticket Agent</h1>
+    <p>Enter the Demo Access Code provided by your supervisor to continue.</p>
+    <form onSubmit={submit}>
+      <label htmlFor="demo-access-code">Demo Access Code</label>
+      <input id="demo-access-code" type="password" autoComplete="current-password" value={code} onChange={(event)=>setCode(event.target.value)} required maxLength={256}/>
+      {error && <div className="inline-error"><AlertCircle size={15}/>{error}</div>}
+      <button className="primary-button wide-button" disabled={busy || !code}>{busy ? 'Verifying…' : 'Continue to workspace'}</button>
+    </form>
+    <small>Access expires automatically after four hours.</small>
+  </section></main>
+}
+
+function InvestigationResult({ ticket, investigation, aiProvenance, aiModel, onContactCustomer, communicationOpen }) {
   const [copiedRole, setCopiedRole] = useState('')
   const evidence = investigation?.evidence?.unified_inbox || {}
   const scenario = evidence.scenario || investigation?.scenario_evidence || {}
@@ -121,6 +160,9 @@ function InvestigationResult({ ticket, investigation, onContactCustomer, communi
       <h3><Sparkles size={24} aria-hidden="true"/>AI Investigation</h3>
       <span>{ticket.incident_number} · {sourceSystem}</span>
     </header>
+    {aiProvenance && <div className={`ai-provenance ${aiProvenance === 'live_gpt' ? 'live' : ''}`}>
+      {aiProvenance === 'live_gpt' ? `Live GPT · ${aiModel || 'configured model'}` : aiProvenance === 'deterministic_fallback' ? 'Deterministic troubleshooting guidance · GPT unavailable' : ''}
+    </div>}
     <section className="expected-cause">
       <div className="expected-label">{verified ? 'VERIFIED ROOT CAUSE' : 'EXPECTED ROOT CAUSE'}</div>
       <h4>{verified ? (assessment.statement || issueHeading) : issueHeading}</h4>
@@ -193,6 +235,7 @@ function CustomerCommunicationPanel({
           </div>
           <div className="customer-email-card">
             <div className="customer-email-heading"><h4>AI Email Draft</h4>
+              {draft?.ai_provenance === 'live_gpt' && <span className="ai-provenance live">Live GPT · {draft.model || 'configured model'}</span>}
               <button className="communication-generate-button" onClick={onGenerate} disabled={generating}>
                 {generating ? <LoaderCircle className="spin" size={14}/> : <Sparkles size={14}/>}
                 {generating ? 'Generating…' : draft ? 'Regenerate' : draftError ? 'Retry draft' : 'Generate Customer Reply'}
@@ -213,6 +256,9 @@ function CustomerCommunicationPanel({
 }
 
 function App() {
+  const hosted = import.meta.env.PROD
+  const [authStatus, setAuthStatus] = useState(hosted ? 'checking' : 'authenticated')
+  const [authError, setAuthError] = useState('')
   const [tickets, setTickets] = useState([])
   const [selectedId, setSelectedId] = useState('')
   const [query, setQuery] = useState('')
@@ -224,6 +270,7 @@ function App() {
   const [pendingStatus, setPendingStatus] = useState(null)
   const [captureOffer, setCaptureOffer] = useState(null)
   const statusSubmitting = useRef(false)
+  const aiRequestInFlight = useRef(false)
   const [draftMessage, setDraftMessage] = useState('')
   const [workflowOpen, setWorkflowOpen] = useState(false)
   const [resolutionPrefilled, setResolutionPrefilled] = useState(false)
@@ -284,7 +331,19 @@ function App() {
     } catch (err) { setError(err.message) }
   }, [])
 
-  useEffect(() => { loadTickets('') }, [])
+  useEffect(() => {
+    if (!hosted) return
+    let active = true
+    requestDirectApi('/api/auth/session').then((result) => {
+      if (active) { setAuthStatus(result.authenticated ? 'authenticated' : 'signed_out'); setAuthError(result.error || '') }
+    }).catch((err) => {
+      if (active) { setAuthStatus('signed_out'); setAuthError(err.message) }
+    })
+    const requireAuth = () => { setAuthStatus('signed_out'); setAuthError('Your demo session expired. Enter the access code again.') }
+    window.addEventListener('ticket-agent-auth-required', requireAuth)
+    return () => { active = false; window.removeEventListener('ticket-agent-auth-required', requireAuth) }
+  }, [hosted])
+  useEffect(() => { if (authStatus === 'authenticated') loadTickets('') }, [authStatus, loadTickets])
   useEffect(() => { setCommunicationOpenFor('') }, [selectedId])
   useEffect(() => {
     setAnswer(null); setMessages([]); setError(''); setNotice(''); setResolutions([]); setArticles([]); setArticle(null)
@@ -297,22 +356,24 @@ function App() {
   }, [selectedId, loadTicketWorkflow])
 
   const runTroubleshooting = async () => {
-    if (!selected) return
+    if (!selected || aiRequestInFlight.current) return
+    aiRequestInFlight.current = true
     setBusy(true); setError(''); setNotice('')
     try {
       const result = await api(`/api/tickets/${selected.incident_number}/investigation`, { method:'POST', body:JSON.stringify({}) })
       setAnswer(result)
-      if (result.reply) setMessages([{ role:'assistant', content:result.reply }])
+      if (result.reply) setMessages([{ role:'assistant', content:result.reply, ai_provenance:result.ai_provenance, model:result.model }])
       if (result.error) setError(result.error)
     } catch (err) { if (err.payload?.investigation) setAnswer({ investigation:err.payload.investigation, error:err.message }); setError(err.message) }
-    finally { setBusy(false) }
+    finally { aiRequestInFlight.current = false; setBusy(false) }
   }
 
   const sendMessage = async (event) => {
     event?.preventDefault()
     const message = draftMessage.trim()
-    if (!message || !selected || busy) return
-    const prior = [...messages]
+    if (!message || !selected || busy || aiRequestInFlight.current) return
+    aiRequestInFlight.current = true
+    const prior = messages.slice(-12)
     setMessages([...prior, { role:'user', content:message }]); setDraftMessage(''); setBusy(true); setError(''); setStatusFeedback('')
     try {
       const result = await api(`/api/tickets/${selected.incident_number}/chat`, {
@@ -323,13 +384,13 @@ function App() {
         setPendingStatus(result.status_update.state === 'pending_confirmation' ? result.status_update : null)
       }
       if (result.investigation) setAnswer((old) => ({ ...(old || {}), investigation:result.investigation }))
-      setMessages((old) => [...old, { role:'assistant', content:result.reply || 'I could not produce a response.' }])
+      setMessages((old) => [...old, { role:'assistant', content:result.reply || 'I could not produce a response.', ai_provenance:result.ai_provenance, model:result.model }])
       if (result.error) setError(result.error)
     } catch (err) {
       if (err.payload?.investigation) setAnswer((old) => ({ ...(old || {}), investigation:err.payload.investigation }))
       setMessages((old) => [...old, { role:'assistant', content:'The request could not be completed.' }]); setError(err.message)
     }
-    finally { setBusy(false) }
+    finally { aiRequestInFlight.current = false; setBusy(false) }
   }
 
   const confirmStatusUpdate = async () => {
@@ -439,7 +500,7 @@ function App() {
     setWorkflowBusy(true); setError(''); setNotice('')
     try {
       const result = await api(`/api/tickets/${selected.incident_number}/knowledge-articles/generate`, { method:'POST', body:JSON.stringify({ resolution_id:resolution.resolution_id }) })
-      setArticle(result.article); setArticles((old) => old.some((item) => item.article_id === result.article.article_id) ? old : [...old, result.article])
+      setArticle({ ...result.article, ai_provenance:result.ai_provenance }); setArticles((old) => old.some((item) => item.article_id === result.article.article_id) ? old : [...old, result.article])
       setNotice('AI draft created from the consultant-verified resolution. Review it before approval.')
     } catch (err) { setError(err.message) }
     finally { setWorkflowBusy(false) }
@@ -496,7 +557,7 @@ function App() {
         body: JSON.stringify({ investigation:answer.investigation, date:communication.contact_time?.selected_date }),
       })
       setCommunicationByTicket((old) => updateTicketCommunicationState(old, incident, {
-        draft:{ subject:result.subject, body:result.body },
+        draft:{ subject:result.subject, body:result.body, ai_provenance:result.ai_provenance, model:result.generated_by },
         communication: old[incident]?.communication ? { ...old[incident].communication, contact_time:result.contact_time } : communication,
         draftError:'',
       }))
@@ -535,10 +596,42 @@ function App() {
 
   const investigation = answer?.investigation
   const resolutionSaveReady = canSaveVerifiedResolution(resolutionForm, resolutionConfirmed)
+  const resetDemo = async () => {
+    if (!window.confirm('Reset this browser’s demo data to its initial state? This resets ticket statuses, saved resolutions, and captured knowledge for this browser.')) return
+    setBusy(true); setError(''); setNotice('')
+    try {
+      await api('/api/tickets', { method:'GET', demoReset:true })
+      setAnswer(null); setMessages([]); setPendingStatus(null); setCaptureOffer(null)
+      setResolutions([]); setArticles([]); setArticle(null); setWorkflowOpen(false)
+      setResolutionForm({ confirmed_root_cause:'', actions_performed:'', verification_evidence:'', consultant_id:'' })
+      setResolutionPrefilled(false); setResolutionConfirmed(false); setWorkflowStep(1)
+      setCommunicationByTicket({}); setCommunicationOpenFor('')
+      communicationRequests.current.clear(); emailRequests.current.clear()
+      await loadTickets(selectedId)
+      if (selectedId) await loadTicketWorkflow(selectedId)
+      setStatusFeedback('Demo data reset to its initial state for this browser.')
+    } catch (err) { setError(err.message) }
+    finally { setBusy(false) }
+  }
+  const login = async (accessCode) => {
+    const result = await requestDirectApi('/api/auth/login', {
+      method:'POST', body:JSON.stringify({ access_code:accessCode }),
+    })
+    setAuthError(''); setAuthStatus(result.authenticated ? 'authenticated' : 'signed_out')
+  }
+  const logout = async () => {
+    try { await requestDirectApi('/api/auth/logout', { method:'POST', body:'{}' }) }
+    finally {
+      setAuthStatus('signed_out'); setSelectedId(''); setTickets([]); setAnswer(null); setMessages([])
+      setPendingStatus(null); setCaptureOffer(null); setCommunicationByTicket({})
+    }
+  }
+  if (hosted && authStatus === 'checking') return <main className="access-screen"><section className="access-card"><LoaderCircle className="spin"/><p>Checking demo session…</p></section></main>
+  if (hosted && authStatus !== 'authenticated') return <><DemoAccessGate onLogin={login}/>{authError && <div className="access-config-error" role="status">{authError}</div>}</>
   return <div className="app-shell">
     <header className="topbar">
       <div className="brand"><span className="brand-icon"><Sparkles size={19}/></span><div><div className="brand-name">Ticket Agent</div><div className="brand-sub">L2 SUPPORT WORKSPACE</div></div></div>
-      <div className="topbar-right"><span className="live-dot"/> Demonstration environment <span className="top-divider"/> <UserRound size={17}/> Consultant workspace</div>
+      <div className="topbar-right"><span className="live-dot"/> Demonstration environment <span className="top-divider"/> <UserRound size={17}/> Consultant workspace {import.meta.env.PROD && <><span className="top-divider"/><button className="text-button reset-demo-button" onClick={resetDemo} disabled={busy} title="Restore this browser's initial demo data"><RotateCcw size={15}/> Reset Demo</button><button className="text-button reset-demo-button" onClick={logout} title="End this demo session">Log out</button></>}</div>
     </header>
     <main className="workspace">
       <aside className="left-column">
@@ -579,7 +672,7 @@ function App() {
           {!answer && <button className="troubleshoot-button" disabled={busy} onClick={runTroubleshooting}>{busy ? <LoaderCircle className="spin" size={18}/> : <Sparkles size={18}/>} {busy ? 'Investigating…' : 'Troubleshoot this ticket'} <ArrowRight size={17}/></button>}
           {error && <div className="inline-error agent-error"><AlertCircle size={16}/><span>{error}</span></div>}
           {canContactCustomer(selected.incident_number, answer) && <>
-            <InvestigationResult ticket={selected} investigation={investigation} onContactCustomer={contactCustomer} communicationOpen={customerCommunicationOpen}/>
+            <InvestigationResult ticket={selected} investigation={investigation} aiProvenance={answer.ai_provenance} aiModel={answer.model} onContactCustomer={contactCustomer} communicationOpen={customerCommunicationOpen}/>
             {customerCommunicationOpen && <CustomerCommunicationPanel
               communication={customerCommunication}
               loading={communicationLoading}
@@ -599,7 +692,7 @@ function App() {
           </>}
           <div className="conversation">
             {!messages.length && <div className="conversation-hint"><MessageCircle size={16}/><span>Ask a follow-up about the ticket, evidence, or suggested steps.</span></div>}
-            {messages.slice(answer ? 1 : 0).map((message,index) => <div key={index} className={`message message-${message.role}`}><div className="message-icon">{message.role === 'assistant' ? <Bot size={15}/> : <UserRound size={15}/>}</div><div>{message.content}</div></div>)}
+            {messages.slice(answer ? 1 : 0).map((message,index) => <div key={index} className={`message message-${message.role}`}><div className="message-icon">{message.role === 'assistant' ? <Bot size={15}/> : <UserRound size={15}/>}</div><div>{message.content}{message.ai_provenance && <div className="ai-provenance">{message.ai_provenance === 'live_gpt' ? `Live GPT · ${message.model || 'configured model'}` : message.ai_provenance === 'deterministic_fallback' ? 'Deterministic troubleshooting guidance · GPT unavailable' : 'AI response unavailable'}</div>}</div></div>)}
             {captureOffer?.state === 'offered' && captureOffer.incident_number === selected.incident_number && <div className="knowledge-capture-offer">
               <p>Ticket {captureOffer.incident_number} has been updated to {captureOffer.status}. Would you like to capture this resolution as reusable knowledge?</p>
               <div><button className="secondary-button" onClick={declineCaptureFromChat}>Not Now</button><button className="primary-button" onClick={beginCaptureFromChat}>Yes, Capture</button></div>
@@ -633,7 +726,7 @@ function App() {
           <div className="workflow-section-title"><span className="step-marker">2</span><div><h3>Knowledge Article</h3><p>Generate a draft from the saved, consultant-verified resolution.</p></div></div>
           {!resolutions.some((item)=>item.verified) ? <div className="locked-note"><ShieldCheck size={16}/> Save a consultant-verified resolution before drafting an article.</div> : <>
             {!article && <button className="secondary-button wide-button" onClick={generateArticle} disabled={workflowBusy}><Sparkles size={16}/>{workflowBusy ? 'Generating draft…' : 'Generate AI knowledge draft'}</button>}
-            {article && <div className="article-editor"><div className="article-status"><FileCheck2 size={16}/><span>{article.review_status === 'Approved' ? 'Approved & published' : 'Draft · review required'}</span></div>
+            {article && <div className="article-editor"><div className="article-status"><FileCheck2 size={16}/><span>{article.review_status === 'Approved' ? 'Approved & published' : 'Draft · review required'}</span>{article.ai_provenance === 'live_gpt' && <span className="ai-provenance live">Generated by Live GPT</span>}</div>
               <label>Article title<input value={article.title} disabled={article.review_status !== 'Draft'} onChange={(e)=>setArticle({...article,title:e.target.value})}/></label>
               <label>Symptoms<textarea rows="3" value={article.symptoms} disabled={article.review_status !== 'Draft'} onChange={(e)=>setArticle({...article,symptoms:e.target.value})}/></label>
               <div className="article-facts"><div><span>Confirmed cause</span><p>{article.confirmed_root_cause}</p></div><div><span>Verified actions</span><p>{(article.verified_troubleshooting_steps || []).join(' · ')}</p></div><div><span>Verification</span><p>{article.verification_method}</p></div></div>

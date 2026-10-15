@@ -136,6 +136,69 @@ configured address. The UI uses these existing and added API contracts:
   `PATCH /api/knowledge-articles/<article_id>` for draft and review.
 - `GET /api/knowledge-articles/search` for approved reusable articles.
 
+## Vercel browser demo state
+
+In a Vercel deployment, the JSON files are read-only seed data. Ticket status
+changes, consultant-verified resolutions, and captured article edits are carried
+in a signed state snapshot stored in that browser's local storage. The API
+validates the signature and references before each request; the snapshot is
+returned with each response so refreshes keep the same browser's demo state.
+The **Reset Demo** control restores that browser's state from the current seed
+files. A different browser starts with its own initial state. There is no
+cross-browser synchronization or recovery if that browser's local storage is
+cleared.
+
+### Vercel access and live AI
+
+In Vercel Project Settings → Environment Variables, configure these for the
+Production environment (and Preview only if supervisors will use preview URLs):
+
+| Variable | Required value |
+| --- | --- |
+| `DEMO_ACCESS_CODE` | A high-entropy shared passphrase, at least 16 characters. Give it to supervisors out of band. |
+| `DEMO_AUTH_SECRET` | A random server-only signing secret, at least 32 characters. |
+| `DEMO_STATE_SECRET` | A separate random server-only signing secret, at least 32 characters. |
+| `OPENAI_API_KEY` | The server-side OpenAI API key for the GPT Luna deployment. |
+| `OPENAI_MODEL` | Optional model name; defaults to `gpt-5.6-luna`. |
+| `ENABLE_LIVE_AI` | Set to `true` to enable GPT. Set to `false` (or unset) to disable live AI immediately. |
+| `OPENAI_TIMEOUT_SECONDS` | Optional request timeout from 5 to 45 seconds; defaults to 25. |
+| `OPENAI_MAX_OUTPUT_TOKENS` | Optional response cap from 128 to 2048 tokens; defaults to 800. |
+
+Never prefix secrets with `VITE_`. The access screen sends the code to Flask
+for server-side constant-time verification. Successful login sets a signed,
+HttpOnly, Secure, SameSite=Strict cookie that expires after four hours. The
+logout control clears the cookie. Authentication is checked on every API
+request, including the browser-state dispatcher; a signed state token alone
+does not grant access.
+
+To prepare secrets locally, use a password manager or generate separate random
+values, for example `openssl rand -base64 32`. Do not reuse the access code as
+either signing secret. After changing `DEMO_STATE_SECRET`, each browser can
+replace its invalidated snapshot with **Reset Demo**.
+
+The JSON files remain read-only seed data in Vercel. Mutable ticket, resolution,
+and article data stays in each browser's signed local-storage snapshot. The
+snapshot is signed, not encrypted; supervisors using the same browser profile
+can read its contents. There is no cross-browser synchronization.
+
+Each model call is bounded by a 45-second configured maximum timeout and a
+configurable output-token limit, with route-specific input-size limits. On
+Vercel, model calls are capped at 20 seconds and investigation is limited to two
+model rounds so requests fit the function time budget; local development keeps
+the configured timeout and existing round limit. The demo has no
+shared global request quota or cross-instance rate limiter. Personal prepaid
+credit with Auto Recharge disabled does not guarantee a perfectly hard
+spending cap: requests already in flight and provider billing/reporting timing
+can still affect the remaining balance. Keep the shared access code high
+entropy, share it only with the small supervisor group, and set
+`ENABLE_LIVE_AI=false` in Vercel to stop new model calls. Redeploy or apply the
+environment change in Vercel so functions receive the updated setting.
+
+The app labels successful model responses as **Live GPT** with the configured
+model name. If troubleshooting chat cannot use GPT, the existing deterministic
+troubleshooting guidance is labeled as a fallback. Email and knowledge draft
+generation fail with an explicit error instead of substituting scripted text.
+
 ## Troubleshooting
 
 - **`ModuleNotFoundError`** — activate the virtual environment in that

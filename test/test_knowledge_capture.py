@@ -63,17 +63,15 @@ class KnowledgeCaptureTests(unittest.TestCase):
         }).get_json()["resolution"]
 
     def mock_get(self, url, *args, **kwargs):
-        path = url.replace(knowledge_capture.BASE_URL, "")
-        return FlaskResponse(self.flask_client.get(path, query_string=kwargs.get("params")))
+        return FlaskResponse(self.flask_client.get(url, query_string=kwargs.get("params")))
 
     def mock_post(self, url, *args, **kwargs):
-        path = url.replace(knowledge_capture.BASE_URL, "")
-        return FlaskResponse(self.flask_client.post(path, json=kwargs.get("json")))
+        return FlaskResponse(self.flask_client.post(url, json=kwargs.get("json")))
 
     def test_generated_draft_uses_verified_resolution_and_persists(self):
         fake = FakeResponses()
-        with patch.object(knowledge_capture.requests, "get", side_effect=self.mock_get), patch.object(
-            knowledge_capture.requests, "post", side_effect=self.mock_post,
+        with patch.object(knowledge_capture.internal_api, "get", side_effect=self.mock_get), patch.object(
+            knowledge_capture.internal_api, "post", side_effect=self.mock_post,
         ):
             article = knowledge_capture.generate_knowledge_draft(
                 "INC100001", self.resolution["resolution_id"], client=SimpleNamespace(responses=fake),
@@ -87,6 +85,7 @@ class KnowledgeCaptureTests(unittest.TestCase):
         self.assertTrue(article["article_id"])
         self.assertTrue(article["created_at"])
         self.assertEqual(fake.create.call_count, 1)
+        self.assertEqual(fake.create.call_args.kwargs["max_output_tokens"], llm_agent.MAX_OUTPUT_TOKENS)
         prompt = json.loads(fake.create.call_args.kwargs["input"])
         self.assertEqual(prompt["verified_resolution"]["confirmed_root_cause"], self.resolution["confirmed_root_cause"])
         with open(self.articles_path, encoding="utf-8") as file:
@@ -94,8 +93,8 @@ class KnowledgeCaptureTests(unittest.TestCase):
 
     def test_missing_or_unverified_resolution_is_rejected_before_openai(self):
         fake = FakeResponses()
-        with patch.object(knowledge_capture.requests, "get", side_effect=self.mock_get), patch.object(
-            knowledge_capture.requests, "post", side_effect=self.mock_post,
+        with patch.object(knowledge_capture.internal_api, "get", side_effect=self.mock_get), patch.object(
+            knowledge_capture.internal_api, "post", side_effect=self.mock_post,
         ), self.assertRaisesRegex(knowledge_capture.KnowledgeCaptureError, "No persisted verified resolution"):
             knowledge_capture.generate_knowledge_draft("INC100001", "RES-OTHER", client=SimpleNamespace(responses=fake))
         fake.create.assert_not_called()
@@ -103,8 +102,8 @@ class KnowledgeCaptureTests(unittest.TestCase):
 
     def test_openai_failure_is_reported_and_draft_is_not_saved(self):
         fake = FakeResponses(error=RuntimeError("private request detail"))
-        with patch.object(knowledge_capture.requests, "get", side_effect=self.mock_get), patch.object(
-            knowledge_capture.requests, "post", side_effect=self.mock_post,
+        with patch.object(knowledge_capture.internal_api, "get", side_effect=self.mock_get), patch.object(
+            knowledge_capture.internal_api, "post", side_effect=self.mock_post,
         ), self.assertRaises(knowledge_capture.KnowledgeCaptureError) as raised:
             knowledge_capture.generate_knowledge_draft("INC100001", self.resolution["resolution_id"], client=SimpleNamespace(responses=fake))
         self.assertIn("OpenAI knowledge draft generation request failed", str(raised.exception))
@@ -112,7 +111,7 @@ class KnowledgeCaptureTests(unittest.TestCase):
         self.assertFalse(os.path.exists(self.articles_path))
 
     def test_missing_openai_configuration_is_displayable_and_saves_no_draft(self):
-        with patch.object(knowledge_capture.requests, "get", side_effect=self.mock_get), patch.object(
+        with patch.object(knowledge_capture.internal_api, "get", side_effect=self.mock_get), patch.object(
             knowledge_capture.llm_agent, "_get_client", side_effect=RuntimeError(
                 "OpenAI API key is missing. Set OPENAI_API_KEY in your .env file."
             ),
@@ -122,8 +121,8 @@ class KnowledgeCaptureTests(unittest.TestCase):
 
     def test_duplicate_generation_returns_existing_article_without_second_ai_call(self):
         fake = FakeResponses()
-        with patch.object(knowledge_capture.requests, "get", side_effect=self.mock_get), patch.object(
-            knowledge_capture.requests, "post", side_effect=self.mock_post,
+        with patch.object(knowledge_capture.internal_api, "get", side_effect=self.mock_get), patch.object(
+            knowledge_capture.internal_api, "post", side_effect=self.mock_post,
         ) as post:
             first = knowledge_capture.generate_knowledge_draft("INC100001", self.resolution["resolution_id"], client=SimpleNamespace(responses=fake))
             second = knowledge_capture.generate_knowledge_draft("INC100001", self.resolution["resolution_id"], client=SimpleNamespace(responses=fake))
@@ -133,8 +132,8 @@ class KnowledgeCaptureTests(unittest.TestCase):
 
     def test_investigation_retrieval_excludes_draft_then_finds_approved_article(self):
         fake = FakeResponses('{"title":"Approval Task Visibility Guidance","symptoms":"A purchase order approval task cannot be found in SAP MM."}')
-        with patch.object(knowledge_capture.requests, "get", side_effect=self.mock_get), patch.object(
-            knowledge_capture.requests, "post", side_effect=self.mock_post,
+        with patch.object(knowledge_capture.internal_api, "get", side_effect=self.mock_get), patch.object(
+            knowledge_capture.internal_api, "post", side_effect=self.mock_post,
         ):
             article = knowledge_capture.generate_knowledge_draft(
                 "INC100001", self.resolution["resolution_id"], client=SimpleNamespace(responses=fake),

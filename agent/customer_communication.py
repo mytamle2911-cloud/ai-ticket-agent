@@ -5,10 +5,11 @@ from __future__ import annotations
 import json
 import os
 import re
+import requests
 from datetime import date, datetime, time, timedelta, timezone
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from agent import llm_agent
+from agent import demo_state, internal_api, llm_agent
 
 
 class CustomerCommunicationError(ValueError):
@@ -278,7 +279,15 @@ def _email_prompt_context(ticket: dict, customer: dict, contact_time: dict, inve
 
 
 def _verified_resolution_for_ticket(incident_number: str) -> dict | None:
-    rows = _load_records("resolution_records.json", "verified_resolutions")
+    try:
+        if demo_state.has_active_state():
+            response = internal_api.get(f"/api/tickets/{incident_number}/resolutions", timeout=10)
+            response.raise_for_status()
+            rows = response.json().get("resolutions", [])
+        else:
+            rows = _load_records("resolution_records.json", "verified_resolutions")
+    except (RuntimeError, ValueError, AttributeError, requests.RequestException):
+        return None
     return next((row for row in rows if row.get("incident_number") == incident_number and row.get("verified") is True), None)
 
 
@@ -302,6 +311,8 @@ def generate_customer_email_draft(
             ticket, customer, contact_time, investigation,
             _verified_resolution_for_ticket(ticket["incident_number"]),
         )
+        if len(json.dumps(context, ensure_ascii=False).encode("utf-8")) > 48 * 1024:
+            raise CustomerCommunicationError("The customer-email context is too large for a safe AI request.")
         response = client.responses.create(
             model=llm_agent.MODEL,
             instructions=(
@@ -319,6 +330,7 @@ def generate_customer_email_draft(
                 "or requested information. Sign as L2 Support Team."
             ),
             input=json.dumps(context, ensure_ascii=False),
+            max_output_tokens=llm_agent.MAX_OUTPUT_TOKENS,
         )
         output = llm_agent._item_value(response, "output_text", "")
         if not isinstance(output, str) or not output.strip():
@@ -348,6 +360,7 @@ def generate_customer_email_draft(
             "subject": subject,
             "body": body,
             "generated_by": llm_agent.MODEL,
+            "ai_provenance": "live_gpt",
             "draft_status": "editable_unverified",
             "contact_time": contact_time,
         }

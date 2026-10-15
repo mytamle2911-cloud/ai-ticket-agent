@@ -65,9 +65,11 @@ class ChatAgentTests(unittest.TestCase):
 
         self.assertIsNone(result["error"])
         self.assertIn("not visible", result["reply"])
+        self.assertEqual(result["ai_provenance"], "live_gpt")
         run_investigation.assert_not_called()
         kwargs = fake.responses.create.call_args.kwargs
         self.assertEqual(kwargs["model"], llm_agent.MODEL)
+        self.assertEqual(kwargs["max_output_tokens"], llm_agent.MAX_OUTPUT_TOKENS)
         self.assertNotIn("tools", kwargs)
         self.assertEqual(kwargs["input"][0]["role"], "user")
         self.assertEqual(kwargs["input"][1]["content"], "The item is not visible.")
@@ -493,6 +495,17 @@ class ChatAgentTests(unittest.TestCase):
             result = chat_agent.chat_with_incident("INC100012", "What should L2 do?", [], self.investigation)
         self.assertEqual(result["reply"], "")
         self.assertIn("OpenAI API key is missing", result["error"])
+        self.assertEqual(result["ai_provenance"], "unavailable")
+
+    def test_troubleshooting_fallback_is_explicit_when_live_gpt_is_unavailable(self):
+        with patch.object(llm_agent, "get_ticket", return_value=self.ticket), \
+             patch.object(llm_agent, "_get_client", side_effect=RuntimeError("Live GPT is disabled for this demo.")):
+            result = chat_agent.chat_with_incident(
+                "INC100012", "Troubleshoot this ticket", [], self.investigation,
+            )
+        self.assertTrue(result["reply"])
+        self.assertIn("Live GPT is disabled", result["error"])
+        self.assertEqual(result["ai_provenance"], "deterministic_fallback")
 
     def test_invalid_input_and_malformed_history_fail_closed(self):
         self.assertTrue(chat_agent.chat_with_incident("INC100012", " ")["error"])

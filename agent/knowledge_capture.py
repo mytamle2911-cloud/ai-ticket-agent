@@ -9,8 +9,7 @@ from typing import Any
 import requests
 
 from agent import llm_agent
-
-BASE_URL = "http://127.0.0.1:5000"
+from agent import internal_api
 
 
 class KnowledgeCaptureError(RuntimeError):
@@ -19,7 +18,7 @@ class KnowledgeCaptureError(RuntimeError):
 
 def _get_json(path: str) -> dict[str, Any]:
     try:
-        response = requests.get(f"{BASE_URL}{path}", timeout=10)
+        response = internal_api.get(path, timeout=10)
         response.raise_for_status()
         payload = response.json()
     except requests.Timeout:
@@ -67,11 +66,17 @@ def _article_seed(ticket: dict[str, Any], resolution: dict[str, Any]) -> dict[st
 
 
 def _model_draft(seed: dict[str, Any], client: Any = None) -> dict[str, str]:
+    serialized_seed = json.dumps(seed, ensure_ascii=False)
+    if len(serialized_seed.encode("utf-8")) > 32 * 1024:
+        raise KnowledgeCaptureError("The knowledge context is too large for a safe AI request.")
     try:
         api = client if client is not None else llm_agent._get_client()
     except RuntimeError as exc:
         message = str(exc)
-        if "OPENAI_API_KEY" in message:
+        if any(marker in message for marker in (
+            "OPENAI_API_KEY", "Live GPT is disabled", "Sign in with the Demo Access Code",
+            "OpenAI request limits",
+        )):
             raise KnowledgeCaptureError(message) from None
         raise KnowledgeCaptureError("OpenAI client configuration is unavailable. Check the app configuration and retry.") from None
     instructions = (
@@ -85,7 +90,8 @@ def _model_draft(seed: dict[str, Any], client: Any = None) -> dict[str, str]:
         response = api.responses.create(
             model=llm_agent.MODEL,
             instructions=instructions,
-            input=json.dumps(seed, ensure_ascii=False),
+            input=serialized_seed,
+            max_output_tokens=llm_agent.MAX_OUTPUT_TOKENS,
         )
     except Exception as exc:
         raise KnowledgeCaptureError(llm_agent._safe_openai_error(exc).replace("investigation", "knowledge draft generation")) from None
@@ -156,8 +162,8 @@ def generate_knowledge_draft(incident_number: str, resolution_id: str, *, client
         raise KnowledgeCaptureError("The ticket service did not return the selected incident. No article was generated.")
     draft_content = generate_article_content(ticket, resolution, client=client)
     try:
-        response = requests.post(
-            f"{BASE_URL}/api/tickets/{incident_number}/knowledge-articles",
+        response = internal_api.post(
+            f"/api/tickets/{incident_number}/knowledge-articles",
             json={"source_resolution_id": resolution_id, **draft_content}, timeout=10,
         )
         response.raise_for_status()

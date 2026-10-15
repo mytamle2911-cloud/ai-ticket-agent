@@ -1,17 +1,20 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, make_response, request
 from datetime import datetime, timezone
 import json
 import os
 import re
 import threading
 import uuid
+from urllib.parse import parse_qsl, urlsplit
 
 from agent.history import search_historical_cases
 from agent import chat_agent, knowledge_capture, llm_agent
 from agent import customer_communication
 from agent.status_intent import parse_status_intent
+from agent import demo_state, demo_auth
 
 app = Flask(__name__)
+app.config["MAX_CONTENT_LENGTH"] = 3 * 1024 * 1024
 
 BASE_DIR = os.path.dirname(
     os.path.dirname(os.path.abspath(__file__))
@@ -36,20 +39,108 @@ IMPACT_URGENCY_LABELS = {1: "Critical", 2: "High", 3: "Medium", 4: "Low"}
 _ticket_status_lock = threading.Lock()
 
 
+@app.before_request
+def require_hosted_demo_authentication():
+    """Authenticate every deployed API operation, including state dispatch."""
+    if os.getenv("VERCEL") != "1" or not request.path.startswith("/api/"):
+        return None
+    if request.path in {"/api/auth/session", "/api/auth/login"}:
+        return None
+    if not demo_auth.request_is_authenticated():
+        return jsonify({
+            "error": "Sign in with the Demo Access Code to use this hosted demo.",
+            "authentication_required": True,
+        }), 401
+    if (request.path not in {"/api/demo/dispatch", "/api/auth/logout"}
+            and not demo_state.has_active_state()):
+        return jsonify({
+            "error": "Use the application request flow so browser demo state is validated.",
+        }), 400
+
+
+@app.errorhandler(413)
+def request_too_large(_error):
+    return jsonify({"error": "Request is too large. Reduce the submitted text and retry."}), 413
+
+
+@app.route("/api/auth/session", methods=["GET"])
+def auth_session():
+    if os.getenv("VERCEL") != "1":
+        return jsonify({"authenticated": True, "hosted_gate": False})
+    try:
+        demo_auth.validate_configuration()
+    except demo_auth.DemoAuthError as exc:
+        return jsonify({"authenticated": False, "error": str(exc)}), 503
+    return jsonify({"authenticated": demo_auth.request_is_authenticated(),
+                    "session_seconds": demo_auth.SESSION_SECONDS})
+
+
+@app.route("/api/auth/login", methods=["POST"])
+def auth_login():
+    if os.getenv("VERCEL") != "1":
+        return jsonify({"authenticated": True, "hosted_gate": False})
+    if request.content_length is not None and request.content_length > 2048:
+        return jsonify({"error": "The access-code request is too large."}), 413
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict) or set(payload) != {"access_code"}:
+        return jsonify({"error": "Enter the Demo Access Code."}), 400
+    try:
+        if not demo_auth.verify_access_code(payload.get("access_code")):
+            return jsonify({"error": "That Demo Access Code is not valid."}), 401
+        session = demo_auth.issue_session()
+    except demo_auth.DemoAuthError as exc:
+        return jsonify({"error": str(exc)}), 503
+    response = make_response(jsonify({"authenticated": True,
+                                      "session_seconds": demo_auth.SESSION_SECONDS}))
+    response.set_cookie(
+        demo_auth.COOKIE_NAME, session, max_age=demo_auth.SESSION_SECONDS,
+        httponly=True, secure=True, samesite="Strict", path="/",
+    )
+    response.headers["Cache-Control"] = "no-store"
+    return response
+
+
+@app.route("/api/auth/logout", methods=["POST"])
+def auth_logout():
+    response = make_response(jsonify({"authenticated": False}))
+    response.delete_cookie(demo_auth.COOKIE_NAME, path="/", secure=os.getenv("VERCEL") == "1",
+                           httponly=True, samesite="Strict")
+    response.headers["Cache-Control"] = "no-store"
+    return response
+
+
 # ============================================================
 # LOAD / SAVE
 # ============================================================
 
 def load_tickets():
+    if os.getenv("VERCEL") == "1" and not demo_state.has_active_state():
+        raise RuntimeError("A browser demo-state context is required for mutable ticket status data.")
     with open(
         TICKETS_FILE,
         "r",
         encoding="utf-8"
     ) as file:
-        return json.load(file)
+        data = json.load(file)
+    state = demo_state.active_state()
+    if state is not None:
+        for ticket in data.get("tickets", []):
+            code = state["ticket_statuses"].get(ticket.get("incident_number"))
+            if code is not None:
+                ticket["status"] = code
+                if isinstance(ticket.get("legacy_fields"), dict):
+                    label = STATUS_CODES[code]
+                    ticket["legacy_status"] = label
+                    ticket["legacy_fields"]["status"] = label
+    return data
 
 
 def save_tickets(data):
+    if demo_state.has_active_state():
+        demo_state.save_statuses(data)
+        return
+    if os.getenv("VERCEL") == "1":
+        raise OSError("Refusing to write mutable ticket data to the Vercel filesystem.")
     with open(
         TICKETS_FILE,
         "w",
@@ -65,6 +156,11 @@ def save_tickets(data):
 
 def load_resolution_records():
     """Read consultant-confirmed outcomes from their separate local JSON store."""
+    state = demo_state.active_state()
+    if state is not None:
+        return {"verified_resolutions": state["verified_resolutions"]}
+    if os.getenv("VERCEL") == "1":
+        raise RuntimeError("A browser demo-state context is required for resolution records.")
     if not os.path.exists(RESOLUTIONS_FILE):
         return {"verified_resolutions": []}
     try:
@@ -79,11 +175,21 @@ def load_resolution_records():
 
 def save_resolution_records(data):
     """Persist resolution records without changing tickets or KB documents."""
+    if demo_state.has_active_state():
+        demo_state.save_resolutions(data)
+        return
+    if os.getenv("VERCEL") == "1":
+        raise OSError("Refusing to write resolution records to the Vercel filesystem.")
     with open(RESOLUTIONS_FILE, "w", encoding="utf-8") as file:
         json.dump(data, file, indent=2, ensure_ascii=False)
 
 
 def load_knowledge_articles():
+    state = demo_state.active_state()
+    if state is not None:
+        return {"articles": state["articles"]}
+    if os.getenv("VERCEL") == "1":
+        raise RuntimeError("A browser demo-state context is required for knowledge articles.")
     if not os.path.exists(KNOWLEDGE_ARTICLES_FILE):
         return {"articles": []}
     try:
@@ -97,6 +203,11 @@ def load_knowledge_articles():
 
 
 def save_knowledge_articles(data):
+    if demo_state.has_active_state():
+        demo_state.save_articles(data)
+        return
+    if os.getenv("VERCEL") == "1":
+        raise OSError("Refusing to write knowledge articles to the Vercel filesystem.")
     with open(KNOWLEDGE_ARTICLES_FILE, "w", encoding="utf-8") as file:
         json.dump(data, file, indent=2, ensure_ascii=False)
 
@@ -166,6 +277,75 @@ def ticket_status_label(ticket):
 # ============================================================
 # HEALTH CHECK
 # ============================================================
+
+@app.route("/api/demo/dispatch", methods=["POST"])
+def dispatch_demo_state():
+    """Run an existing API route against a validated, browser-carried snapshot."""
+    envelope = request.get_json(silent=True)
+    required_keys = {"path", "method"}
+    allowed_keys = required_keys | {"payload", "state", "reset"}
+    if (not isinstance(envelope, dict) or not required_keys.issubset(envelope)
+            or set(envelope) - allowed_keys):
+        return jsonify({"error": "Provide a valid demo-state request."}), 400
+    method = envelope.get("method")
+    raw_path = envelope.get("path")
+    if (not isinstance(method, str) or method.upper() not in {"GET", "POST", "PATCH"}
+            or not isinstance(raw_path, str) or len(raw_path) > 2048):
+        return jsonify({"error": "The demo-state request method or path is invalid."}), 400
+    parsed = urlsplit(raw_path)
+    route_path = parsed.path
+    if (not route_path.startswith("/api/") or route_path == "/api/demo/dispatch"
+            or parsed.scheme or parsed.netloc or ".." in route_path.split("/")):
+        return jsonify({"error": "Only application API routes can use browser demo state."}), 400
+    if "payload" in envelope and method.upper() == "GET":
+        return jsonify({"error": "GET requests cannot include a payload."}), 400
+    if "reset" in envelope and not isinstance(envelope["reset"], bool):
+        return jsonify({"error": "The reset flag must be a boolean."}), 400
+    if envelope.get("reset") and (method.upper() != "GET" or "payload" in envelope):
+        return jsonify({"error": "Reset must be a payload-free GET operation."}), 400
+    if (not envelope.get("reset") and envelope.get("state") is None
+            and method.upper() in {"POST", "PATCH"}):
+        return jsonify({"error": "Load the demo state before changing it."}), 428
+    model_route = any(route_path.endswith(suffix) for suffix in (
+        "/investigation", "/chat", "/customer-email-draft", "/knowledge-articles/generate",
+    ))
+    if model_route:
+        try:
+            payload_bytes = len(json.dumps(envelope.get("payload"), ensure_ascii=False).encode("utf-8"))
+        except (TypeError, ValueError):
+            return jsonify({"error": "AI request payload must be valid JSON data."}), 400
+        if payload_bytes > 96 * 1024:
+            return jsonify({"error": "AI request content is too large. Reduce the submitted text and retry."}), 413
+    try:
+        state = demo_state.initial_state() if envelope.get("reset") else (
+            demo_state.decode_state(envelope.get("state"))
+            if envelope.get("state") is not None else demo_state.initial_state()
+        )
+        # Check the deployment signing secret and state bounds before any route
+        # can perform side effects or spend a model request.
+        demo_state.encode_state(state)
+        with demo_state.use_state(state), demo_auth.trusted_dispatch():
+            with app.test_client() as client:
+                inner = client.open(
+                    route_path,
+                    method=method.upper(),
+                    query_string=parse_qsl(parsed.query, keep_blank_values=True),
+                    json=envelope.get("payload"),
+                )
+            result = inner.get_json(silent=True)
+            if result is None:
+                result = {"error": "The application API returned a non-JSON response."}
+            token = demo_state.encode_state(state)
+        return jsonify({
+            "result": result,
+            "status_code": inner.status_code,
+            "demo_state": token,
+        })
+    except demo_state.DemoStateError as exc:
+        status = 503 if "DEMO_STATE_SECRET" in str(exc) else 400
+        return jsonify({"error": str(exc)}), status
+    except (OSError, RuntimeError, ValueError) as exc:
+        return jsonify({"error": f"Could not process browser demo state: {exc}"}), 400
 
 @app.route("/health", methods=["GET"])
 def health_check():
@@ -297,7 +477,10 @@ def investigate_ticket(incident_number):
         [],
         investigation,
     )
-    return jsonify({"investigation": investigation, "reply": chat.get("reply", ""), "error": chat.get("error")})
+    return jsonify({"investigation": investigation, "reply": chat.get("reply", ""),
+                    "error": chat.get("error"),
+                    "ai_provenance": chat.get("ai_provenance", "unavailable"),
+                    "model": chat.get("model")})
 
 
 @app.route("/api/tickets/<incident_number>/customer-communication", methods=["GET"])
@@ -338,6 +521,8 @@ def generate_customer_email_draft(incident_number):
         return jsonify({"error": "Provide optional investigation evidence and an ISO contact date."}), 400
     if "investigation" in payload and not isinstance(payload["investigation"], dict):
         return jsonify({"error": "Investigation evidence must be a JSON object."}), 400
+    if len(json.dumps(payload, ensure_ascii=False).encode("utf-8")) > 96 * 1024:
+        return jsonify({"error": "Email context is too large. Run the investigation again and retry."}), 413
     investigation = payload.get("investigation")
     if not isinstance(investigation, dict) or not isinstance(investigation.get("ticket"), dict):
         return jsonify({"error": "Run and provide the completed investigation for this ticket before generating a customer email."}), 400
@@ -383,6 +568,17 @@ def chat_about_ticket(incident_number):
         return jsonify({"error": "Enter a message for the Ticket Agent."}), 400
     if not isinstance(history, list) or not isinstance(request_investigation, bool):
         return jsonify({"error": "Conversation history or investigation flag has an invalid format."}), 400
+    if len(message) > 4000:
+        return jsonify({"error": "Messages must be 4000 characters or fewer."}), 413
+    if len(history) > 12 or any(
+        not isinstance(item, dict) or set(item) != {"role", "content"}
+        or item.get("role") not in {"user", "assistant"}
+        or not isinstance(item.get("content"), str) or len(item["content"]) > 4000
+        for item in history
+    ):
+        return jsonify({"error": "Chat history is invalid or too long. Start a new message and retry."}), 400
+    if sum(len(item["content"]) for item in history) > 20_000:
+        return jsonify({"error": "Chat history exceeds the supported size. Start a new message and retry."}), 413
     status_intent = parse_status_intent(message)
     if status_intent:
         target_incident = status_intent.get("incident_number") or incident_number
@@ -428,7 +624,7 @@ def chat_about_ticket(incident_number):
         incident_number, message, history, None,
         request_investigation=request_investigation,
     )
-    return jsonify(result), 200 if not result.get("error") else 503
+    return jsonify(result), 200 if not result.get("error") or result.get("ai_provenance") == "deterministic_fallback" else 503
 
 
 @app.route("/api/tickets/<incident_number>/knowledge-articles/generate", methods=["POST"])
@@ -450,7 +646,8 @@ def generate_ticket_knowledge_draft(incident_number):
         existing = next((item for item in data["articles"] if isinstance(item, dict)
                          and item.get("source_resolution_id") == resolution["resolution_id"]), None)
         if existing:
-            return jsonify({"article": existing, "created": False}), 200
+            return jsonify({"article": existing, "created": False,
+                            "ai_provenance": "previously_generated"}), 200
         draft_content = knowledge_capture.generate_article_content(ticket, resolution)
         source_system = ticket.get("source_system") or ticket.get("system") or ""
         category = ticket.get("category") or ticket.get("issue_type") or ""
@@ -478,10 +675,11 @@ def generate_ticket_knowledge_draft(incident_number):
         data["articles"].append(article)
         save_knowledge_articles(data)
     except knowledge_capture.KnowledgeCaptureError as exc:
-        return jsonify({"error": str(exc)}), 400
+        return jsonify({"error": str(exc)}), 503
     except (RuntimeError, OSError, json.JSONDecodeError, AttributeError):
         return jsonify({"error": "Resolution or knowledge article storage is unavailable; no draft was saved."}), 500
-    return jsonify({"article": article, "created": True}), 201
+    return jsonify({"article": article, "created": True,
+                    "ai_provenance": "live_gpt", "model": llm_agent.MODEL}), 201
 
 
 @app.route("/api/tickets/<incident_number>/resolutions", methods=["GET"])
