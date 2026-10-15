@@ -1,0 +1,82 @@
+{
+  "verified_resolutions": [
+    {
+      "resolution_id": "RES-49c8348c7f7c444ea645754f7f3fc593",
+      "incident_number": "INC100003",
+      "confirmed_root_cause": "Missing Gateway role - XX:GATEWAY_FICO:XX",
+      "actions_performed": [
+        "Provide the missing role for user"
+      ],
+      "verification_evidence": "N.A",
+      "consultant_id": "10001",
+      "confirmation_timestamp": "2026-10-13T16:37:32Z",
+      "verified": true,
+      "verification_source": "explicit_consultant_confirmation"
+    },
+    {
+      "resolution_id": "RES-e355da956ff34be2a0d8e40a2005d0ca",
+      "incident_number": "INC100006",
+      "confirmed_root_cause": "Missing SAP SD Backend Role — XX:BACKEND_SD:XX",
+      "actions_performed": [
+        "Verify the user's SAP SD Backend Role. If missing, request XX:BACKEND_SD:XX through authorized access management, then retest SD-6005."
+      ],
+      "verification_evidence": "Missing SAP SD backend role",
+      "consultant_id": "100001",
+      "confirmation_timestamp": "2026-10-13T16:49:51Z",
+      "verified": true,
+      "verification_source": "explicit_consultant_confirmation"
+    },
+    {
+      "resolution_id": "RES-d5901e366ff34d349c2c31b3a713f111",
+      "incident_number": "INC100007",
+      "confirmed_root_cause": "Missing PM7 Gateway Role — XX:GATEWAY_PM7:XX",
+      "actions_performed": [
+        "Verify the user's PM7 Gateway Role. If missing, request XX:GATEWAY_PM7:XX through authorized access management, then retest PR-1012."
+      ],
+      "verification_evidence": "Missing PM7 gateway role",
+      "consultant_id": "100002",
+      "confirmation_timestamp": "2026-10-14T07:02:32Z",
+      "verified": true,
+      "verification_source": "explicit_consultant_confirmation"
+    },
+    {
+      "resolution_id": "RES-3edc4e2caa7a4026b86d2c4df1cccd6d",
+      "incident_number": "INC100009",
+      "confirmed_root_cause": "Missing PM7 Gateway Role — XX:GATEWAY_PM7:XX",
+      "actions_performed": [
+        "Verify the user's PM7 Gateway Role. If missing, request XX:GATEWAY_PM7:XX through authorized access management, then retest PR-1001."
+      ],
+      "verification_evidence": "Missing Gateway role",
+      "consultant_id": "100002",
+      "confirmation_timestamp": "2026-10-14T07:05:38Z",
+      "verified": true,
+      "verification_source": "explicit_consultant_confirmation"
+    },
+    {
+      "resolution_id": "RES-f3fa021facdf463ab4bdc0031fe3b865",
+      "incident_number": "INC100001",
+      "confirmed_root_cause": "Missing PM7 Gateway Role — XX:GATEWAY_PM7:XX",
+      "actions_performed": [
+        "Verify the user's PM7 Gateway Role. If missing, request XX:GATEWAY_PM7:XX through authorized access management, then retest PR-1001."
+      ],
+      "verification_evidence": "Missing PM7 gateway role",
+      "consultant_id": "100003",
+      "confirmation_timestamp": "2026-10-14T08:54:13Z",
+      "verified": true,
+      "verification_source": "explicit_consultant_confirmation"
+    },
+    {
+      "resolution_id": "RES-6936f93a4a3b4d9bb9f8d177ed27a937",
+      "incident_number": "INC100002",
+      "confirmed_root_cause": "Missing SAP MM Backend Role — XX:BACKEND_MM:XX",
+      "actions_performed": [
+        "Verify the user's SAP MM Backend Role. If missing, request XX:BACKEND_MM:XX through authorized access management, then retest PO-2045."
+      ],
+      "verification_evidence": "Missing Backend Role for SAP MM",
+      "consultant_id": "100003",
+      "confirmation_timestamp": "2026-10-14T14:37:02Z",
+      "verified": true,
+      "verification_source": "explicit_consultant_confirmation"
+    }
+  ]
+}

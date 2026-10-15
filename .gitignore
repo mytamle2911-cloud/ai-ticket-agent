@@ -11,3 +11,7 @@ __pycache__/
 .pytest_cache/
 .coverage
 htmlcov/
+
+# React frontend build artifacts
+frontend/node_modules/
+frontend/dist/

@@ -1,274 +1,2830 @@
 {
+  "synthetic_data_notice": "25 synthetic Unified Inbox L2 incidents; expected causes are scenario-defined and unverified.",
   "tickets": [
     {
       "incident_number": "INC100001",
-      "created_datetime": "2026-09-30T09:15:00",
-      "incident_type": "User Service Restoration",
-      "summary": "Cannot view request",
-      "system": "PM7",
-      "issue": "Request visibility",
-      "test": "User cannot open workflow request",
-      "test_detail": "Access denied",
-      "description": "User receives an authorization error when opening the request.",
-      "status": "On Hold",
+      "user_information": {
+        "name": "Synthetic User 001",
+        "user_id": "USER001",
+        "email": "user001@example.com"
+      },
+      "category": "Task Not Visible",
+      "subcategory": "Task Not Visible",
+      "urgency": 3,
+      "impact": 3,
       "priority": "P3",
-      "impact": "Medium",
-      "urgency": "Medium",
-      "assignment_group": "Workflow L2 Support",
-      "category": "Access",
-      "reported_by": { "user_id": "USER001", "email": "user001@example.com" }
+      "status": 4,
+      "short_description": "PM7 — Task Not Visible",
+      "additional_comments": "My manager cannot find purchase request PR-1001.",
+      "assigned_group": "Workflow L2 Support",
+      "assigned_to": {
+        "consultant_id": "SYNTH-CONS-01",
+        "name": "Synthetic Consultant 1"
+      },
+      "sla": {
+        "target_response_at": "2026-09-30T13:15",
+        "target_resolution_at": "2026-10-02T09:15",
+        "mock_value": true,
+        "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+      },
+      "time": {
+        "created_at": "2026-09-30T09:15:00",
+        "last_updated_at": null,
+        "timestamp_basis": "source timestamp",
+        "timezone": "unspecified_source_local_time"
+      },
+      "notes": [],
+      "priority_rule_state": "preserved_unvalidated",
+      "data_provenance": "synthetic_scenario_expected_unverified",
+      "notes_source": "none_recorded",
+      "attachments": [],
+      "source_system": "PM7",
+      "issue_type": "Task Not Visible",
+      "linked_kb_document_ids": [
+        "KB_TASK_NOT_VISIBLE_PM7"
+      ],
+      "legacy_status": "Resolved",
+      "linked_work_note_ids": [],
+      "linked_communication_ids": [],
+      "linked_historical_case_ids": [],
+      "legacy_fields": {
+        "incident_number": "INC100001",
+        "created_datetime": "2026-09-30T09:15:00",
+        "incident_type": "Enterprise Approval Workflow Support",
+        "summary": "PM7 — Task Not Visible",
+        "system": "PM7",
+        "issue": "Task Not Visible",
+        "test": "N/A — No error displayed",
+        "test_detail": "N/A — No error displayed",
+        "description": "My manager cannot find purchase request PR-1001.",
+        "category": "Visibility",
+        "subcategory": "Approval Workflow",
+        "status": "Resolved",
+        "priority": "P3",
+        "impact": 3,
+        "urgency": 3,
+        "assignment_group": "Workflow L2 Support",
+        "assigned_to": {
+          "consultant_id": "SYNTH-CONS-01",
+          "name": "Synthetic Consultant 1"
+        },
+        "created_at": "2026-09-30T09:15:00",
+        "sla": {
+          "target_response_at": "2026-09-30T13:15",
+          "target_resolution_at": "2026-10-02T09:15",
+          "mock_value": true,
+          "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+        }
+      },
+      "error_message": "N/A — No error displayed",
+      "scenario_id": "TS01-PM7-01",
+      "scenario_reference": "PR-1001",
+      "scenario_root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-defined expected cause: the required Gateway role may be missing or unavailable for this workflow. The user's current role assignments have not been independently verified.",
+        "verified": false
+      },
+      "troubleshooting_steps": [
+        {
+          "step_id": "TS01-1-1",
+          "instruction": "Confirm source system PM7 and affected task PR-1001 with the reporter.",
+          "expected_observation": "The reporter confirms the source system and exact approval-task reference.",
+          "handling_when_unclear": "Ask for the task reference and source system before proceeding."
+        },
+        {
+          "step_id": "TS01-1-2",
+          "instruction": "Compare the user's current assignments with the configured Gateway role XX:GATEWAY_PM7:XX and Backend role XX:BACKEND_PM7:XX.",
+          "expected_observation": "The authorized access process provides current assignments for comparison.",
+          "handling_when_unclear": "State that assignments are unverified; request an authorized role check."
+        },
+        {
+          "step_id": "TS01-1-3",
+          "instruction": "If the authorized check confirms the scenario-relevant Gateway role is absent, direct the user to request XX:GATEWAY_PM7:XX through the approved access-management process; then retest task PR-1001.",
+          "expected_observation": "The user can see task PR-1001 after an authorized change, if one is approved and completed.",
+          "handling_when_unclear": "Do not request or grant access from this prototype; escalate through the established access process."
+        }
+      ],
+      "gateway_role_id": "XX:GATEWAY_PM7:XX",
+      "backend_role_id": "XX:BACKEND_PM7:XX",
+      "expected_missing_role_type": "Gateway",
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": null,
+      "source_task_content_language_only": false,
+      "synthetic_data_notice": "Scenario-defined synthetic expected cause; not a consultant-verified resolution.",
+      "customer_id": "CUST100001"
     },
     {
       "incident_number": "INC100002",
-      "created_datetime": "2026-10-01T10:30:00",
-      "incident_type": "User Service Restoration",
-      "summary": "Cannot view request",
-      "system": "SYNTH_SYSTEM_A",
-      "issue": "Request visibility",
-      "test": "User cannot open workflow request",
-      "test_detail": "Access denied",
-      "description": "User receives an authorization error when opening the request.",
-      "status": "On Hold",
+      "user_information": {
+        "name": "Synthetic User 002",
+        "user_id": "USER002",
+        "email": "user002@example.com"
+      },
+      "category": "Task Not Visible",
+      "subcategory": "Task Not Visible",
+      "urgency": 3,
+      "impact": 3,
       "priority": "P3",
-      "impact": "Medium",
-      "urgency": "Medium",
-      "assignment_group": "Workflow L2 Support",
-      "category": "Access",
-      "reported_by": { "user_id": "USER002", "email": "user002@example.com" }
+      "status": 4,
+      "short_description": "SAP MM — Task Not Visible",
+      "additional_comments": "The approver cannot find purchase order PO-2045 in the Unified Inbox.",
+      "assigned_group": "Workflow L2 Support",
+      "assigned_to": {
+        "consultant_id": "SYNTH-CONS-02",
+        "name": "Synthetic Consultant 2"
+      },
+      "sla": {
+        "target_response_at": "2026-10-01T14:30",
+        "target_resolution_at": "2026-10-03T10:30",
+        "mock_value": true,
+        "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+      },
+      "time": {
+        "created_at": "2026-10-01T10:30:00",
+        "last_updated_at": null,
+        "timestamp_basis": "source timestamp",
+        "timezone": "unspecified_source_local_time"
+      },
+      "notes": [],
+      "priority_rule_state": "preserved_unvalidated",
+      "data_provenance": "synthetic_scenario_expected_unverified",
+      "notes_source": "none_recorded",
+      "attachments": [],
+      "source_system": "SAP MM",
+      "issue_type": "Task Not Visible",
+      "linked_kb_document_ids": [
+        "KB_TASK_NOT_VISIBLE_SAP_MM"
+      ],
+      "legacy_status": "Resolved",
+      "linked_work_note_ids": [],
+      "linked_communication_ids": [],
+      "linked_historical_case_ids": [],
+      "legacy_fields": {
+        "incident_number": "INC100002",
+        "created_datetime": "2026-10-01T10:30:00",
+        "incident_type": "Enterprise Approval Workflow Support",
+        "summary": "SAP MM — Task Not Visible",
+        "system": "SAP MM",
+        "issue": "Task Not Visible",
+        "test": "N/A — No error displayed",
+        "test_detail": "N/A — No error displayed",
+        "description": "The approver cannot find purchase order PO-2045 in the Unified Inbox.",
+        "category": "Approval Action",
+        "subcategory": "Approval Workflow",
+        "status": "Resolved",
+        "priority": "P3",
+        "impact": 3,
+        "urgency": 3,
+        "assignment_group": "Workflow L2 Support",
+        "assigned_to": {
+          "consultant_id": "SYNTH-CONS-02",
+          "name": "Synthetic Consultant 2"
+        },
+        "created_at": "2026-10-01T10:30:00",
+        "sla": {
+          "target_response_at": "2026-10-01T14:30",
+          "target_resolution_at": "2026-10-03T10:30",
+          "mock_value": true,
+          "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+        }
+      },
+      "error_message": "N/A — No error displayed",
+      "scenario_id": "TS01-SAP_MM-02",
+      "scenario_reference": "PO-2045",
+      "scenario_root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-defined expected cause: the required Backend role may be missing or unavailable for this workflow. The user's current role assignments have not been independently verified.",
+        "verified": false
+      },
+      "troubleshooting_steps": [
+        {
+          "step_id": "TS01-2-1",
+          "instruction": "Confirm source system SAP MM and affected task PO-2045 with the reporter.",
+          "expected_observation": "The reporter confirms the source system and exact approval-task reference.",
+          "handling_when_unclear": "Ask for the task reference and source system before proceeding."
+        },
+        {
+          "step_id": "TS01-2-2",
+          "instruction": "Compare the user's current assignments with the configured Gateway role XX:GATEWAY_MM:XX and Backend role XX:BACKEND_MM:XX.",
+          "expected_observation": "The authorized access process provides current assignments for comparison.",
+          "handling_when_unclear": "State that assignments are unverified; request an authorized role check."
+        },
+        {
+          "step_id": "TS01-2-3",
+          "instruction": "If the authorized check confirms the scenario-relevant Backend role is absent, direct the user to request XX:BACKEND_MM:XX through the approved access-management process; then retest task PO-2045.",
+          "expected_observation": "The user can see task PO-2045 after an authorized change, if one is approved and completed.",
+          "handling_when_unclear": "Do not request or grant access from this prototype; escalate through the established access process."
+        }
+      ],
+      "gateway_role_id": "XX:GATEWAY_MM:XX",
+      "backend_role_id": "XX:BACKEND_MM:XX",
+      "expected_missing_role_type": "Backend",
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": null,
+      "source_task_content_language_only": false,
+      "synthetic_data_notice": "Scenario-defined synthetic expected cause; not a consultant-verified resolution.",
+      "customer_id": "CUST100002"
     },
     {
       "incident_number": "INC100003",
-      "created_datetime": "2026-10-01T14:20:00",
-      "incident_type": "User Service Restoration",
-      "summary": "Cannot view request",
-      "system": "SYNTH_SYSTEM_B",
-      "issue": "Request visibility",
-      "test": "User cannot open workflow request",
-      "test_detail": "Access denied",
-      "description": "User receives an authorization error when opening the request.",
-      "status": "On Hold",
+      "user_information": {
+        "name": "Synthetic User 003",
+        "user_id": "USER003",
+        "email": "user003@example.com"
+      },
+      "category": "Task Not Visible",
+      "subcategory": "Task Not Visible",
+      "urgency": 3,
+      "impact": 3,
       "priority": "P3",
-      "impact": "Medium",
-      "urgency": "Medium",
-      "assignment_group": "Workflow L2 Support",
-      "category": "Access",
-      "reported_by": { "user_id": "USER003", "email": "user003@example.com" }
+      "status": 3,
+      "short_description": "SAP FI/CO — Task Not Visible",
+      "additional_comments": "The approver cannot find expense approval EXP-3002 in the Unified Inbox.",
+      "assigned_group": "Workflow L2 Support",
+      "assigned_to": {
+        "consultant_id": "SYNTH-CONS-03",
+        "name": "Synthetic Consultant 3"
+      },
+      "sla": {
+        "target_response_at": "2026-10-01T18:20",
+        "target_resolution_at": "2026-10-03T14:20",
+        "mock_value": true,
+        "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+      },
+      "time": {
+        "created_at": "2026-10-01T14:20:00",
+        "last_updated_at": null,
+        "timestamp_basis": "source timestamp",
+        "timezone": "unspecified_source_local_time"
+      },
+      "notes": [],
+      "priority_rule_state": "preserved_unvalidated",
+      "data_provenance": "synthetic_scenario_expected_unverified",
+      "notes_source": "none_recorded",
+      "attachments": [],
+      "source_system": "SAP FI/CO",
+      "issue_type": "Task Not Visible",
+      "linked_kb_document_ids": [
+        "KB_TASK_NOT_VISIBLE_SAP_FICO"
+      ],
+      "legacy_status": "On Hold",
+      "linked_work_note_ids": [],
+      "linked_communication_ids": [],
+      "linked_historical_case_ids": [],
+      "legacy_fields": {
+        "incident_number": "INC100003",
+        "created_datetime": "2026-10-01T14:20:00",
+        "incident_type": "Enterprise Approval Workflow Support",
+        "summary": "SAP FI/CO — Task Not Visible",
+        "system": "SAP FI/CO",
+        "issue": "Task Not Visible",
+        "test": "N/A — No error displayed",
+        "test_detail": "N/A — No error displayed",
+        "description": "The approver cannot find expense approval EXP-3002 in the Unified Inbox.",
+        "category": "Attachment",
+        "subcategory": "Approval Workflow",
+        "status": "On Hold",
+        "priority": "P3",
+        "impact": 3,
+        "urgency": 3,
+        "assignment_group": "Workflow L2 Support",
+        "assigned_to": {
+          "consultant_id": "SYNTH-CONS-03",
+          "name": "Synthetic Consultant 3"
+        },
+        "created_at": "2026-10-01T14:20:00",
+        "sla": {
+          "target_response_at": "2026-10-01T18:20",
+          "target_resolution_at": "2026-10-03T14:20",
+          "mock_value": true,
+          "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+        }
+      },
+      "error_message": "N/A — No error displayed",
+      "scenario_id": "TS01-SAP_FICO-03",
+      "scenario_reference": "EXP-3002",
+      "scenario_root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-defined expected cause: the required Gateway role may be missing or unavailable for this workflow. The user's current role assignments have not been independently verified.",
+        "verified": false
+      },
+      "troubleshooting_steps": [
+        {
+          "step_id": "TS01-3-1",
+          "instruction": "Confirm source system SAP FI/CO and affected task EXP-3002 with the reporter.",
+          "expected_observation": "The reporter confirms the source system and exact approval-task reference.",
+          "handling_when_unclear": "Ask for the task reference and source system before proceeding."
+        },
+        {
+          "step_id": "TS01-3-2",
+          "instruction": "Compare the user's current assignments with the configured Gateway role XX:GATEWAY_FICO:XX and Backend role XX:BACKEND_FICO:XX.",
+          "expected_observation": "The authorized access process provides current assignments for comparison.",
+          "handling_when_unclear": "State that assignments are unverified; request an authorized role check."
+        },
+        {
+          "step_id": "TS01-3-3",
+          "instruction": "If the authorized check confirms the scenario-relevant Gateway role is absent, direct the user to request XX:GATEWAY_FICO:XX through the approved access-management process; then retest task EXP-3002.",
+          "expected_observation": "The user can see task EXP-3002 after an authorized change, if one is approved and completed.",
+          "handling_when_unclear": "Do not request or grant access from this prototype; escalate through the established access process."
+        }
+      ],
+      "gateway_role_id": "XX:GATEWAY_FICO:XX",
+      "backend_role_id": "XX:BACKEND_FICO:XX",
+      "expected_missing_role_type": "Gateway",
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": null,
+      "source_task_content_language_only": false,
+      "synthetic_data_notice": "Scenario-defined synthetic expected cause; not a consultant-verified resolution.",
+      "customer_id": "CUST100003"
     },
     {
       "incident_number": "INC100004",
-      "created_datetime": "2026-10-03T09:00:00",
-      "incident_type": "User Service Restoration",
-      "summary": "Request fails to load",
-      "system": "SYNTH_SYSTEM_B",
-      "issue": "Request loading failure",
-      "test": "User cannot open workflow request",
-      "test_detail": "Unable to load request due to an unknown processing error",
-      "description": "User reports that the request page fails to load with a generic processing error. No authorization message is displayed.",
-      "status": "In Progress",
+      "user_information": {
+        "name": "Synthetic User 004",
+        "user_id": "USER004",
+        "email": "user004@example.com"
+      },
+      "category": "Task Not Visible",
+      "subcategory": "Task Not Visible",
+      "urgency": 3,
+      "impact": 3,
       "priority": "P3",
-      "impact": "Medium",
-      "urgency": "Medium",
-      "assignment_group": "Workflow L2 Support",
-      "category": "System Error",
-      "reported_by": { "user_id": "USER004", "email": "user004@example.com" }
+      "status": 2,
+      "short_description": "bTravel — Task Not Visible",
+      "additional_comments": "The approver cannot find travel request TR-4008 in the Unified Inbox.",
+      "assigned_group": "Workflow L2 Support",
+      "assigned_to": {
+        "consultant_id": "SYNTH-CONS-01",
+        "name": "Synthetic Consultant 1"
+      },
+      "sla": {
+        "target_response_at": "2026-10-03T13:00",
+        "target_resolution_at": "2026-10-05T09:00",
+        "mock_value": true,
+        "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+      },
+      "time": {
+        "created_at": "2026-10-03T09:00:00",
+        "last_updated_at": null,
+        "timestamp_basis": "source timestamp",
+        "timezone": "unspecified_source_local_time"
+      },
+      "notes": [],
+      "priority_rule_state": "preserved_unvalidated",
+      "data_provenance": "synthetic_scenario_expected_unverified",
+      "notes_source": "none_recorded",
+      "attachments": [],
+      "source_system": "bTravel",
+      "issue_type": "Task Not Visible",
+      "linked_kb_document_ids": [
+        "KB_TASK_NOT_VISIBLE_BTRAVEL"
+      ],
+      "legacy_status": "In Progress",
+      "linked_work_note_ids": [],
+      "linked_communication_ids": [],
+      "linked_historical_case_ids": [],
+      "legacy_fields": {
+        "incident_number": "INC100004",
+        "created_datetime": "2026-10-03T09:00:00",
+        "incident_type": "Enterprise Approval Workflow Support",
+        "summary": "bTravel — Task Not Visible",
+        "system": "bTravel",
+        "issue": "Task Not Visible",
+        "test": "N/A — No error displayed",
+        "test_detail": "N/A — No error displayed",
+        "description": "The approver cannot find travel request TR-4008 in the Unified Inbox.",
+        "category": "Substitution",
+        "subcategory": "Approval Workflow",
+        "status": "In Progress",
+        "priority": "P3",
+        "impact": 3,
+        "urgency": 3,
+        "assignment_group": "Workflow L2 Support",
+        "assigned_to": {
+          "consultant_id": "SYNTH-CONS-01",
+          "name": "Synthetic Consultant 1"
+        },
+        "created_at": "2026-10-03T09:00:00",
+        "sla": {
+          "target_response_at": "2026-10-03T13:00",
+          "target_resolution_at": "2026-10-05T09:00",
+          "mock_value": true,
+          "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+        }
+      },
+      "error_message": "N/A — No error displayed",
+      "scenario_id": "TS01-BTRAVEL-04",
+      "scenario_reference": "TR-4008",
+      "scenario_root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-defined expected cause: the required Backend role may be missing or unavailable for this workflow. The user's current role assignments have not been independently verified.",
+        "verified": false
+      },
+      "troubleshooting_steps": [
+        {
+          "step_id": "TS01-4-1",
+          "instruction": "Confirm source system bTravel and affected task TR-4008 with the reporter.",
+          "expected_observation": "The reporter confirms the source system and exact approval-task reference.",
+          "handling_when_unclear": "Ask for the task reference and source system before proceeding."
+        },
+        {
+          "step_id": "TS01-4-2",
+          "instruction": "Compare the user's current assignments with the configured Gateway role XX:GATEWAY_BTRAVEL:XX and Backend role XX:BACKEND_BTRAVEL:XX.",
+          "expected_observation": "The authorized access process provides current assignments for comparison.",
+          "handling_when_unclear": "State that assignments are unverified; request an authorized role check."
+        },
+        {
+          "step_id": "TS01-4-3",
+          "instruction": "If the authorized check confirms the scenario-relevant Backend role is absent, direct the user to request XX:BACKEND_BTRAVEL:XX through the approved access-management process; then retest task TR-4008.",
+          "expected_observation": "The user can see task TR-4008 after an authorized change, if one is approved and completed.",
+          "handling_when_unclear": "Do not request or grant access from this prototype; escalate through the established access process."
+        }
+      ],
+      "gateway_role_id": "XX:GATEWAY_BTRAVEL:XX",
+      "backend_role_id": "XX:BACKEND_BTRAVEL:XX",
+      "expected_missing_role_type": "Backend",
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": null,
+      "source_task_content_language_only": false,
+      "synthetic_data_notice": "Scenario-defined synthetic expected cause; not a consultant-verified resolution.",
+      "customer_id": "CUST100004"
     },
     {
       "incident_number": "INC100005",
-      "created_datetime": "2026-10-04T08:30:00",
-      "incident_type": "User Service Restoration",
-      "summary": "Cannot view purchase order request",
-      "system": "PM7",
-      "issue": "Request visibility",
-      "test": "User cannot open workflow request",
-      "test_detail": "Access denied when trying to view purchase order request",
-      "description": "User receives an access denied error when attempting to open a purchase order workflow request in PM7. The error appears immediately after clicking the request link.",
-      "status": "In Progress",
+      "user_information": {
+        "name": "Synthetic User 005",
+        "user_id": "USER005",
+        "email": "user005@example.com"
+      },
+      "category": "Task Not Visible",
+      "subcategory": "Task Not Visible",
+      "urgency": 2,
+      "impact": 3,
       "priority": "P2",
-      "impact": "Medium",
-      "urgency": "High",
-      "assignment_group": "Workflow L2 Support",
-      "category": "Access",
-      "reported_by": { "user_id": "USER005", "email": "user005@example.com" }
+      "status": 2,
+      "short_description": "HR ESS — Task Not Visible",
+      "additional_comments": "The manager cannot find leave request LV-5003 in the Unified Inbox.",
+      "assigned_group": "Workflow L2 Support",
+      "assigned_to": {
+        "consultant_id": "SYNTH-CONS-02",
+        "name": "Synthetic Consultant 2"
+      },
+      "sla": {
+        "target_response_at": "2026-10-04T12:30",
+        "target_resolution_at": "2026-10-06T08:30",
+        "mock_value": true,
+        "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+      },
+      "time": {
+        "created_at": "2026-10-04T08:30:00",
+        "last_updated_at": null,
+        "timestamp_basis": "source timestamp",
+        "timezone": "unspecified_source_local_time"
+      },
+      "notes": [],
+      "priority_rule_state": "preserved_unvalidated",
+      "data_provenance": "synthetic_scenario_expected_unverified",
+      "notes_source": "none_recorded",
+      "attachments": [],
+      "source_system": "HR ESS",
+      "issue_type": "Task Not Visible",
+      "linked_kb_document_ids": [
+        "KB_TASK_NOT_VISIBLE_HR_ESS"
+      ],
+      "legacy_status": "In Progress",
+      "linked_work_note_ids": [],
+      "linked_communication_ids": [],
+      "linked_historical_case_ids": [],
+      "legacy_fields": {
+        "incident_number": "INC100005",
+        "created_datetime": "2026-10-04T08:30:00",
+        "incident_type": "Enterprise Approval Workflow Support",
+        "summary": "HR ESS — Task Not Visible",
+        "system": "HR ESS",
+        "issue": "Task Not Visible",
+        "test": "N/A — No error displayed",
+        "test_detail": "N/A — No error displayed",
+        "description": "The manager cannot find leave request LV-5003 in the Unified Inbox.",
+        "category": "Approval Action",
+        "subcategory": "Approval Workflow",
+        "status": "In Progress",
+        "priority": "P2",
+        "impact": 3,
+        "urgency": 2,
+        "assignment_group": "Workflow L2 Support",
+        "assigned_to": {
+          "consultant_id": "SYNTH-CONS-02",
+          "name": "Synthetic Consultant 2"
+        },
+        "created_at": "2026-10-04T08:30:00",
+        "sla": {
+          "target_response_at": "2026-10-04T12:30",
+          "target_resolution_at": "2026-10-06T08:30",
+          "mock_value": true,
+          "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+        }
+      },
+      "error_message": "N/A — No error displayed",
+      "scenario_id": "TS01-HR_ESS-05",
+      "scenario_reference": "LV-5003",
+      "scenario_root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-defined expected cause: the required Gateway role may be missing or unavailable for this workflow. The user's current role assignments have not been independently verified.",
+        "verified": false
+      },
+      "troubleshooting_steps": [
+        {
+          "step_id": "TS01-5-1",
+          "instruction": "Confirm source system HR ESS and affected task LV-5003 with the reporter.",
+          "expected_observation": "The reporter confirms the source system and exact approval-task reference.",
+          "handling_when_unclear": "Ask for the task reference and source system before proceeding."
+        },
+        {
+          "step_id": "TS01-5-2",
+          "instruction": "Compare the user's current assignments with the configured Gateway role XX:GATEWAY_HRESS:XX and Backend role XX:BACKEND_HRESS:XX.",
+          "expected_observation": "The authorized access process provides current assignments for comparison.",
+          "handling_when_unclear": "State that assignments are unverified; request an authorized role check."
+        },
+        {
+          "step_id": "TS01-5-3",
+          "instruction": "If the authorized check confirms the scenario-relevant Gateway role is absent, direct the user to request XX:GATEWAY_HRESS:XX through the approved access-management process; then retest task LV-5003.",
+          "expected_observation": "The user can see task LV-5003 after an authorized change, if one is approved and completed.",
+          "handling_when_unclear": "Do not request or grant access from this prototype; escalate through the established access process."
+        }
+      ],
+      "gateway_role_id": "XX:GATEWAY_HRESS:XX",
+      "backend_role_id": "XX:BACKEND_HRESS:XX",
+      "expected_missing_role_type": "Gateway",
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": null,
+      "source_task_content_language_only": false,
+      "synthetic_data_notice": "Scenario-defined synthetic expected cause; not a consultant-verified resolution.",
+      "customer_id": "CUST100005"
     },
     {
       "incident_number": "INC100006",
-      "created_datetime": "2026-10-04T11:45:00",
-      "incident_type": "User Service Restoration",
-      "summary": "Request page keeps timing out",
-      "system": "SYNTH_SYSTEM_A",
-      "issue": "Page timeout on request load",
-      "test": "User cannot open workflow request",
-      "test_detail": "Request page times out after 30 seconds — no error code displayed",
-      "description": "User reports that the workflow request page in System A consistently times out after approximately 30 seconds. No authorization or access error is shown. The timeout occurs regardless of request type.",
-      "status": "In Progress",
+      "user_information": {
+        "name": "Synthetic User 006",
+        "user_id": "USER006",
+        "email": "user006@example.com"
+      },
+      "category": "Task Not Visible",
+      "subcategory": "Task Not Visible",
+      "urgency": 3,
+      "impact": 3,
       "priority": "P3",
-      "impact": "Medium",
-      "urgency": "Medium",
-      "assignment_group": "Workflow L2 Support",
-      "category": "System Error",
-      "reported_by": { "user_id": "USER006", "email": "user006@example.com" }
+      "status": 2,
+      "short_description": "SAP SD — Task Not Visible",
+      "additional_comments": "The approver cannot find sales document SD-6005 in the Unified Inbox.",
+      "assigned_group": "Workflow L2 Support",
+      "assigned_to": {
+        "consultant_id": "SYNTH-CONS-03",
+        "name": "Synthetic Consultant 3"
+      },
+      "sla": {
+        "target_response_at": "2026-10-04T15:45",
+        "target_resolution_at": "2026-10-06T11:45",
+        "mock_value": true,
+        "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+      },
+      "time": {
+        "created_at": "2026-10-04T11:45:00",
+        "last_updated_at": null,
+        "timestamp_basis": "source timestamp",
+        "timezone": "unspecified_source_local_time"
+      },
+      "notes": [],
+      "priority_rule_state": "preserved_unvalidated",
+      "data_provenance": "synthetic_scenario_expected_unverified",
+      "notes_source": "none_recorded",
+      "attachments": [],
+      "source_system": "SAP SD",
+      "issue_type": "Task Not Visible",
+      "linked_kb_document_ids": [
+        "KB_TASK_NOT_VISIBLE_SAP_SD"
+      ],
+      "legacy_status": "In Progress",
+      "linked_work_note_ids": [],
+      "linked_communication_ids": [],
+      "linked_historical_case_ids": [],
+      "legacy_fields": {
+        "incident_number": "INC100006",
+        "created_datetime": "2026-10-04T11:45:00",
+        "incident_type": "Enterprise Approval Workflow Support",
+        "summary": "SAP SD — Task Not Visible",
+        "system": "SAP SD",
+        "issue": "Task Not Visible",
+        "test": "N/A — No error displayed",
+        "test_detail": "N/A — No error displayed",
+        "description": "The approver cannot find sales document SD-6005 in the Unified Inbox.",
+        "category": "Performance",
+        "subcategory": "Approval Workflow",
+        "status": "In Progress",
+        "priority": "P3",
+        "impact": 3,
+        "urgency": 3,
+        "assignment_group": "Workflow L2 Support",
+        "assigned_to": {
+          "consultant_id": "SYNTH-CONS-03",
+          "name": "Synthetic Consultant 3"
+        },
+        "created_at": "2026-10-04T11:45:00",
+        "sla": {
+          "target_response_at": "2026-10-04T15:45",
+          "target_resolution_at": "2026-10-06T11:45",
+          "mock_value": true,
+          "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+        }
+      },
+      "error_message": "N/A — No error displayed",
+      "scenario_id": "TS01-SAP_SD-06",
+      "scenario_reference": "SD-6005",
+      "scenario_root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-defined expected cause: the required Backend role may be missing or unavailable for this workflow. The user's current role assignments have not been independently verified.",
+        "verified": false
+      },
+      "troubleshooting_steps": [
+        {
+          "step_id": "TS01-6-1",
+          "instruction": "Confirm source system SAP SD and affected task SD-6005 with the reporter.",
+          "expected_observation": "The reporter confirms the source system and exact approval-task reference.",
+          "handling_when_unclear": "Ask for the task reference and source system before proceeding."
+        },
+        {
+          "step_id": "TS01-6-2",
+          "instruction": "Compare the user's current assignments with the configured Gateway role XX:GATEWAY_SD:XX and Backend role XX:BACKEND_SD:XX.",
+          "expected_observation": "The authorized access process provides current assignments for comparison.",
+          "handling_when_unclear": "State that assignments are unverified; request an authorized role check."
+        },
+        {
+          "step_id": "TS01-6-3",
+          "instruction": "If the authorized check confirms the scenario-relevant Backend role is absent, direct the user to request XX:BACKEND_SD:XX through the approved access-management process; then retest task SD-6005.",
+          "expected_observation": "The user can see task SD-6005 after an authorized change, if one is approved and completed.",
+          "handling_when_unclear": "Do not request or grant access from this prototype; escalate through the established access process."
+        }
+      ],
+      "gateway_role_id": "XX:GATEWAY_SD:XX",
+      "backend_role_id": "XX:BACKEND_SD:XX",
+      "expected_missing_role_type": "Backend",
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": null,
+      "source_task_content_language_only": false,
+      "synthetic_data_notice": "Scenario-defined synthetic expected cause; not a consultant-verified resolution.",
+      "customer_id": "CUST100006"
     },
     {
       "incident_number": "INC100007",
-      "created_datetime": "2026-10-05T09:10:00",
-      "incident_type": "User Service Restoration",
-      "summary": "Authorization error opening workflow",
-      "system": "SYNTH_SYSTEM_B",
-      "issue": "Request visibility",
-      "test": "User cannot open workflow request",
-      "test_detail": "You are not authorized to view this request.",
-      "description": "User receives an authorization error when attempting to open a workflow request in System B. The error message states the user is not authorized to view the request.",
-      "status": "New",
+      "user_information": {
+        "name": "Synthetic User 007",
+        "user_id": "USER007",
+        "email": "user007@example.com"
+      },
+      "category": "Task Not Visible",
+      "subcategory": "Task Not Visible",
+      "urgency": 3,
+      "impact": 3,
       "priority": "P3",
-      "impact": "Medium",
-      "urgency": "Medium",
-      "assignment_group": "Workflow L2 Support",
-      "category": "Access",
-      "reported_by": { "user_id": "USER007", "email": "user007@example.com" }
+      "status": 1,
+      "short_description": "PM7 — Task Not Visible",
+      "additional_comments": "The manager reports that purchase request PR-1012 is no longer visible after a Gateway role change.",
+      "assigned_group": "Workflow L2 Support",
+      "assigned_to": {
+        "consultant_id": "SYNTH-CONS-01",
+        "name": "Synthetic Consultant 1"
+      },
+      "sla": {
+        "target_response_at": "2026-10-05T13:10",
+        "target_resolution_at": "2026-10-07T09:10",
+        "mock_value": true,
+        "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+      },
+      "time": {
+        "created_at": "2026-10-05T09:10:00",
+        "last_updated_at": null,
+        "timestamp_basis": "source timestamp",
+        "timezone": "unspecified_source_local_time"
+      },
+      "notes": [],
+      "priority_rule_state": "preserved_unvalidated",
+      "data_provenance": "synthetic_scenario_expected_unverified",
+      "notes_source": "none_recorded",
+      "attachments": [],
+      "source_system": "PM7",
+      "issue_type": "Task Not Visible",
+      "linked_kb_document_ids": [
+        "KB_TASK_NOT_VISIBLE_PM7"
+      ],
+      "legacy_status": "New",
+      "linked_work_note_ids": [],
+      "linked_communication_ids": [],
+      "linked_historical_case_ids": [],
+      "legacy_fields": {
+        "incident_number": "INC100007",
+        "created_datetime": "2026-10-05T09:10:00",
+        "incident_type": "Enterprise Approval Workflow Support",
+        "summary": "PM7 — Task Not Visible",
+        "system": "PM7",
+        "issue": "Task Not Visible",
+        "test": "N/A — No error displayed",
+        "test_detail": "N/A — No error displayed",
+        "description": "The manager reports that purchase request PR-1012 is no longer visible after a Gateway role change.",
+        "category": "Visibility",
+        "subcategory": "Approval Workflow",
+        "status": "New",
+        "priority": "P3",
+        "impact": 3,
+        "urgency": 3,
+        "assignment_group": "Workflow L2 Support",
+        "assigned_to": {
+          "consultant_id": "SYNTH-CONS-01",
+          "name": "Synthetic Consultant 1"
+        },
+        "created_at": "2026-10-05T09:10:00",
+        "sla": {
+          "target_response_at": "2026-10-05T13:10",
+          "target_resolution_at": "2026-10-07T09:10",
+          "mock_value": true,
+          "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+        }
+      },
+      "error_message": "N/A — No error displayed",
+      "scenario_id": "TS01-PM7-07",
+      "scenario_reference": "PR-1012",
+      "scenario_root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-defined expected cause: the Gateway role was revoked in this synthetic scenario. Current user-role assignments have not been independently verified.",
+        "verified": false
+      },
+      "troubleshooting_steps": [
+        {
+          "step_id": "TS01-7-1",
+          "instruction": "Confirm source system PM7 and affected task PR-1012 with the reporter.",
+          "expected_observation": "The reporter confirms the source system and exact approval-task reference.",
+          "handling_when_unclear": "Ask for the task reference and source system before proceeding."
+        },
+        {
+          "step_id": "TS01-7-2",
+          "instruction": "Compare the user's current assignments with the configured Gateway role XX:GATEWAY_PM7:XX and Backend role XX:BACKEND_PM7:XX.",
+          "expected_observation": "The authorized access process provides current assignments for comparison.",
+          "handling_when_unclear": "State that assignments are unverified; request an authorized role check."
+        },
+        {
+          "step_id": "TS01-7-3",
+          "instruction": "If the authorized check confirms the scenario-relevant Gateway role is absent, direct the user to request XX:GATEWAY_PM7:XX through the approved access-management process; then retest task PR-1012.",
+          "expected_observation": "The user can see task PR-1012 after an authorized change, if one is approved and completed.",
+          "handling_when_unclear": "Do not request or grant access from this prototype; escalate through the established access process."
+        }
+      ],
+      "gateway_role_id": "XX:GATEWAY_PM7:XX",
+      "backend_role_id": "XX:BACKEND_PM7:XX",
+      "expected_missing_role_type": "Gateway",
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": null,
+      "source_task_content_language_only": false,
+      "synthetic_data_notice": "Scenario-defined synthetic expected cause; not a consultant-verified resolution.",
+      "customer_id": "CUST100007"
     },
     {
       "incident_number": "INC100008",
-      "created_datetime": "2026-10-05T13:20:00",
-      "incident_type": "User Service Restoration",
-      "summary": "Cannot access procurement request",
-      "system": "SYNTH_SYSTEM_C",
-      "issue": "Request visibility",
-      "test": "User cannot open workflow request",
-      "test_detail": "Access denied — insufficient permissions",
-      "description": "User reports access denied when trying to open a procurement workflow request in System C. The error message indicates insufficient permissions.",
-      "status": "In Progress",
+      "user_information": {
+        "name": "Synthetic User 008",
+        "user_id": "USER008",
+        "email": "user008@example.com"
+      },
+      "category": "Task Not Visible",
+      "subcategory": "Task Not Visible",
+      "urgency": 2,
+      "impact": 3,
       "priority": "P2",
-      "impact": "Medium",
-      "urgency": "High",
-      "assignment_group": "Workflow L2 Support",
-      "category": "Access",
-      "reported_by": { "user_id": "USER008", "email": "user008@example.com" }
+      "status": 2,
+      "short_description": "SAP MM — Task Not Visible",
+      "additional_comments": "The approver cannot find purchase order PO-2088; the scenario notes that the Backend role is not assigned.",
+      "assigned_group": "Workflow L2 Support",
+      "assigned_to": {
+        "consultant_id": "SYNTH-CONS-02",
+        "name": "Synthetic Consultant 2"
+      },
+      "sla": {
+        "target_response_at": "2026-10-05T17:20",
+        "target_resolution_at": "2026-10-07T13:20",
+        "mock_value": true,
+        "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+      },
+      "time": {
+        "created_at": "2026-10-05T13:20:00",
+        "last_updated_at": null,
+        "timestamp_basis": "source timestamp",
+        "timezone": "unspecified_source_local_time"
+      },
+      "notes": [],
+      "priority_rule_state": "preserved_unvalidated",
+      "data_provenance": "synthetic_scenario_expected_unverified",
+      "notes_source": "none_recorded",
+      "attachments": [],
+      "source_system": "SAP MM",
+      "issue_type": "Task Not Visible",
+      "linked_kb_document_ids": [
+        "KB_TASK_NOT_VISIBLE_SAP_MM"
+      ],
+      "legacy_status": "In Progress",
+      "linked_work_note_ids": [],
+      "linked_communication_ids": [],
+      "linked_historical_case_ids": [],
+      "legacy_fields": {
+        "incident_number": "INC100008",
+        "created_datetime": "2026-10-05T13:20:00",
+        "incident_type": "Enterprise Approval Workflow Support",
+        "summary": "SAP MM — Task Not Visible",
+        "system": "SAP MM",
+        "issue": "Task Not Visible",
+        "test": "N/A — No error displayed",
+        "test_detail": "N/A — No error displayed",
+        "description": "The approver cannot find purchase order PO-2088; the scenario notes that the Backend role is not assigned.",
+        "category": "Workflow Execution",
+        "subcategory": "Approval Workflow",
+        "status": "In Progress",
+        "priority": "P2",
+        "impact": 3,
+        "urgency": 2,
+        "assignment_group": "Workflow L2 Support",
+        "assigned_to": {
+          "consultant_id": "SYNTH-CONS-02",
+          "name": "Synthetic Consultant 2"
+        },
+        "created_at": "2026-10-05T13:20:00",
+        "sla": {
+          "target_response_at": "2026-10-05T17:20",
+          "target_resolution_at": "2026-10-07T13:20",
+          "mock_value": true,
+          "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+        }
+      },
+      "error_message": "N/A — No error displayed",
+      "scenario_id": "TS01-SAP_MM-08",
+      "scenario_reference": "PO-2088",
+      "scenario_root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-defined expected cause: the Backend role is not assigned in this synthetic scenario. No independent assignment evidence is available.",
+        "verified": false
+      },
+      "troubleshooting_steps": [
+        {
+          "step_id": "TS01-8-1",
+          "instruction": "Confirm source system SAP MM and affected task PO-2088 with the reporter.",
+          "expected_observation": "The reporter confirms the source system and exact approval-task reference.",
+          "handling_when_unclear": "Ask for the task reference and source system before proceeding."
+        },
+        {
+          "step_id": "TS01-8-2",
+          "instruction": "Compare the user's current assignments with the configured Gateway role XX:GATEWAY_MM:XX and Backend role XX:BACKEND_MM:XX.",
+          "expected_observation": "The authorized access process provides current assignments for comparison.",
+          "handling_when_unclear": "State that assignments are unverified; request an authorized role check."
+        },
+        {
+          "step_id": "TS01-8-3",
+          "instruction": "If the authorized check confirms the scenario-relevant Backend role is absent, direct the user to request XX:BACKEND_MM:XX through the approved access-management process; then retest task PO-2088.",
+          "expected_observation": "The user can see task PO-2088 after an authorized change, if one is approved and completed.",
+          "handling_when_unclear": "Do not request or grant access from this prototype; escalate through the established access process."
+        }
+      ],
+      "gateway_role_id": "XX:GATEWAY_MM:XX",
+      "backend_role_id": "XX:BACKEND_MM:XX",
+      "expected_missing_role_type": "Backend",
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": null,
+      "source_task_content_language_only": false,
+      "synthetic_data_notice": "Scenario-defined synthetic expected cause; not a consultant-verified resolution.",
+      "customer_id": "CUST100008"
     },
     {
       "incident_number": "INC100009",
-      "created_datetime": "2026-10-06T08:00:00",
-      "incident_type": "User Service Restoration",
-      "summary": "Slow page load when opening request",
-      "system": "PM7",
-      "issue": "Performance degradation on request page",
-      "test": "Request page takes over 60 seconds to load",
-      "test_detail": "Page load time exceeds 60 seconds — no error message, no authorization issue",
-      "description": "User reports extremely slow page load times when opening workflow requests in PM7. Pages take over 60 seconds to load. There is no error message or access denied indicator — the page eventually loads but is unusably slow.",
-      "status": "In Progress",
+      "user_information": {
+        "name": "Synthetic User 009",
+        "user_id": "USER009",
+        "email": "user009@example.com"
+      },
+      "category": "Loading Time Too Slow",
+      "subcategory": "Loading Time Too Slow",
+      "urgency": 4,
+      "impact": 4,
       "priority": "P3",
-      "impact": "Low",
-      "urgency": "Low",
-      "assignment_group": "Workflow L2 Support",
-      "category": "Performance",
-      "reported_by": { "user_id": "USER009", "email": "user009@example.com" }
+      "status": 2,
+      "short_description": "PM7 — Loading Time Too Slow",
+      "additional_comments": "My Unified Inbox approval requests for PM7 take several minutes to load. Loading is slow while the PM7 operational incident is recorded as ongoing.",
+      "assigned_group": "Workflow L2 Support",
+      "assigned_to": {
+        "consultant_id": "SYNTH-CONS-03",
+        "name": "Synthetic Consultant 3"
+      },
+      "sla": {
+        "target_response_at": "2026-10-06T12:00",
+        "target_resolution_at": "2026-10-08T08:00",
+        "mock_value": true,
+        "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+      },
+      "time": {
+        "created_at": "2026-10-06T08:00:00",
+        "last_updated_at": null,
+        "timestamp_basis": "source timestamp",
+        "timezone": "unspecified_source_local_time"
+      },
+      "notes": [],
+      "priority_rule_state": "legacy_priority_matrix_mismatch_preserved",
+      "data_provenance": "synthetic_scenario_expected_unverified",
+      "notes_source": "none_recorded",
+      "attachments": [],
+      "source_system": "PM7",
+      "issue_type": "Loading Time Too Slow",
+      "linked_kb_document_ids": [
+        "KB_LOADING_TIME_TOO_SLOW_PM7"
+      ],
+      "legacy_status": "In Progress",
+      "linked_work_note_ids": [],
+      "linked_communication_ids": [],
+      "linked_historical_case_ids": [],
+      "legacy_fields": {
+        "incident_number": "INC100009",
+        "created_datetime": "2026-10-06T08:00:00",
+        "incident_type": "Enterprise Approval Workflow Support",
+        "summary": "PM7 — Loading Time Too Slow",
+        "system": "PM7",
+        "issue": "Loading Time Too Slow",
+        "test": "Request timed out while retrieving workflow data.",
+        "test_detail": "Request timed out while retrieving workflow data.",
+        "description": "My Unified Inbox approval requests for PM7 take several minutes to load. Loading is slow while the PM7 operational incident is recorded as ongoing.",
+        "category": "Approval Action",
+        "subcategory": "Approval Workflow",
+        "status": "In Progress",
+        "priority": "P3",
+        "impact": 4,
+        "urgency": 4,
+        "assignment_group": "Workflow L2 Support",
+        "assigned_to": {
+          "consultant_id": "SYNTH-CONS-03",
+          "name": "Synthetic Consultant 3"
+        },
+        "created_at": "2026-10-06T08:00:00",
+        "sla": {
+          "target_response_at": "2026-10-06T12:00",
+          "target_resolution_at": "2026-10-08T08:00",
+          "mock_value": true,
+          "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+        }
+      },
+      "error_message": "Request timed out while retrieving workflow data.",
+      "scenario_id": "TS02-PM7-09",
+      "scenario_reference": "OPS-PM7-09",
+      "scenario_root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-defined expected cause: source-system technical outage affecting Unified Inbox data retrieval. The operational record must be checked against its timestamps; this is not proof of a current outage.",
+        "verified": false
+      },
+      "troubleshooting_steps": [
+        {
+          "step_id": "TS02-9-1",
+          "instruction": "Confirm that PM7 is the affected source system and record when the slow load occurred, including timezone.",
+          "expected_observation": "The source system and observation time are recorded.",
+          "handling_when_unclear": "Ask the reporter for an approximate timestamp and timezone."
+        },
+        {
+          "step_id": "TS02-9-2",
+          "instruction": "Check operational incident OPS-PM7-09 and compare its status and time window with the reported delay.",
+          "expected_observation": "The incident record supplies a status as of a timestamp, a scheduled window, and any actual resolution time.",
+          "handling_when_unclear": "Treat a stale or missing status as unconfirmed; check the operational incident owner/process."
+        },
+        {
+          "step_id": "TS02-9-3",
+          "instruction": "If a matching incident is currently active, retry after its confirmed recovery; if the delay persists outside the incident window, collect a fresh timestamp and escalate through the source-system support process.",
+          "expected_observation": "The retry is made after confirmed recovery, or a new report is linked to an active incident.",
+          "handling_when_unclear": "Do not treat a planned end time as confirmed recovery."
+        }
+      ],
+      "gateway_role_id": "XX:GATEWAY_PM7:XX",
+      "backend_role_id": "XX:BACKEND_PM7:XX",
+      "expected_missing_role_type": null,
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": "OPS-PM7-09",
+      "source_task_content_language_only": false,
+      "synthetic_data_notice": "Scenario-defined synthetic expected cause; not a consultant-verified resolution.",
+      "customer_id": "CUST100009"
     },
     {
       "incident_number": "INC100010",
-      "created_datetime": "2026-10-06T10:30:00",
-      "incident_type": "User Service Restoration",
-      "summary": "Cannot open workflow request — access denied",
-      "system": "SYNTH_SYSTEM_A",
-      "issue": "Request visibility",
-      "test": "User cannot open workflow request",
-      "test_detail": "Access denied",
-      "description": "User received an access denied error when opening a System A workflow request. User subsequently completed the access management process and obtained the required roles. Issue resolved.",
-      "status": "Resolved",
+      "user_information": {
+        "name": "Synthetic User 010",
+        "user_id": "USER010",
+        "email": "user010@example.com"
+      },
+      "category": "Loading Time Too Slow",
+      "subcategory": "Loading Time Too Slow",
+      "urgency": 3,
+      "impact": 3,
       "priority": "P3",
-      "impact": "Medium",
-      "urgency": "Medium",
-      "assignment_group": "Workflow L2 Support",
-      "category": "Access",
-      "reported_by": { "user_id": "USER010", "email": "user010@example.com" }
+      "status": 4,
+      "short_description": "SAP FI/CO — Loading Time Too Slow",
+      "additional_comments": "My Unified Inbox approval requests for SAP FI/CO take several minutes to load. SAP FI/CO loading may be affected by the scheduled maintenance window.",
+      "assigned_group": "Workflow L2 Support",
+      "assigned_to": {
+        "consultant_id": "SYNTH-CONS-01",
+        "name": "Synthetic Consultant 1"
+      },
+      "sla": {
+        "target_response_at": "2026-10-06T14:30",
+        "target_resolution_at": "2026-10-08T10:30",
+        "mock_value": true,
+        "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+      },
+      "time": {
+        "created_at": "2026-10-06T10:30:00",
+        "last_updated_at": null,
+        "timestamp_basis": "source timestamp",
+        "timezone": "unspecified_source_local_time"
+      },
+      "notes": [],
+      "priority_rule_state": "preserved_unvalidated",
+      "data_provenance": "synthetic_scenario_expected_unverified",
+      "notes_source": "none_recorded",
+      "attachments": [],
+      "source_system": "SAP FI/CO",
+      "issue_type": "Loading Time Too Slow",
+      "linked_kb_document_ids": [
+        "KB_LOADING_TIME_TOO_SLOW_SAP_FICO"
+      ],
+      "legacy_status": "Resolved",
+      "linked_work_note_ids": [],
+      "linked_communication_ids": [],
+      "linked_historical_case_ids": [],
+      "legacy_fields": {
+        "incident_number": "INC100010",
+        "created_datetime": "2026-10-06T10:30:00",
+        "incident_type": "Enterprise Approval Workflow Support",
+        "summary": "SAP FI/CO — Loading Time Too Slow",
+        "system": "SAP FI/CO",
+        "issue": "Loading Time Too Slow",
+        "test": "Request timed out while retrieving workflow data.",
+        "test_detail": "Request timed out while retrieving workflow data.",
+        "description": "My Unified Inbox approval requests for SAP FI/CO take several minutes to load. SAP FI/CO loading may be affected by the scheduled maintenance window.",
+        "category": "Document Retrieval",
+        "subcategory": "Approval Workflow",
+        "status": "Resolved",
+        "priority": "P3",
+        "impact": 3,
+        "urgency": 3,
+        "assignment_group": "Workflow L2 Support",
+        "assigned_to": {
+          "consultant_id": "SYNTH-CONS-01",
+          "name": "Synthetic Consultant 1"
+        },
+        "created_at": "2026-10-06T10:30:00",
+        "sla": {
+          "target_response_at": "2026-10-06T14:30",
+          "target_resolution_at": "2026-10-08T10:30",
+          "mock_value": true,
+          "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+        }
+      },
+      "error_message": "Request timed out while retrieving workflow data.",
+      "scenario_id": "TS02-SAP_FICO-10",
+      "scenario_reference": "OPS-SAP_FICO-10",
+      "scenario_root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-defined expected cause: source-system scheduled maintenance affecting Unified Inbox data retrieval. The operational record must be checked against its timestamps; this is not proof of a current outage.",
+        "verified": false
+      },
+      "troubleshooting_steps": [
+        {
+          "step_id": "TS02-10-1",
+          "instruction": "Confirm that SAP FI/CO is the affected source system and record when the slow load occurred, including timezone.",
+          "expected_observation": "The source system and observation time are recorded.",
+          "handling_when_unclear": "Ask the reporter for an approximate timestamp and timezone."
+        },
+        {
+          "step_id": "TS02-10-2",
+          "instruction": "Check operational incident OPS-SAP_FICO-10 and compare its status and time window with the reported delay.",
+          "expected_observation": "The incident record supplies a status as of a timestamp, a scheduled window, and any actual resolution time.",
+          "handling_when_unclear": "Treat a stale or missing status as unconfirmed; check the operational incident owner/process."
+        },
+        {
+          "step_id": "TS02-10-3",
+          "instruction": "If a matching incident is currently active, retry after its confirmed recovery; if the delay persists outside the incident window, collect a fresh timestamp and escalate through the source-system support process.",
+          "expected_observation": "The retry is made after confirmed recovery, or a new report is linked to an active incident.",
+          "handling_when_unclear": "Do not treat a planned end time as confirmed recovery."
+        }
+      ],
+      "gateway_role_id": "XX:GATEWAY_FICO:XX",
+      "backend_role_id": "XX:BACKEND_FICO:XX",
+      "expected_missing_role_type": null,
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": "OPS-SAP_FICO-10",
+      "source_task_content_language_only": false,
+      "synthetic_data_notice": "Scenario-defined synthetic expected cause; not a consultant-verified resolution.",
+      "customer_id": "CUST100010"
     },
     {
       "incident_number": "INC100011",
-      "created_datetime": "2026-10-07T07:45:00",
-      "incident_type": "User Service Restoration",
-      "summary": "Not authorized to view request — production impact",
-      "system": "PM7",
-      "issue": "Request visibility",
-      "test": "User cannot open workflow request",
-      "test_detail": "You are not authorized to view this request.",
-      "description": "Critical production user is unable to view a high-priority workflow request in PM7. The authorization error is blocking an urgent approval process. Escalated due to production impact.",
-      "status": "New",
+      "user_information": {
+        "name": "Synthetic User 011",
+        "user_id": "USER011",
+        "email": "user011@example.com"
+      },
+      "category": "Loading Time Too Slow",
+      "subcategory": "Loading Time Too Slow",
+      "urgency": 1,
+      "impact": 2,
       "priority": "P1",
-      "impact": "High",
-      "urgency": "Critical",
-      "assignment_group": "Workflow L2 Support",
-      "category": "Access",
-      "reported_by": { "user_id": "USER011", "email": "user011@example.com" }
+      "status": 1,
+      "short_description": "bTravel — Loading Time Too Slow",
+      "additional_comments": "My Unified Inbox approval requests for bTravel take several minutes to load. bTravel loading was reported during an integration service degradation.",
+      "assigned_group": "Workflow L2 Support",
+      "assigned_to": {
+        "consultant_id": "SYNTH-CONS-02",
+        "name": "Synthetic Consultant 2"
+      },
+      "sla": {
+        "target_response_at": "2026-10-07T11:45",
+        "target_resolution_at": "2026-10-09T07:45",
+        "mock_value": true,
+        "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+      },
+      "time": {
+        "created_at": "2026-10-07T07:45:00",
+        "last_updated_at": null,
+        "timestamp_basis": "source timestamp",
+        "timezone": "unspecified_source_local_time"
+      },
+      "notes": [],
+      "priority_rule_state": "preserved_unvalidated",
+      "data_provenance": "synthetic_scenario_expected_unverified",
+      "notes_source": "none_recorded",
+      "attachments": [],
+      "source_system": "bTravel",
+      "issue_type": "Loading Time Too Slow",
+      "linked_kb_document_ids": [
+        "KB_LOADING_TIME_TOO_SLOW_BTRAVEL"
+      ],
+      "legacy_status": "New",
+      "linked_work_note_ids": [],
+      "linked_communication_ids": [],
+      "linked_historical_case_ids": [],
+      "legacy_fields": {
+        "incident_number": "INC100011",
+        "created_datetime": "2026-10-07T07:45:00",
+        "incident_type": "Enterprise Approval Workflow Support",
+        "summary": "bTravel — Loading Time Too Slow",
+        "system": "bTravel",
+        "issue": "Loading Time Too Slow",
+        "test": "Request timed out while retrieving workflow data.",
+        "test_detail": "Request timed out while retrieving workflow data.",
+        "description": "My Unified Inbox approval requests for bTravel take several minutes to load. bTravel loading was reported during an integration service degradation.",
+        "category": "Visibility",
+        "subcategory": "Approval Workflow",
+        "status": "New",
+        "priority": "P1",
+        "impact": 2,
+        "urgency": 1,
+        "assignment_group": "Workflow L2 Support",
+        "assigned_to": {
+          "consultant_id": "SYNTH-CONS-02",
+          "name": "Synthetic Consultant 2"
+        },
+        "created_at": "2026-10-07T07:45:00",
+        "sla": {
+          "target_response_at": "2026-10-07T11:45",
+          "target_resolution_at": "2026-10-09T07:45",
+          "mock_value": true,
+          "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+        }
+      },
+      "error_message": "Request timed out while retrieving workflow data.",
+      "scenario_id": "TS02-BTRAVEL-11",
+      "scenario_reference": "OPS-BTRAVEL-11",
+      "scenario_root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-defined expected cause: source-system integration service degradation affecting Unified Inbox data retrieval. The operational record must be checked against its timestamps; this is not proof of a current outage.",
+        "verified": false
+      },
+      "troubleshooting_steps": [
+        {
+          "step_id": "TS02-11-1",
+          "instruction": "Confirm that bTravel is the affected source system and record when the slow load occurred, including timezone.",
+          "expected_observation": "The source system and observation time are recorded.",
+          "handling_when_unclear": "Ask the reporter for an approximate timestamp and timezone."
+        },
+        {
+          "step_id": "TS02-11-2",
+          "instruction": "Check operational incident OPS-BTRAVEL-11 and compare its status and time window with the reported delay.",
+          "expected_observation": "The incident record supplies a status as of a timestamp, a scheduled window, and any actual resolution time.",
+          "handling_when_unclear": "Treat a stale or missing status as unconfirmed; check the operational incident owner/process."
+        },
+        {
+          "step_id": "TS02-11-3",
+          "instruction": "If a matching incident is currently active, retry after its confirmed recovery; if the delay persists outside the incident window, collect a fresh timestamp and escalate through the source-system support process.",
+          "expected_observation": "The retry is made after confirmed recovery, or a new report is linked to an active incident.",
+          "handling_when_unclear": "Do not treat a planned end time as confirmed recovery."
+        }
+      ],
+      "gateway_role_id": "XX:GATEWAY_BTRAVEL:XX",
+      "backend_role_id": "XX:BACKEND_BTRAVEL:XX",
+      "expected_missing_role_type": null,
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": "OPS-BTRAVEL-11",
+      "source_task_content_language_only": false,
+      "synthetic_data_notice": "Scenario-defined synthetic expected cause; not a consultant-verified resolution.",
+      "customer_id": "CUST100011"
     },
     {
       "incident_number": "INC100012",
-      "created_datetime": "2026-10-07T14:00:00",
-      "incident_type": "User Service Restoration",
-      "summary": "Session expires immediately after login",
-      "system": "SYNTH_SYSTEM_B",
-      "issue": "Session management failure",
-      "test": "User session terminates within seconds of login",
-      "test_detail": "Session token invalidated immediately — error code SYNTH-SESSION-ERR-001",
-      "description": "User reports that their session in System B is immediately invalidated after logging in. The user is redirected to the login page within a few seconds of successful authentication. No access denied message is shown.",
-      "status": "In Progress",
+      "user_information": {
+        "name": "Synthetic User 012",
+        "user_id": "USER012",
+        "email": "user012@example.com"
+      },
+      "category": "Loading Time Too Slow",
+      "subcategory": "Loading Time Too Slow",
+      "urgency": 3,
+      "impact": 3,
       "priority": "P3",
-      "impact": "Medium",
-      "urgency": "Medium",
-      "assignment_group": "Workflow L2 Support",
-      "category": "System Error",
-      "reported_by": { "user_id": "USER012", "email": "user012@example.com" }
+      "status": 2,
+      "short_description": "HR ESS — Loading Time Too Slow",
+      "additional_comments": "My Unified Inbox approval requests for HR ESS take several minutes to load. HR ESS loading was reported while the backend service was unavailable.",
+      "assigned_group": "Workflow L2 Support",
+      "assigned_to": {
+        "consultant_id": "SYNTH-CONS-03",
+        "name": "Synthetic Consultant 3"
+      },
+      "sla": {
+        "target_response_at": "2026-10-07T18:00",
+        "target_resolution_at": "2026-10-09T14:00",
+        "mock_value": true,
+        "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+      },
+      "time": {
+        "created_at": "2026-10-07T14:00:00",
+        "last_updated_at": null,
+        "timestamp_basis": "source timestamp",
+        "timezone": "unspecified_source_local_time"
+      },
+      "notes": [],
+      "priority_rule_state": "preserved_unvalidated",
+      "data_provenance": "synthetic_scenario_expected_unverified",
+      "notes_source": "none_recorded",
+      "attachments": [],
+      "source_system": "HR ESS",
+      "issue_type": "Loading Time Too Slow",
+      "linked_kb_document_ids": [
+        "KB_LOADING_TIME_TOO_SLOW_HR_ESS"
+      ],
+      "legacy_status": "In Progress",
+      "linked_work_note_ids": [],
+      "linked_communication_ids": [],
+      "linked_historical_case_ids": [],
+      "legacy_fields": {
+        "incident_number": "INC100012",
+        "created_datetime": "2026-10-07T14:00:00",
+        "incident_type": "Enterprise Approval Workflow Support",
+        "summary": "HR ESS — Loading Time Too Slow",
+        "system": "HR ESS",
+        "issue": "Loading Time Too Slow",
+        "test": "Request timed out while retrieving workflow data.",
+        "test_detail": "Request timed out while retrieving workflow data.",
+        "description": "My Unified Inbox approval requests for HR ESS take several minutes to load. HR ESS loading was reported while the backend service was unavailable.",
+        "category": "Visibility",
+        "subcategory": "Approval Workflow",
+        "status": "In Progress",
+        "priority": "P3",
+        "impact": 3,
+        "urgency": 3,
+        "assignment_group": "Workflow L2 Support",
+        "assigned_to": {
+          "consultant_id": "SYNTH-CONS-03",
+          "name": "Synthetic Consultant 3"
+        },
+        "created_at": "2026-10-07T14:00:00",
+        "sla": {
+          "target_response_at": "2026-10-07T18:00",
+          "target_resolution_at": "2026-10-09T14:00",
+          "mock_value": true,
+          "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+        }
+      },
+      "error_message": "Request timed out while retrieving workflow data.",
+      "scenario_id": "TS02-HR_ESS-12",
+      "scenario_reference": "OPS-HRESS-12",
+      "scenario_root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-defined expected cause: source-system backend service unavailable affecting Unified Inbox data retrieval. The operational record must be checked against its timestamps; this is not proof of a current outage.",
+        "verified": false
+      },
+      "troubleshooting_steps": [
+        {
+          "step_id": "TS02-12-1",
+          "instruction": "Confirm that HR ESS is the affected source system and record when the slow load occurred, including timezone.",
+          "expected_observation": "The source system and observation time are recorded.",
+          "handling_when_unclear": "Ask the reporter for an approximate timestamp and timezone."
+        },
+        {
+          "step_id": "TS02-12-2",
+          "instruction": "Check operational incident OPS-HR_ESS-12 and compare its status and time window with the reported delay.",
+          "expected_observation": "The incident record supplies a status as of a timestamp, a scheduled window, and any actual resolution time.",
+          "handling_when_unclear": "Treat a stale or missing status as unconfirmed; check the operational incident owner/process."
+        },
+        {
+          "step_id": "TS02-12-3",
+          "instruction": "If a matching incident is currently active, retry after its confirmed recovery; if the delay persists outside the incident window, collect a fresh timestamp and escalate through the source-system support process.",
+          "expected_observation": "The retry is made after confirmed recovery, or a new report is linked to an active incident.",
+          "handling_when_unclear": "Do not treat a planned end time as confirmed recovery."
+        }
+      ],
+      "gateway_role_id": "XX:GATEWAY_HRESS:XX",
+      "backend_role_id": "XX:BACKEND_HRESS:XX",
+      "expected_missing_role_type": null,
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": "OPS-HRESS-12",
+      "source_task_content_language_only": false,
+      "synthetic_data_notice": "Scenario-defined synthetic expected cause; not a consultant-verified resolution.",
+      "customer_id": "CUST100012"
     },
     {
       "incident_number": "INC100013",
-      "created_datetime": "2026-10-08T09:30:00",
-      "incident_type": "User Service Restoration",
-      "summary": "Authorization failure opening workflow request",
-      "system": "SYNTH_SYSTEM_A",
-      "issue": "Request visibility",
-      "test": "User cannot open workflow request",
-      "test_detail": "Access denied — you are not authorized to view this request.",
-      "description": "User is unable to open a workflow request in System A and receives an authorization failure message. The issue is consistent across multiple requests in the system.",
-      "status": "In Progress",
+      "user_information": {
+        "name": "Synthetic User 013",
+        "user_id": "USER013",
+        "email": "user013@example.com"
+      },
+      "category": "Loading Time Too Slow",
+      "subcategory": "Loading Time Too Slow",
+      "urgency": 2,
+      "impact": 3,
       "priority": "P2",
-      "impact": "Medium",
-      "urgency": "High",
-      "assignment_group": "Workflow L2 Support",
-      "category": "Access",
-      "reported_by": { "user_id": "USER013", "email": "user013@example.com" }
+      "status": 2,
+      "short_description": "SAP MM — Loading Time Too Slow",
+      "additional_comments": "My Unified Inbox approval requests for SAP MM take several minutes to load. SAP MM loading may be affected by the scheduled maintenance window.",
+      "assigned_group": "Workflow L2 Support",
+      "assigned_to": {
+        "consultant_id": "SYNTH-CONS-01",
+        "name": "Synthetic Consultant 1"
+      },
+      "sla": {
+        "target_response_at": "2026-10-08T13:30",
+        "target_resolution_at": "2026-10-10T09:30",
+        "mock_value": true,
+        "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+      },
+      "time": {
+        "created_at": "2026-10-08T09:30:00",
+        "last_updated_at": null,
+        "timestamp_basis": "source timestamp",
+        "timezone": "unspecified_source_local_time"
+      },
+      "notes": [],
+      "priority_rule_state": "preserved_unvalidated",
+      "data_provenance": "synthetic_scenario_expected_unverified",
+      "notes_source": "none_recorded",
+      "attachments": [],
+      "source_system": "SAP MM",
+      "issue_type": "Loading Time Too Slow",
+      "linked_kb_document_ids": [
+        "KB_LOADING_TIME_TOO_SLOW_SAP_MM"
+      ],
+      "legacy_status": "In Progress",
+      "linked_work_note_ids": [],
+      "linked_communication_ids": [],
+      "linked_historical_case_ids": [],
+      "legacy_fields": {
+        "incident_number": "INC100013",
+        "created_datetime": "2026-10-08T09:30:00",
+        "incident_type": "Enterprise Approval Workflow Support",
+        "summary": "SAP MM — Loading Time Too Slow",
+        "system": "SAP MM",
+        "issue": "Loading Time Too Slow",
+        "test": "Request timed out while retrieving workflow data.",
+        "test_detail": "Request timed out while retrieving workflow data.",
+        "description": "My Unified Inbox approval requests for SAP MM take several minutes to load. SAP MM loading may be affected by the scheduled maintenance window.",
+        "category": "Notification",
+        "subcategory": "Approval Workflow",
+        "status": "In Progress",
+        "priority": "P2",
+        "impact": 3,
+        "urgency": 2,
+        "assignment_group": "Workflow L2 Support",
+        "assigned_to": {
+          "consultant_id": "SYNTH-CONS-01",
+          "name": "Synthetic Consultant 1"
+        },
+        "created_at": "2026-10-08T09:30:00",
+        "sla": {
+          "target_response_at": "2026-10-08T13:30",
+          "target_resolution_at": "2026-10-10T09:30",
+          "mock_value": true,
+          "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+        }
+      },
+      "error_message": "Request timed out while retrieving workflow data.",
+      "scenario_id": "TS02-SAP_MM-13",
+      "scenario_reference": "OPS-SAP_MM-13",
+      "scenario_root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-defined expected cause: source-system scheduled maintenance affecting Unified Inbox data retrieval. The operational record must be checked against its timestamps; this is not proof of a current outage.",
+        "verified": false
+      },
+      "troubleshooting_steps": [
+        {
+          "step_id": "TS02-13-1",
+          "instruction": "Confirm that SAP MM is the affected source system and record when the slow load occurred, including timezone.",
+          "expected_observation": "The source system and observation time are recorded.",
+          "handling_when_unclear": "Ask the reporter for an approximate timestamp and timezone."
+        },
+        {
+          "step_id": "TS02-13-2",
+          "instruction": "Check operational incident OPS-SAP_MM-13 and compare its status and time window with the reported delay.",
+          "expected_observation": "The incident record supplies a status as of a timestamp, a scheduled window, and any actual resolution time.",
+          "handling_when_unclear": "Treat a stale or missing status as unconfirmed; check the operational incident owner/process."
+        },
+        {
+          "step_id": "TS02-13-3",
+          "instruction": "If a matching incident is currently active, retry after its confirmed recovery; if the delay persists outside the incident window, collect a fresh timestamp and escalate through the source-system support process.",
+          "expected_observation": "The retry is made after confirmed recovery, or a new report is linked to an active incident.",
+          "handling_when_unclear": "Do not treat a planned end time as confirmed recovery."
+        }
+      ],
+      "gateway_role_id": "XX:GATEWAY_MM:XX",
+      "backend_role_id": "XX:BACKEND_MM:XX",
+      "expected_missing_role_type": null,
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": "OPS-SAP_MM-13",
+      "source_task_content_language_only": false,
+      "synthetic_data_notice": "Scenario-defined synthetic expected cause; not a consultant-verified resolution.",
+      "customer_id": "CUST100013"
     },
     {
       "incident_number": "INC100014",
-      "created_datetime": "2026-10-09T11:15:00",
-      "incident_type": "User Service Restoration",
-      "summary": "Unknown error code when opening request",
-      "system": "PM7",
-      "issue": "Request loading failure",
-      "test": "Request form throws unknown error",
-      "test_detail": "Unhandled exception — error code SYNTH-ERR-999. No authorization message.",
-      "description": "User encounters an unexpected error with code SYNTH-ERR-999 when trying to open a request form in PM7. The error is not an authorization or access denied message — it appears to be an unhandled application exception.",
-      "status": "In Progress",
+      "user_information": {
+        "name": "Synthetic User 014",
+        "user_id": "USER014",
+        "email": "user014@example.com"
+      },
+      "category": "Loading Time Too Slow",
+      "subcategory": "Loading Time Too Slow",
+      "urgency": 3,
+      "impact": 3,
       "priority": "P3",
-      "impact": "Medium",
-      "urgency": "Medium",
-      "assignment_group": "Workflow L2 Support",
-      "category": "System Error",
-      "reported_by": { "user_id": "USER014", "email": "user014@example.com" }
+      "status": 2,
+      "short_description": "SAP SD — Loading Time Too Slow",
+      "additional_comments": "My Unified Inbox approval requests for SAP SD take several minutes to load. SAP SD loading is slow during a technical service interruption.",
+      "assigned_group": "Workflow L2 Support",
+      "assigned_to": {
+        "consultant_id": "SYNTH-CONS-02",
+        "name": "Synthetic Consultant 2"
+      },
+      "sla": {
+        "target_response_at": "2026-10-09T15:15",
+        "target_resolution_at": "2026-10-11T11:15",
+        "mock_value": true,
+        "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+      },
+      "time": {
+        "created_at": "2026-10-09T11:15:00",
+        "last_updated_at": null,
+        "timestamp_basis": "source timestamp",
+        "timezone": "unspecified_source_local_time"
+      },
+      "notes": [],
+      "priority_rule_state": "preserved_unvalidated",
+      "data_provenance": "synthetic_scenario_expected_unverified",
+      "notes_source": "none_recorded",
+      "attachments": [],
+      "source_system": "SAP SD",
+      "issue_type": "Loading Time Too Slow",
+      "linked_kb_document_ids": [
+        "KB_LOADING_TIME_TOO_SLOW_SAP_SD"
+      ],
+      "legacy_status": "In Progress",
+      "linked_work_note_ids": [],
+      "linked_communication_ids": [],
+      "linked_historical_case_ids": [],
+      "legacy_fields": {
+        "incident_number": "INC100014",
+        "created_datetime": "2026-10-09T11:15:00",
+        "incident_type": "Enterprise Approval Workflow Support",
+        "summary": "SAP SD — Loading Time Too Slow",
+        "system": "SAP SD",
+        "issue": "Loading Time Too Slow",
+        "test": "Request timed out while retrieving workflow data.",
+        "test_detail": "Request timed out while retrieving workflow data.",
+        "description": "My Unified Inbox approval requests for SAP SD take several minutes to load. SAP SD loading is slow during a technical service interruption.",
+        "category": "Notification",
+        "subcategory": "Approval Workflow",
+        "status": "In Progress",
+        "priority": "P3",
+        "impact": 3,
+        "urgency": 3,
+        "assignment_group": "Workflow L2 Support",
+        "assigned_to": {
+          "consultant_id": "SYNTH-CONS-02",
+          "name": "Synthetic Consultant 2"
+        },
+        "created_at": "2026-10-09T11:15:00",
+        "sla": {
+          "target_response_at": "2026-10-09T15:15",
+          "target_resolution_at": "2026-10-11T11:15",
+          "mock_value": true,
+          "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+        }
+      },
+      "error_message": "Request timed out while retrieving workflow data.",
+      "scenario_id": "TS02-SAP_SD-14",
+      "scenario_reference": "OPS-SAP_SD-14",
+      "scenario_root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-defined expected cause: source-system technical service interruption affecting Unified Inbox data retrieval. The operational record must be checked against its timestamps; this is not proof of a current outage.",
+        "verified": false
+      },
+      "troubleshooting_steps": [
+        {
+          "step_id": "TS02-14-1",
+          "instruction": "Confirm that SAP SD is the affected source system and record when the slow load occurred, including timezone.",
+          "expected_observation": "The source system and observation time are recorded.",
+          "handling_when_unclear": "Ask the reporter for an approximate timestamp and timezone."
+        },
+        {
+          "step_id": "TS02-14-2",
+          "instruction": "Check operational incident OPS-SAP_SD-14 and compare its status and time window with the reported delay.",
+          "expected_observation": "The incident record supplies a status as of a timestamp, a scheduled window, and any actual resolution time.",
+          "handling_when_unclear": "Treat a stale or missing status as unconfirmed; check the operational incident owner/process."
+        },
+        {
+          "step_id": "TS02-14-3",
+          "instruction": "If a matching incident is currently active, retry after its confirmed recovery; if the delay persists outside the incident window, collect a fresh timestamp and escalate through the source-system support process.",
+          "expected_observation": "The retry is made after confirmed recovery, or a new report is linked to an active incident.",
+          "handling_when_unclear": "Do not treat a planned end time as confirmed recovery."
+        }
+      ],
+      "gateway_role_id": "XX:GATEWAY_SD:XX",
+      "backend_role_id": "XX:BACKEND_SD:XX",
+      "expected_missing_role_type": null,
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": "OPS-SAP_SD-14",
+      "source_task_content_language_only": false,
+      "synthetic_data_notice": "Scenario-defined synthetic expected cause; not a consultant-verified resolution.",
+      "customer_id": "CUST100014"
     },
     {
       "incident_number": "INC100015",
-      "created_datetime": "2026-10-10T08:00:00",
-      "incident_type": "User Service Restoration",
-      "summary": "Access denied on request page load",
-      "system": "SYNTH_SYSTEM_B",
-      "issue": "Request visibility",
-      "test": "User cannot open workflow request",
-      "test_detail": "Access denied when loading request page",
-      "description": "User is blocked from accessing a System B workflow request. The access denied error appears immediately when the request page loads. User has confirmed this affects multiple requests in the system.",
-      "status": "New",
+      "user_information": {
+        "name": "Synthetic User 015",
+        "user_id": "USER015",
+        "email": "user015@example.com"
+      },
+      "category": "Cannot Set Up Substitution",
+      "subcategory": "Cannot Set Up Substitution",
+      "urgency": 2,
+      "impact": 3,
       "priority": "P2",
-      "impact": "Medium",
-      "urgency": "High",
-      "assignment_group": "Workflow L2 Support",
-      "category": "Access",
-      "reported_by": { "user_id": "USER015", "email": "user015@example.com" }
+      "status": 1,
+      "short_description": "HR ESS — Substitution Setup Issue",
+      "additional_comments": "I cannot set up a substitute approver for the Leave Approval task WF-0015 in Unified Inbox.",
+      "assigned_group": "Workflow L2 Support",
+      "assigned_to": {
+        "consultant_id": "SYNTH-CONS-03",
+        "name": "Synthetic Consultant 3"
+      },
+      "sla": {
+        "target_response_at": "2026-10-10T12:00",
+        "target_resolution_at": "2026-10-12T08:00",
+        "mock_value": true,
+        "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+      },
+      "time": {
+        "created_at": "2026-10-10T08:00:00",
+        "last_updated_at": null,
+        "timestamp_basis": "source timestamp",
+        "timezone": "unspecified_source_local_time"
+      },
+      "notes": [],
+      "priority_rule_state": "preserved_unvalidated",
+      "data_provenance": "synthetic_scenario_expected_unverified",
+      "notes_source": "none_recorded",
+      "attachments": [],
+      "source_system": "HR ESS",
+      "issue_type": "Cannot Set Up Substitution",
+      "linked_kb_document_ids": [
+        "KB_CANNOT_SET_UP_SUBSTITUTION_HR_ESS"
+      ],
+      "legacy_status": "New",
+      "linked_work_note_ids": [],
+      "linked_communication_ids": [],
+      "linked_historical_case_ids": [],
+      "legacy_fields": {
+        "incident_number": "INC100015",
+        "created_datetime": "2026-10-10T08:00:00",
+        "incident_type": "Enterprise Approval Workflow Support",
+        "summary": "HR ESS — Substitution Setup Issue",
+        "system": "HR ESS",
+        "issue": "Cannot Set Up Substitution",
+        "test": "Substitution is not supported for this workflow.",
+        "test_detail": "Substitution is not supported for this workflow.",
+        "description": "I cannot set up a substitute approver for the Leave Approval task WF-0015 in Unified Inbox.",
+        "category": "Attachment",
+        "subcategory": "Approval Workflow",
+        "status": "New",
+        "priority": "P2",
+        "impact": 3,
+        "urgency": 2,
+        "assignment_group": "Workflow L2 Support",
+        "assigned_to": {
+          "consultant_id": "SYNTH-CONS-03",
+          "name": "Synthetic Consultant 3"
+        },
+        "created_at": "2026-10-10T08:00:00",
+        "sla": {
+          "target_response_at": "2026-10-10T12:00",
+          "target_resolution_at": "2026-10-12T08:00",
+          "mock_value": true,
+          "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+        }
+      },
+      "error_message": "Substitution is not supported for this workflow.",
+      "scenario_id": "TS03-HR_ESS-15",
+      "scenario_reference": "WF-0015",
+      "scenario_root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-defined expected cause: substitution is unsupported for workflow Leave Approval (HR-LEAVE-APPROVAL) in the synthetic capability catalogue.",
+        "verified": false
+      },
+      "troubleshooting_steps": [
+        {
+          "step_id": "TS03-15-1",
+          "instruction": "Confirm the source system HR ESS and workflow Leave Approval (HR-LEAVE-APPROVAL).",
+          "expected_observation": "The affected workflow matches the named catalogue entry.",
+          "handling_when_unclear": "Ask the reporter for the task/workflow reference and source system."
+        },
+        {
+          "step_id": "TS03-15-2",
+          "instruction": "Check the source-system catalogue capability for Leave Approval; the synthetic catalogue records substitution as unsupported for this workflow.",
+          "expected_observation": "The exact workflow entry states supports_substitution=false.",
+          "handling_when_unclear": "If the workflow cannot be matched, do not generalize; request source-system support confirmation."
+        },
+        {
+          "step_id": "TS03-15-3",
+          "instruction": "Explain that substitution is not supported for this workflow and refer the user to the source-system support team for an approved alternative.",
+          "expected_observation": "The user receives an authorized support route for alternatives.",
+          "handling_when_unclear": "Do not enable or recommend enabling unsupported functionality."
+        }
+      ],
+      "gateway_role_id": "XX:GATEWAY_HRESS:XX",
+      "backend_role_id": "XX:BACKEND_HRESS:XX",
+      "expected_missing_role_type": null,
+      "workflow_id": "HR-LEAVE-APPROVAL",
+      "requested_language": null,
+      "operational_incident_id": null,
+      "source_task_content_language_only": false,
+      "synthetic_data_notice": "Scenario-defined synthetic expected cause; not a consultant-verified resolution.",
+      "customer_id": "CUST100015"
+    },
+    {
+      "incident_number": "INC100016",
+      "user_information": {
+        "name": "Synthetic User 016",
+        "user_id": "SYNTH_USER_016",
+        "email": "synthetic.user016@example.com"
+      },
+      "category": "Cannot Set Up Substitution",
+      "subcategory": "Cannot Set Up Substitution",
+      "urgency": 3,
+      "impact": 3,
+      "priority": "P3",
+      "status": 2,
+      "short_description": "PM7 — Substitution Setup Issue",
+      "additional_comments": "I cannot set up a substitute approver for the Purchase Request Approval task WF-0016 in Unified Inbox.",
+      "assigned_group": "Workflow L2 Support",
+      "assigned_to": {
+        "consultant_id": "SYNTH-CONS-01",
+        "name": "Synthetic Consultant 1"
+      },
+      "sla": {
+        "target_response_at": "2026-10-08T16:10",
+        "target_resolution_at": "2026-10-10T12:10",
+        "mock_value": true,
+        "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+      },
+      "time": {
+        "created_at": "2026-10-08T12:10:00",
+        "last_updated_at": null,
+        "timestamp_basis": "source timestamp",
+        "timezone": "unspecified_source_local_time"
+      },
+      "notes": [],
+      "priority_rule_state": "synthetic_matrix_assigned",
+      "data_provenance": "synthetic_scenario_expected_unverified",
+      "notes_source": "none_recorded",
+      "attachments": [],
+      "source_system": "PM7",
+      "issue_type": "Cannot Set Up Substitution",
+      "linked_kb_document_ids": [
+        "KB_CANNOT_SET_UP_SUBSTITUTION_PM7"
+      ],
+      "legacy_status": "In Progress",
+      "linked_work_note_ids": [],
+      "linked_communication_ids": [],
+      "linked_historical_case_ids": [],
+      "legacy_fields": {
+        "incident_number": "INC100016",
+        "created_datetime": "2026-10-08T12:10:00",
+        "incident_type": "Enterprise Approval Workflow Support",
+        "summary": "PM7 — Substitution Setup Issue",
+        "system": "PM7",
+        "issue": "Cannot Set Up Substitution",
+        "test": "Substitution is not supported for this workflow.",
+        "test_detail": "Substitution is not supported for this workflow.",
+        "description": "I cannot set up a substitute approver for the Purchase Request Approval task WF-0016 in Unified Inbox.",
+        "category": "Visibility",
+        "subcategory": "Approval Workflow",
+        "status": "In Progress",
+        "priority": "P3",
+        "impact": 3,
+        "urgency": 3,
+        "assignment_group": "Workflow L2 Support",
+        "assigned_to": {
+          "consultant_id": "SYNTH-CONS-01",
+          "name": "Synthetic Consultant 1"
+        },
+        "created_at": "2026-10-08T12:10:00",
+        "sla": {
+          "target_response_at": "2026-10-08T16:10",
+          "target_resolution_at": "2026-10-10T12:10",
+          "mock_value": true,
+          "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+        }
+      },
+      "error_message": "Substitution is not supported for this workflow.",
+      "scenario_id": "TS03-PM7-16",
+      "scenario_reference": "WF-0016",
+      "scenario_root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-defined expected cause: substitution is unsupported for workflow Purchase Request Approval (PM7-PURCHASE-REQUEST-APPROVAL) in the synthetic capability catalogue.",
+        "verified": false
+      },
+      "troubleshooting_steps": [
+        {
+          "step_id": "TS03-16-1",
+          "instruction": "Confirm the source system PM7 and workflow Purchase Request Approval (PM7-PURCHASE-REQUEST-APPROVAL).",
+          "expected_observation": "The affected workflow matches the named catalogue entry.",
+          "handling_when_unclear": "Ask the reporter for the task/workflow reference and source system."
+        },
+        {
+          "step_id": "TS03-16-2",
+          "instruction": "Check the source-system catalogue capability for Purchase Request Approval; the synthetic catalogue records substitution as unsupported for this workflow.",
+          "expected_observation": "The exact workflow entry states supports_substitution=false.",
+          "handling_when_unclear": "If the workflow cannot be matched, do not generalize; request source-system support confirmation."
+        },
+        {
+          "step_id": "TS03-16-3",
+          "instruction": "Explain that substitution is not supported for this workflow and refer the user to the source-system support team for an approved alternative.",
+          "expected_observation": "The user receives an authorized support route for alternatives.",
+          "handling_when_unclear": "Do not enable or recommend enabling unsupported functionality."
+        }
+      ],
+      "gateway_role_id": "XX:GATEWAY_PM7:XX",
+      "backend_role_id": "XX:BACKEND_PM7:XX",
+      "expected_missing_role_type": null,
+      "workflow_id": "PM7-PURCHASE-REQUEST-APPROVAL",
+      "requested_language": null,
+      "operational_incident_id": null,
+      "source_task_content_language_only": false,
+      "synthetic_data_notice": "Scenario-defined synthetic expected cause; not a consultant-verified resolution.",
+      "customer_id": "CUST100016"
+    },
+    {
+      "incident_number": "INC100017",
+      "user_information": {
+        "name": "Synthetic User 017",
+        "user_id": "SYNTH_USER_017",
+        "email": "synthetic.user017@example.com"
+      },
+      "category": "Cannot Set Up Substitution",
+      "subcategory": "Cannot Set Up Substitution",
+      "urgency": 3,
+      "impact": 3,
+      "priority": "P3",
+      "status": 1,
+      "short_description": "bTravel — Substitution Setup Issue",
+      "additional_comments": "I cannot set up a substitute approver for the Travel Expense Approval task WF-0017 in Unified Inbox.",
+      "assigned_group": "Workflow L2 Support",
+      "assigned_to": {
+        "consultant_id": "SYNTH-CONS-02",
+        "name": "Synthetic Consultant 2"
+      },
+      "sla": {
+        "target_response_at": "2026-10-08T17:40",
+        "target_resolution_at": "2026-10-10T13:40",
+        "mock_value": true,
+        "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+      },
+      "time": {
+        "created_at": "2026-10-08T13:40:00",
+        "last_updated_at": null,
+        "timestamp_basis": "source timestamp",
+        "timezone": "unspecified_source_local_time"
+      },
+      "notes": [],
+      "priority_rule_state": "synthetic_matrix_assigned",
+      "data_provenance": "synthetic_scenario_expected_unverified",
+      "notes_source": "none_recorded",
+      "attachments": [],
+      "source_system": "bTravel",
+      "issue_type": "Cannot Set Up Substitution",
+      "linked_kb_document_ids": [
+        "KB_CANNOT_SET_UP_SUBSTITUTION_BTRAVEL"
+      ],
+      "legacy_status": "New",
+      "linked_work_note_ids": [],
+      "linked_communication_ids": [],
+      "linked_historical_case_ids": [],
+      "legacy_fields": {
+        "incident_number": "INC100017",
+        "created_datetime": "2026-10-08T13:40:00",
+        "incident_type": "Enterprise Approval Workflow Support",
+        "summary": "bTravel — Substitution Setup Issue",
+        "system": "bTravel",
+        "issue": "Cannot Set Up Substitution",
+        "test": "Substitution is not supported for this workflow.",
+        "test_detail": "Substitution is not supported for this workflow.",
+        "description": "I cannot set up a substitute approver for the Travel Expense Approval task WF-0017 in Unified Inbox.",
+        "category": "Approval Action",
+        "subcategory": "Approval Workflow",
+        "status": "New",
+        "priority": "P3",
+        "impact": 3,
+        "urgency": 3,
+        "assignment_group": "Workflow L2 Support",
+        "assigned_to": {
+          "consultant_id": "SYNTH-CONS-02",
+          "name": "Synthetic Consultant 2"
+        },
+        "created_at": "2026-10-08T13:40:00",
+        "sla": {
+          "target_response_at": "2026-10-08T17:40",
+          "target_resolution_at": "2026-10-10T13:40",
+          "mock_value": true,
+          "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+        }
+      },
+      "error_message": "Substitution is not supported for this workflow.",
+      "scenario_id": "TS03-BTRAVEL-17",
+      "scenario_reference": "WF-0017",
+      "scenario_root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-defined expected cause: substitution is unsupported for workflow Travel Expense Approval (BTRAVEL-TRAVEL-EXPENSE-APPROVAL) in the synthetic capability catalogue.",
+        "verified": false
+      },
+      "troubleshooting_steps": [
+        {
+          "step_id": "TS03-17-1",
+          "instruction": "Confirm the source system bTravel and workflow Travel Expense Approval (BTRAVEL-TRAVEL-EXPENSE-APPROVAL).",
+          "expected_observation": "The affected workflow matches the named catalogue entry.",
+          "handling_when_unclear": "Ask the reporter for the task/workflow reference and source system."
+        },
+        {
+          "step_id": "TS03-17-2",
+          "instruction": "Check the source-system catalogue capability for Travel Expense Approval; the synthetic catalogue records substitution as unsupported for this workflow.",
+          "expected_observation": "The exact workflow entry states supports_substitution=false.",
+          "handling_when_unclear": "If the workflow cannot be matched, do not generalize; request source-system support confirmation."
+        },
+        {
+          "step_id": "TS03-17-3",
+          "instruction": "Explain that substitution is not supported for this workflow and refer the user to the source-system support team for an approved alternative.",
+          "expected_observation": "The user receives an authorized support route for alternatives.",
+          "handling_when_unclear": "Do not enable or recommend enabling unsupported functionality."
+        }
+      ],
+      "gateway_role_id": "XX:GATEWAY_BTRAVEL:XX",
+      "backend_role_id": "XX:BACKEND_BTRAVEL:XX",
+      "expected_missing_role_type": null,
+      "workflow_id": "BTRAVEL-TRAVEL-EXPENSE-APPROVAL",
+      "requested_language": null,
+      "operational_incident_id": null,
+      "source_task_content_language_only": false,
+      "synthetic_data_notice": "Scenario-defined synthetic expected cause; not a consultant-verified resolution.",
+      "customer_id": "CUST100017"
+    },
+    {
+      "incident_number": "INC100018",
+      "user_information": {
+        "name": "Synthetic User 018",
+        "user_id": "SYNTH_USER_018",
+        "email": "synthetic.user018@example.com"
+      },
+      "category": "Cannot Set Up Substitution",
+      "subcategory": "Cannot Set Up Substitution",
+      "urgency": 2,
+      "impact": 3,
+      "priority": "P2",
+      "status": 2,
+      "short_description": "SAP SD — Substitution Setup Issue",
+      "additional_comments": "I cannot set up a substitute approver for the Sales Order Approval task WF-0018 in Unified Inbox.",
+      "assigned_group": "Workflow L2 Support",
+      "assigned_to": {
+        "consultant_id": "SYNTH-CONS-03",
+        "name": "Synthetic Consultant 3"
+      },
+      "sla": {
+        "target_response_at": "2026-10-09T12:20",
+        "target_resolution_at": "2026-10-11T08:20",
+        "mock_value": true,
+        "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+      },
+      "time": {
+        "created_at": "2026-10-09T08:20:00",
+        "last_updated_at": null,
+        "timestamp_basis": "source timestamp",
+        "timezone": "unspecified_source_local_time"
+      },
+      "notes": [],
+      "priority_rule_state": "synthetic_matrix_assigned",
+      "data_provenance": "synthetic_scenario_expected_unverified",
+      "notes_source": "none_recorded",
+      "attachments": [],
+      "source_system": "SAP SD",
+      "issue_type": "Cannot Set Up Substitution",
+      "linked_kb_document_ids": [
+        "KB_CANNOT_SET_UP_SUBSTITUTION_SAP_SD"
+      ],
+      "legacy_status": "In Progress",
+      "linked_work_note_ids": [],
+      "linked_communication_ids": [],
+      "linked_historical_case_ids": [],
+      "legacy_fields": {
+        "incident_number": "INC100018",
+        "created_datetime": "2026-10-09T08:20:00",
+        "incident_type": "Enterprise Approval Workflow Support",
+        "summary": "SAP SD — Substitution Setup Issue",
+        "system": "SAP SD",
+        "issue": "Cannot Set Up Substitution",
+        "test": "Substitution is not supported for this workflow.",
+        "test_detail": "Substitution is not supported for this workflow.",
+        "description": "I cannot set up a substitute approver for the Sales Order Approval task WF-0018 in Unified Inbox.",
+        "category": "Attachment",
+        "subcategory": "Approval Workflow",
+        "status": "In Progress",
+        "priority": "P2",
+        "impact": 3,
+        "urgency": 2,
+        "assignment_group": "Workflow L2 Support",
+        "assigned_to": {
+          "consultant_id": "SYNTH-CONS-03",
+          "name": "Synthetic Consultant 3"
+        },
+        "created_at": "2026-10-09T08:20:00",
+        "sla": {
+          "target_response_at": "2026-10-09T12:20",
+          "target_resolution_at": "2026-10-11T08:20",
+          "mock_value": true,
+          "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+        }
+      },
+      "error_message": "Substitution is not supported for this workflow.",
+      "scenario_id": "TS03-SAP_SD-18",
+      "scenario_reference": "WF-0018",
+      "scenario_root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-defined expected cause: substitution is unsupported for workflow Sales Order Approval (SAPSD-SALES-ORDER-APPROVAL) in the synthetic capability catalogue.",
+        "verified": false
+      },
+      "troubleshooting_steps": [
+        {
+          "step_id": "TS03-18-1",
+          "instruction": "Confirm the source system SAP SD and workflow Sales Order Approval (SAPSD-SALES-ORDER-APPROVAL).",
+          "expected_observation": "The affected workflow matches the named catalogue entry.",
+          "handling_when_unclear": "Ask the reporter for the task/workflow reference and source system."
+        },
+        {
+          "step_id": "TS03-18-2",
+          "instruction": "Check the source-system catalogue capability for Sales Order Approval; the synthetic catalogue records substitution as unsupported for this workflow.",
+          "expected_observation": "The exact workflow entry states supports_substitution=false.",
+          "handling_when_unclear": "If the workflow cannot be matched, do not generalize; request source-system support confirmation."
+        },
+        {
+          "step_id": "TS03-18-3",
+          "instruction": "Explain that substitution is not supported for this workflow and refer the user to the source-system support team for an approved alternative.",
+          "expected_observation": "The user receives an authorized support route for alternatives.",
+          "handling_when_unclear": "Do not enable or recommend enabling unsupported functionality."
+        }
+      ],
+      "gateway_role_id": "XX:GATEWAY_SD:XX",
+      "backend_role_id": "XX:BACKEND_SD:XX",
+      "expected_missing_role_type": null,
+      "workflow_id": "SAPSD-SALES-ORDER-APPROVAL",
+      "requested_language": null,
+      "operational_incident_id": null,
+      "source_task_content_language_only": false,
+      "synthetic_data_notice": "Scenario-defined synthetic expected cause; not a consultant-verified resolution.",
+      "customer_id": "CUST100018"
+    },
+    {
+      "incident_number": "INC100019",
+      "user_information": {
+        "name": "Synthetic User 019",
+        "user_id": "SYNTH_USER_019",
+        "email": "synthetic.user019@example.com"
+      },
+      "category": "Cannot Set Up Substitution",
+      "subcategory": "Cannot Set Up Substitution",
+      "urgency": 3,
+      "impact": 4,
+      "priority": "P3",
+      "status": 2,
+      "short_description": "HR ESS — Substitution Setup Issue",
+      "additional_comments": "I cannot set up a substitute approver for the Employee Change Approval task WF-0019 in Unified Inbox.",
+      "assigned_group": "Workflow L2 Support",
+      "assigned_to": {
+        "consultant_id": "SYNTH-CONS-01",
+        "name": "Synthetic Consultant 1"
+      },
+      "sla": {
+        "target_response_at": "2026-10-09T14:55",
+        "target_resolution_at": "2026-10-11T10:55",
+        "mock_value": true,
+        "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+      },
+      "time": {
+        "created_at": "2026-10-09T10:55:00",
+        "last_updated_at": null,
+        "timestamp_basis": "source timestamp",
+        "timezone": "unspecified_source_local_time"
+      },
+      "notes": [],
+      "priority_rule_state": "synthetic_matrix_assigned",
+      "data_provenance": "synthetic_scenario_expected_unverified",
+      "notes_source": "none_recorded",
+      "attachments": [],
+      "source_system": "HR ESS",
+      "issue_type": "Cannot Set Up Substitution",
+      "linked_kb_document_ids": [
+        "KB_CANNOT_SET_UP_SUBSTITUTION_HR_ESS"
+      ],
+      "legacy_status": "In Progress",
+      "linked_work_note_ids": [],
+      "linked_communication_ids": [],
+      "linked_historical_case_ids": [],
+      "legacy_fields": {
+        "incident_number": "INC100019",
+        "created_datetime": "2026-10-09T10:55:00",
+        "incident_type": "Enterprise Approval Workflow Support",
+        "summary": "HR ESS — Substitution Setup Issue",
+        "system": "HR ESS",
+        "issue": "Cannot Set Up Substitution",
+        "test": "Substitution is not supported for this workflow.",
+        "test_detail": "Substitution is not supported for this workflow.",
+        "description": "I cannot set up a substitute approver for the Employee Change Approval task WF-0019 in Unified Inbox.",
+        "category": "Substitution",
+        "subcategory": "Approval Workflow",
+        "status": "In Progress",
+        "priority": "P3",
+        "impact": 4,
+        "urgency": 3,
+        "assignment_group": "Workflow L2 Support",
+        "assigned_to": {
+          "consultant_id": "SYNTH-CONS-01",
+          "name": "Synthetic Consultant 1"
+        },
+        "created_at": "2026-10-09T10:55:00",
+        "sla": {
+          "target_response_at": "2026-10-09T14:55",
+          "target_resolution_at": "2026-10-11T10:55",
+          "mock_value": true,
+          "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+        }
+      },
+      "error_message": "Substitution is not supported for this workflow.",
+      "scenario_id": "TS03-HR_ESS-19",
+      "scenario_reference": "WF-0019",
+      "scenario_root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-defined expected cause: substitution is unsupported for workflow Employee Change Approval (HR-EMPLOYEE-CHANGE-APPROVAL) in the synthetic capability catalogue.",
+        "verified": false
+      },
+      "troubleshooting_steps": [
+        {
+          "step_id": "TS03-19-1",
+          "instruction": "Confirm the source system HR ESS and workflow Employee Change Approval (HR-EMPLOYEE-CHANGE-APPROVAL).",
+          "expected_observation": "The affected workflow matches the named catalogue entry.",
+          "handling_when_unclear": "Ask the reporter for the task/workflow reference and source system."
+        },
+        {
+          "step_id": "TS03-19-2",
+          "instruction": "Check the source-system catalogue capability for Employee Change Approval; the synthetic catalogue records substitution as unsupported for this workflow.",
+          "expected_observation": "The exact workflow entry states supports_substitution=false.",
+          "handling_when_unclear": "If the workflow cannot be matched, do not generalize; request source-system support confirmation."
+        },
+        {
+          "step_id": "TS03-19-3",
+          "instruction": "Explain that substitution is not supported for this workflow and refer the user to the source-system support team for an approved alternative.",
+          "expected_observation": "The user receives an authorized support route for alternatives.",
+          "handling_when_unclear": "Do not enable or recommend enabling unsupported functionality."
+        }
+      ],
+      "gateway_role_id": "XX:GATEWAY_HRESS:XX",
+      "backend_role_id": "XX:BACKEND_HRESS:XX",
+      "expected_missing_role_type": null,
+      "workflow_id": "HR-EMPLOYEE-CHANGE-APPROVAL",
+      "requested_language": null,
+      "operational_incident_id": null,
+      "source_task_content_language_only": false,
+      "synthetic_data_notice": "Scenario-defined synthetic expected cause; not a consultant-verified resolution.",
+      "customer_id": "CUST100019"
+    },
+    {
+      "incident_number": "INC100020",
+      "user_information": {
+        "name": "Synthetic User 020",
+        "user_id": "SYNTH_USER_020",
+        "email": "synthetic.user020@example.com"
+      },
+      "category": "Cannot See Specific Language",
+      "subcategory": "Cannot See Specific Language",
+      "urgency": 3,
+      "impact": 3,
+      "priority": "P3",
+      "status": 2,
+      "short_description": "bTravel — Cannot See Specific Language",
+      "additional_comments": "The travel approval TASK-LANG-20 is displayed in Chinese instead of English; English task content is not available in this synthetic scenario.",
+      "assigned_group": "Workflow L2 Support",
+      "assigned_to": {
+        "consultant_id": "SYNTH-CONS-02",
+        "name": "Synthetic Consultant 2"
+      },
+      "sla": {
+        "target_response_at": "2026-10-09T18:15",
+        "target_resolution_at": "2026-10-11T14:15",
+        "mock_value": true,
+        "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+      },
+      "time": {
+        "created_at": "2026-10-09T14:15:00",
+        "last_updated_at": "2026-10-09T17:15",
+        "timestamp_basis": "illustrative synthetic case-history timestamp",
+        "timezone": "unspecified_source_local_time"
+      },
+      "notes": [],
+      "priority_rule_state": "synthetic_matrix_assigned",
+      "data_provenance": "synthetic_scenario_expected_unverified",
+      "notes_source": "work_note_and_resolution_history",
+      "attachments": [],
+      "source_system": "bTravel",
+      "issue_type": "Cannot See Specific Language",
+      "linked_kb_document_ids": [
+        "KB_CANNOT_SEE_SPECIFIC_LANGUAGE_BTRAVEL"
+      ],
+      "legacy_status": "In Progress",
+      "linked_work_note_ids": [],
+      "linked_communication_ids": [],
+      "linked_historical_case_ids": [],
+      "legacy_fields": {
+        "incident_number": "INC100020",
+        "created_datetime": "2026-10-09T14:15:00",
+        "incident_type": "Enterprise Approval Workflow Support",
+        "summary": "bTravel — Cannot See Specific Language",
+        "system": "bTravel",
+        "issue": "Cannot See Specific Language",
+        "test": "English translation is not available for this task.",
+        "test_detail": "English translation is not available for this task.",
+        "description": "The travel approval TASK-LANG-20 is displayed in Chinese instead of English; English task content is not available in this synthetic scenario.",
+        "category": "Approval Action",
+        "subcategory": "Approval Workflow",
+        "status": "In Progress",
+        "priority": "P3",
+        "impact": 3,
+        "urgency": 3,
+        "assignment_group": "Workflow L2 Support",
+        "assigned_to": {
+          "consultant_id": "SYNTH-CONS-02",
+          "name": "Synthetic Consultant 2"
+        },
+        "created_at": "2026-10-09T14:15:00",
+        "sla": {
+          "target_response_at": "2026-10-09T18:15",
+          "target_resolution_at": "2026-10-11T14:15",
+          "mock_value": true,
+          "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+        }
+      },
+      "error_message": "English translation is not available for this task.",
+      "scenario_id": "TS04-BTRAVEL-20",
+      "scenario_reference": "TASK-LANG-20",
+      "scenario_root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-defined expected cause: English is not supported for the source-system task content in this synthetic scenario. This does not describe the Unified Inbox interface language.",
+        "verified": false
+      },
+      "troubleshooting_steps": [
+        {
+          "step_id": "TS04-20-1",
+          "instruction": "Confirm source system bTravel, task TASK-LANG-20, and the requested task-content language English.",
+          "expected_observation": "The source task and requested language are identified.",
+          "handling_when_unclear": "Ask which language is requested and confirm whether the concern is task content or the Unified Inbox interface."
+        },
+        {
+          "step_id": "TS04-20-2",
+          "instruction": "Compare English with the supported task-content language list for bTravel; it is excluded in this synthetic scenario.",
+          "expected_observation": "The catalogue provides the source-system task-content language list.",
+          "handling_when_unclear": "If no source-system list is available, report the limitation and request source-system confirmation."
+        },
+        {
+          "step_id": "TS04-20-3",
+          "instruction": "Offer a language present in the supported list or refer the user to source-system support for an approved alternative.",
+          "expected_observation": "The user selects a documented supported task-content language or receives an approved support route.",
+          "handling_when_unclear": "Do not imply that changing the Unified Inbox UI language translates source-provided task content."
+        }
+      ],
+      "gateway_role_id": "XX:GATEWAY_BTRAVEL:XX",
+      "backend_role_id": "XX:BACKEND_BTRAVEL:XX",
+      "expected_missing_role_type": null,
+      "workflow_id": null,
+      "requested_language": "English",
+      "operational_incident_id": null,
+      "source_task_content_language_only": true,
+      "synthetic_data_notice": "Scenario-defined synthetic expected cause; not a consultant-verified resolution.",
+      "customer_id": "CUST100020"
+    },
+    {
+      "incident_number": "INC100021",
+      "user_information": {
+        "name": "Synthetic User 021",
+        "user_id": "SYNTH_USER_021",
+        "email": "synthetic.user021@example.com"
+      },
+      "category": "Cannot See Specific Language",
+      "subcategory": "Cannot See Specific Language",
+      "urgency": 3,
+      "impact": 3,
+      "priority": "P3",
+      "status": 2,
+      "short_description": "SAP MM — Cannot See Specific Language",
+      "additional_comments": "The approval task TASK-LANG-21 is displayed in a language the employee did not request; the employee requested French task content.",
+      "assigned_group": "Workflow L2 Support",
+      "assigned_to": {
+        "consultant_id": "SYNTH-CONS-03",
+        "name": "Synthetic Consultant 3"
+      },
+      "sla": {
+        "target_response_at": "2026-10-10T12:05",
+        "target_resolution_at": "2026-10-12T08:05",
+        "mock_value": true,
+        "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+      },
+      "time": {
+        "created_at": "2026-10-10T08:05:00",
+        "last_updated_at": null,
+        "timestamp_basis": "source timestamp",
+        "timezone": "unspecified_source_local_time"
+      },
+      "notes": [],
+      "priority_rule_state": "synthetic_matrix_assigned",
+      "data_provenance": "synthetic_scenario_expected_unverified",
+      "notes_source": "work_note_and_resolution_history",
+      "attachments": [],
+      "source_system": "SAP MM",
+      "issue_type": "Cannot See Specific Language",
+      "linked_kb_document_ids": [
+        "KB_CANNOT_SEE_SPECIFIC_LANGUAGE_SAP_MM"
+      ],
+      "legacy_status": "In Progress",
+      "linked_work_note_ids": [],
+      "linked_communication_ids": [],
+      "linked_historical_case_ids": [],
+      "legacy_fields": {
+        "incident_number": "INC100021",
+        "created_datetime": "2026-10-10T08:05:00",
+        "incident_type": "Enterprise Approval Workflow Support",
+        "summary": "SAP MM — Cannot See Specific Language",
+        "system": "SAP MM",
+        "issue": "Cannot See Specific Language",
+        "test": "French translation is not available for this task.",
+        "test_detail": "French translation is not available for this task.",
+        "description": "The approval task TASK-LANG-21 is displayed in a language the employee did not request; the employee requested French task content.",
+        "category": "Approval Action",
+        "subcategory": "Approval Workflow",
+        "status": "In Progress",
+        "priority": "P3",
+        "impact": 3,
+        "urgency": 3,
+        "assignment_group": "Workflow L2 Support",
+        "assigned_to": {
+          "consultant_id": "SYNTH-CONS-03",
+          "name": "Synthetic Consultant 3"
+        },
+        "created_at": "2026-10-10T08:05:00",
+        "sla": {
+          "target_response_at": "2026-10-10T12:05",
+          "target_resolution_at": "2026-10-12T08:05",
+          "mock_value": true,
+          "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+        }
+      },
+      "error_message": "French translation is not available for this task.",
+      "scenario_id": "TS04-SAP_MM-21",
+      "scenario_reference": "TASK-LANG-21",
+      "scenario_root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-defined expected cause: French is not supported for the source-system task content in this synthetic scenario. This does not describe the Unified Inbox interface language.",
+        "verified": false
+      },
+      "troubleshooting_steps": [
+        {
+          "step_id": "TS04-21-1",
+          "instruction": "Confirm source system SAP MM, task TASK-LANG-21, and the requested task-content language French.",
+          "expected_observation": "The source task and requested language are identified.",
+          "handling_when_unclear": "Ask which language is requested and confirm whether the concern is task content or the Unified Inbox interface."
+        },
+        {
+          "step_id": "TS04-21-2",
+          "instruction": "Compare French with the supported task-content language list for SAP MM; it is excluded in this synthetic scenario.",
+          "expected_observation": "The catalogue provides the source-system task-content language list.",
+          "handling_when_unclear": "If no source-system list is available, report the limitation and request source-system confirmation."
+        },
+        {
+          "step_id": "TS04-21-3",
+          "instruction": "Offer a language present in the supported list or refer the user to source-system support for an approved alternative.",
+          "expected_observation": "The user selects a documented supported task-content language or receives an approved support route.",
+          "handling_when_unclear": "Do not imply that changing the Unified Inbox UI language translates source-provided task content."
+        }
+      ],
+      "gateway_role_id": "XX:GATEWAY_MM:XX",
+      "backend_role_id": "XX:BACKEND_MM:XX",
+      "expected_missing_role_type": null,
+      "workflow_id": null,
+      "requested_language": "French",
+      "operational_incident_id": null,
+      "source_task_content_language_only": true,
+      "synthetic_data_notice": "Scenario-defined synthetic expected cause; not a consultant-verified resolution.",
+      "customer_id": "CUST100021"
+    },
+    {
+      "incident_number": "INC100022",
+      "user_information": {
+        "name": "Synthetic User 022",
+        "user_id": "SYNTH_USER_022",
+        "email": "synthetic.user022@example.com"
+      },
+      "category": "Cannot See Specific Language",
+      "subcategory": "Cannot See Specific Language",
+      "urgency": 2,
+      "impact": 2,
+      "priority": "P2",
+      "status": 2,
+      "short_description": "SAP FI/CO — Cannot See Specific Language",
+      "additional_comments": "The approval task TASK-LANG-22 is displayed in a language the employee did not request; the employee requested Vietnamese task content.",
+      "assigned_group": "Workflow L2 Support",
+      "assigned_to": {
+        "consultant_id": "SYNTH-CONS-01",
+        "name": "Synthetic Consultant 1"
+      },
+      "sla": {
+        "target_response_at": "2026-10-10T13:35",
+        "target_resolution_at": "2026-10-12T09:35",
+        "mock_value": true,
+        "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+      },
+      "time": {
+        "created_at": "2026-10-10T09:35:00",
+        "last_updated_at": "2026-10-10T12:35",
+        "timestamp_basis": "illustrative synthetic case-history timestamp",
+        "timezone": "unspecified_source_local_time"
+      },
+      "notes": [],
+      "priority_rule_state": "synthetic_matrix_assigned",
+      "data_provenance": "synthetic_scenario_expected_unverified",
+      "notes_source": "work_note_and_resolution_history",
+      "attachments": [],
+      "source_system": "SAP FI/CO",
+      "issue_type": "Cannot See Specific Language",
+      "linked_kb_document_ids": [
+        "KB_CANNOT_SEE_SPECIFIC_LANGUAGE_SAP_FICO"
+      ],
+      "legacy_status": "In Progress",
+      "linked_work_note_ids": [],
+      "linked_communication_ids": [],
+      "linked_historical_case_ids": [],
+      "legacy_fields": {
+        "incident_number": "INC100022",
+        "created_datetime": "2026-10-10T09:35:00",
+        "incident_type": "Enterprise Approval Workflow Support",
+        "summary": "SAP FI/CO — Cannot See Specific Language",
+        "system": "SAP FI/CO",
+        "issue": "Cannot See Specific Language",
+        "test": "Vietnamese translation is not available for this task.",
+        "test_detail": "Vietnamese translation is not available for this task.",
+        "description": "The approval task TASK-LANG-22 is displayed in a language the employee did not request; the employee requested Vietnamese task content.",
+        "category": "Visibility",
+        "subcategory": "Approval Workflow",
+        "status": "In Progress",
+        "priority": "P2",
+        "impact": 2,
+        "urgency": 2,
+        "assignment_group": "Workflow L2 Support",
+        "assigned_to": {
+          "consultant_id": "SYNTH-CONS-01",
+          "name": "Synthetic Consultant 1"
+        },
+        "created_at": "2026-10-10T09:35:00",
+        "sla": {
+          "target_response_at": "2026-10-10T13:35",
+          "target_resolution_at": "2026-10-12T09:35",
+          "mock_value": true,
+          "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+        }
+      },
+      "error_message": "Vietnamese translation is not available for this task.",
+      "scenario_id": "TS04-SAP_FICO-22",
+      "scenario_reference": "TASK-LANG-22",
+      "scenario_root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-defined expected cause: Vietnamese is not supported for the source-system task content in this synthetic scenario. This does not describe the Unified Inbox interface language.",
+        "verified": false
+      },
+      "troubleshooting_steps": [
+        {
+          "step_id": "TS04-22-1",
+          "instruction": "Confirm source system SAP FI/CO, task TASK-LANG-22, and the requested task-content language Vietnamese.",
+          "expected_observation": "The source task and requested language are identified.",
+          "handling_when_unclear": "Ask which language is requested and confirm whether the concern is task content or the Unified Inbox interface."
+        },
+        {
+          "step_id": "TS04-22-2",
+          "instruction": "Compare Vietnamese with the supported task-content language list for SAP FI/CO; it is excluded in this synthetic scenario.",
+          "expected_observation": "The catalogue provides the source-system task-content language list.",
+          "handling_when_unclear": "If no source-system list is available, report the limitation and request source-system confirmation."
+        },
+        {
+          "step_id": "TS04-22-3",
+          "instruction": "Offer a language present in the supported list or refer the user to source-system support for an approved alternative.",
+          "expected_observation": "The user selects a documented supported task-content language or receives an approved support route.",
+          "handling_when_unclear": "Do not imply that changing the Unified Inbox UI language translates source-provided task content."
+        }
+      ],
+      "gateway_role_id": "XX:GATEWAY_FICO:XX",
+      "backend_role_id": "XX:BACKEND_FICO:XX",
+      "expected_missing_role_type": null,
+      "workflow_id": null,
+      "requested_language": "Vietnamese",
+      "operational_incident_id": null,
+      "source_task_content_language_only": true,
+      "synthetic_data_notice": "Scenario-defined synthetic expected cause; not a consultant-verified resolution.",
+      "customer_id": "CUST100022"
+    },
+    {
+      "incident_number": "INC100023",
+      "user_information": {
+        "name": "Synthetic User 023",
+        "user_id": "SYNTH_USER_023",
+        "email": "synthetic.user023@example.com"
+      },
+      "category": "Cannot See Specific Language",
+      "subcategory": "Cannot See Specific Language",
+      "urgency": 3,
+      "impact": 4,
+      "priority": "P3",
+      "status": 2,
+      "short_description": "SAP SD — Cannot See Specific Language",
+      "additional_comments": "The approval task TASK-LANG-23 is displayed in a language the employee did not request; the employee requested Japanese task content.",
+      "assigned_group": "Workflow L2 Support",
+      "assigned_to": {
+        "consultant_id": "SYNTH-CONS-02",
+        "name": "Synthetic Consultant 2"
+      },
+      "sla": {
+        "target_response_at": "2026-10-10T15:25",
+        "target_resolution_at": "2026-10-12T11:25",
+        "mock_value": true,
+        "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+      },
+      "time": {
+        "created_at": "2026-10-10T11:25:00",
+        "last_updated_at": null,
+        "timestamp_basis": "source timestamp",
+        "timezone": "unspecified_source_local_time"
+      },
+      "notes": [],
+      "priority_rule_state": "synthetic_matrix_assigned",
+      "data_provenance": "synthetic_scenario_expected_unverified",
+      "notes_source": "work_note_and_resolution_history",
+      "attachments": [],
+      "source_system": "SAP SD",
+      "issue_type": "Cannot See Specific Language",
+      "linked_kb_document_ids": [
+        "KB_CANNOT_SEE_SPECIFIC_LANGUAGE_SAP_SD"
+      ],
+      "legacy_status": "In Progress",
+      "linked_work_note_ids": [],
+      "linked_communication_ids": [],
+      "linked_historical_case_ids": [],
+      "legacy_fields": {
+        "incident_number": "INC100023",
+        "created_datetime": "2026-10-10T11:25:00",
+        "incident_type": "Enterprise Approval Workflow Support",
+        "summary": "SAP SD — Cannot See Specific Language",
+        "system": "SAP SD",
+        "issue": "Cannot See Specific Language",
+        "test": "Japanese translation is not available for this task.",
+        "test_detail": "Japanese translation is not available for this task.",
+        "description": "The approval task TASK-LANG-23 is displayed in a language the employee did not request; the employee requested Japanese task content.",
+        "category": "Workflow Execution",
+        "subcategory": "Approval Workflow",
+        "status": "In Progress",
+        "priority": "P3",
+        "impact": 4,
+        "urgency": 3,
+        "assignment_group": "Workflow L2 Support",
+        "assigned_to": {
+          "consultant_id": "SYNTH-CONS-02",
+          "name": "Synthetic Consultant 2"
+        },
+        "created_at": "2026-10-10T11:25:00",
+        "sla": {
+          "target_response_at": "2026-10-10T15:25",
+          "target_resolution_at": "2026-10-12T11:25",
+          "mock_value": true,
+          "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+        }
+      },
+      "error_message": "Japanese translation is not available for this task.",
+      "scenario_id": "TS04-SAP_SD-23",
+      "scenario_reference": "TASK-LANG-23",
+      "scenario_root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-defined expected cause: Japanese is not supported for the source-system task content in this synthetic scenario. This does not describe the Unified Inbox interface language.",
+        "verified": false
+      },
+      "troubleshooting_steps": [
+        {
+          "step_id": "TS04-23-1",
+          "instruction": "Confirm source system SAP SD, task TASK-LANG-23, and the requested task-content language Japanese.",
+          "expected_observation": "The source task and requested language are identified.",
+          "handling_when_unclear": "Ask which language is requested and confirm whether the concern is task content or the Unified Inbox interface."
+        },
+        {
+          "step_id": "TS04-23-2",
+          "instruction": "Compare Japanese with the supported task-content language list for SAP SD; it is excluded in this synthetic scenario.",
+          "expected_observation": "The catalogue provides the source-system task-content language list.",
+          "handling_when_unclear": "If no source-system list is available, report the limitation and request source-system confirmation."
+        },
+        {
+          "step_id": "TS04-23-3",
+          "instruction": "Offer a language present in the supported list or refer the user to source-system support for an approved alternative.",
+          "expected_observation": "The user selects a documented supported task-content language or receives an approved support route.",
+          "handling_when_unclear": "Do not imply that changing the Unified Inbox UI language translates source-provided task content."
+        }
+      ],
+      "gateway_role_id": "XX:GATEWAY_SD:XX",
+      "backend_role_id": "XX:BACKEND_SD:XX",
+      "expected_missing_role_type": null,
+      "workflow_id": null,
+      "requested_language": "Japanese",
+      "operational_incident_id": null,
+      "source_task_content_language_only": true,
+      "synthetic_data_notice": "Scenario-defined synthetic expected cause; not a consultant-verified resolution.",
+      "customer_id": "CUST100023"
+    },
+    {
+      "incident_number": "INC100024",
+      "user_information": {
+        "name": "Synthetic User 024",
+        "user_id": "SYNTH_USER_024",
+        "email": "synthetic.user024@example.com"
+      },
+      "category": "Cannot See Specific Language",
+      "subcategory": "Cannot See Specific Language",
+      "urgency": 3,
+      "impact": 3,
+      "priority": "P3",
+      "status": 2,
+      "short_description": "PM7 — Cannot See Specific Language",
+      "additional_comments": "The approval task TASK-LANG-24 is displayed in a language the employee did not request; the employee requested Korean task content.",
+      "assigned_group": "Workflow L2 Support",
+      "assigned_to": {
+        "consultant_id": "SYNTH-CONS-03",
+        "name": "Synthetic Consultant 3"
+      },
+      "sla": {
+        "target_response_at": "2026-10-11T12:50",
+        "target_resolution_at": "2026-10-13T08:50",
+        "mock_value": true,
+        "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+      },
+      "time": {
+        "created_at": "2026-10-11T08:50:00",
+        "last_updated_at": "2026-10-11T11:50",
+        "timestamp_basis": "illustrative synthetic case-history timestamp",
+        "timezone": "unspecified_source_local_time"
+      },
+      "notes": [],
+      "priority_rule_state": "synthetic_matrix_assigned",
+      "data_provenance": "synthetic_scenario_expected_unverified",
+      "notes_source": "work_note_and_resolution_history",
+      "attachments": [],
+      "source_system": "PM7",
+      "issue_type": "Cannot See Specific Language",
+      "linked_kb_document_ids": [
+        "KB_CANNOT_SEE_SPECIFIC_LANGUAGE_PM7"
+      ],
+      "legacy_status": "In Progress",
+      "linked_work_note_ids": [],
+      "linked_communication_ids": [],
+      "linked_historical_case_ids": [],
+      "legacy_fields": {
+        "incident_number": "INC100024",
+        "created_datetime": "2026-10-11T08:50:00",
+        "incident_type": "Enterprise Approval Workflow Support",
+        "summary": "PM7 — Cannot See Specific Language",
+        "system": "PM7",
+        "issue": "Cannot See Specific Language",
+        "test": "Korean translation is not available for this task.",
+        "test_detail": "Korean translation is not available for this task.",
+        "description": "The approval task TASK-LANG-24 is displayed in a language the employee did not request; the employee requested Korean task content.",
+        "category": "Approval Action",
+        "subcategory": "Approval Workflow",
+        "status": "In Progress",
+        "priority": "P3",
+        "impact": 3,
+        "urgency": 3,
+        "assignment_group": "Workflow L2 Support",
+        "assigned_to": {
+          "consultant_id": "SYNTH-CONS-03",
+          "name": "Synthetic Consultant 3"
+        },
+        "created_at": "2026-10-11T08:50:00",
+        "sla": {
+          "target_response_at": "2026-10-11T12:50",
+          "target_resolution_at": "2026-10-13T08:50",
+          "mock_value": true,
+          "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+        }
+      },
+      "error_message": "Korean translation is not available for this task.",
+      "scenario_id": "TS04-PM7-24",
+      "scenario_reference": "TASK-LANG-24",
+      "scenario_root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-defined expected cause: Korean is not supported for the source-system task content in this synthetic scenario. This does not describe the Unified Inbox interface language.",
+        "verified": false
+      },
+      "troubleshooting_steps": [
+        {
+          "step_id": "TS04-24-1",
+          "instruction": "Confirm source system PM7, task TASK-LANG-24, and the requested task-content language Korean.",
+          "expected_observation": "The source task and requested language are identified.",
+          "handling_when_unclear": "Ask which language is requested and confirm whether the concern is task content or the Unified Inbox interface."
+        },
+        {
+          "step_id": "TS04-24-2",
+          "instruction": "Compare Korean with the supported task-content language list for PM7; it is excluded in this synthetic scenario.",
+          "expected_observation": "The catalogue provides the source-system task-content language list.",
+          "handling_when_unclear": "If no source-system list is available, report the limitation and request source-system confirmation."
+        },
+        {
+          "step_id": "TS04-24-3",
+          "instruction": "Offer a language present in the supported list or refer the user to source-system support for an approved alternative.",
+          "expected_observation": "The user selects a documented supported task-content language or receives an approved support route.",
+          "handling_when_unclear": "Do not imply that changing the Unified Inbox UI language translates source-provided task content."
+        }
+      ],
+      "gateway_role_id": "XX:GATEWAY_PM7:XX",
+      "backend_role_id": "XX:BACKEND_PM7:XX",
+      "expected_missing_role_type": null,
+      "workflow_id": null,
+      "requested_language": "Korean",
+      "operational_incident_id": null,
+      "source_task_content_language_only": true,
+      "synthetic_data_notice": "Scenario-defined synthetic expected cause; not a consultant-verified resolution.",
+      "customer_id": "CUST100024"
+    },
+    {
+      "incident_number": "INC100025",
+      "user_information": {
+        "name": "Synthetic User 025",
+        "user_id": "SYNTH_USER_025",
+        "email": "synthetic.user025@example.com"
+      },
+      "category": "Cannot See Specific Language",
+      "subcategory": "Cannot See Specific Language",
+      "urgency": 3,
+      "impact": 3,
+      "priority": "P3",
+      "status": 2,
+      "short_description": "HR ESS — Cannot See Specific Language",
+      "additional_comments": "The approval task TASK-LANG-25 is displayed in a language the employee did not request; the employee requested Spanish task content.",
+      "assigned_group": "Workflow L2 Support",
+      "assigned_to": {
+        "consultant_id": "SYNTH-CONS-01",
+        "name": "Synthetic Consultant 1"
+      },
+      "sla": {
+        "target_response_at": "2026-10-11T14:30",
+        "target_resolution_at": "2026-10-13T10:30",
+        "mock_value": true,
+        "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+      },
+      "time": {
+        "created_at": "2026-10-11T10:30:00",
+        "last_updated_at": null,
+        "timestamp_basis": "source timestamp",
+        "timezone": "unspecified_source_local_time"
+      },
+      "notes": [],
+      "priority_rule_state": "synthetic_matrix_assigned",
+      "data_provenance": "synthetic_scenario_expected_unverified",
+      "notes_source": "work_note_and_resolution_history",
+      "attachments": [],
+      "source_system": "HR ESS",
+      "issue_type": "Cannot See Specific Language",
+      "linked_kb_document_ids": [
+        "KB_CANNOT_SEE_SPECIFIC_LANGUAGE_HR_ESS"
+      ],
+      "legacy_status": "In Progress",
+      "linked_work_note_ids": [],
+      "linked_communication_ids": [],
+      "linked_historical_case_ids": [],
+      "legacy_fields": {
+        "incident_number": "INC100025",
+        "created_datetime": "2026-10-11T10:30:00",
+        "incident_type": "Enterprise Approval Workflow Support",
+        "summary": "HR ESS — Cannot See Specific Language",
+        "system": "HR ESS",
+        "issue": "Cannot See Specific Language",
+        "test": "Spanish translation is not available for this task.",
+        "test_detail": "Spanish translation is not available for this task.",
+        "description": "The approval task TASK-LANG-25 is displayed in a language the employee did not request; the employee requested Spanish task content.",
+        "category": "Document Retrieval",
+        "subcategory": "Approval Workflow",
+        "status": "In Progress",
+        "priority": "P3",
+        "impact": 3,
+        "urgency": 3,
+        "assignment_group": "Workflow L2 Support",
+        "assigned_to": {
+          "consultant_id": "SYNTH-CONS-01",
+          "name": "Synthetic Consultant 1"
+        },
+        "created_at": "2026-10-11T10:30:00",
+        "sla": {
+          "target_response_at": "2026-10-11T14:30",
+          "target_resolution_at": "2026-10-13T10:30",
+          "mock_value": true,
+          "policy_note": "Synthetic illustrative targets only; no verified Bosch SLA. Do not infer breached/on-track without configured business hours."
+        }
+      },
+      "error_message": "Spanish translation is not available for this task.",
+      "scenario_id": "TS04-HR_ESS-25",
+      "scenario_reference": "TASK-LANG-25",
+      "scenario_root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-defined expected cause: Spanish is not supported for the source-system task content in this synthetic scenario. This does not describe the Unified Inbox interface language.",
+        "verified": false
+      },
+      "troubleshooting_steps": [
+        {
+          "step_id": "TS04-25-1",
+          "instruction": "Confirm source system HR ESS, task TASK-LANG-25, and the requested task-content language Spanish.",
+          "expected_observation": "The source task and requested language are identified.",
+          "handling_when_unclear": "Ask which language is requested and confirm whether the concern is task content or the Unified Inbox interface."
+        },
+        {
+          "step_id": "TS04-25-2",
+          "instruction": "Compare Spanish with the supported task-content language list for HR ESS; it is excluded in this synthetic scenario.",
+          "expected_observation": "The catalogue provides the source-system task-content language list.",
+          "handling_when_unclear": "If no source-system list is available, report the limitation and request source-system confirmation."
+        },
+        {
+          "step_id": "TS04-25-3",
+          "instruction": "Offer a language present in the supported list or refer the user to source-system support for an approved alternative.",
+          "expected_observation": "The user selects a documented supported task-content language or receives an approved support route.",
+          "handling_when_unclear": "Do not imply that changing the Unified Inbox UI language translates source-provided task content."
+        }
+      ],
+      "gateway_role_id": "XX:GATEWAY_HRESS:XX",
+      "backend_role_id": "XX:BACKEND_HRESS:XX",
+      "expected_missing_role_type": null,
+      "workflow_id": null,
+      "requested_language": "Spanish",
+      "operational_incident_id": null,
+      "source_task_content_language_only": true,
+      "synthetic_data_notice": "Scenario-defined synthetic expected cause; not a consultant-verified resolution.",
+      "customer_id": "CUST100025"
     }
   ]
 }

@@ -1,0 +1,12 @@
+{
+  "consultant": [
+    {
+      "consultant_id": "SYNTH-L2-01",
+      "location": "Ho Chi Minh City, Vietnam",
+      "timezone": "Asia/Ho_Chi_Minh",
+      "working_hours_start": "09:00",
+      "working_hours_end": "18:00",
+      "record_type": "synthetic_demo"
+    }
+  ]
+}

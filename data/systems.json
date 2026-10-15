@@ -1,0 +1,187 @@
+{
+  "synthetic_data_notice": "Six synthetic source-system catalogue entries. Unified Inbox is the consumer interface, not a source system.",
+  "systems": [
+    {
+      "system_id": "PM7",
+      "source_system": "PM7",
+      "system_type": "source_system",
+      "description": "Source-system reference for Unified Inbox approval workflows. PM7 is the workflow source; Unified Inbox is the consuming interface.",
+      "timezone": "Europe/Berlin",
+      "configured_gateway_role_ids": [
+        "XX:GATEWAY_PM7:XX"
+      ],
+      "configured_backend_role_ids": [
+        "XX:BACKEND_PM7:XX"
+      ],
+      "supported_task_content_languages": [
+        "German",
+        "Chinese",
+        "English"
+      ],
+      "workflow_capabilities": [
+        {
+          "workflow_id": "PM7-PURCHASE-REQUEST-APPROVAL",
+          "workflow_name": "Purchase Request Approval",
+          "supports_substitution": false,
+          "evidence_state": "synthetic_catalogue_entry",
+          "limitations": [
+            "Applies only to this named workflow reference.",
+            "Does not establish capability for other workflows or a real system."
+          ]
+        }
+      ],
+      "catalogue_status": "synthetic_demo_catalogue",
+      "synthetic_data_notice": "Synthetic demo metadata; not verified product behavior."
+    },
+    {
+      "system_id": "SAP_MM",
+      "source_system": "SAP MM",
+      "system_type": "SAP_module",
+      "description": "Source-system reference for Unified Inbox approval workflows. SAP MM is the workflow source; Unified Inbox is the consuming interface.",
+      "timezone": "Europe/Berlin",
+      "configured_gateway_role_ids": [
+        "XX:GATEWAY_MM:XX"
+      ],
+      "configured_backend_role_ids": [
+        "XX:BACKEND_MM:XX"
+      ],
+      "supported_task_content_languages": [
+        "English",
+        "German",
+        "Chinese"
+      ],
+      "workflow_capabilities": [],
+      "catalogue_status": "synthetic_demo_catalogue",
+      "synthetic_data_notice": "Synthetic demo metadata; not verified product behavior."
+    },
+    {
+      "system_id": "SAP_FICO",
+      "source_system": "SAP FI/CO",
+      "system_type": "SAP_module",
+      "description": "Source-system reference for Unified Inbox approval workflows. SAP FI/CO is the workflow source; Unified Inbox is the consuming interface.",
+      "timezone": "Europe/Berlin",
+      "configured_gateway_role_ids": [
+        "XX:GATEWAY_FICO:XX"
+      ],
+      "configured_backend_role_ids": [
+        "XX:BACKEND_FICO:XX"
+      ],
+      "supported_task_content_languages": [
+        "English",
+        "German",
+        "French",
+        "Chinese"
+      ],
+      "workflow_capabilities": [],
+      "catalogue_status": "synthetic_demo_catalogue",
+      "synthetic_data_notice": "Synthetic demo metadata; not verified product behavior."
+    },
+    {
+      "system_id": "BTRAVEL",
+      "source_system": "bTravel",
+      "system_type": "enterprise_application",
+      "description": "Source-system reference for Unified Inbox approval workflows. bTravel is the workflow source; Unified Inbox is the consuming interface.",
+      "timezone": "Europe/Berlin",
+      "configured_gateway_role_ids": [
+        "XX:GATEWAY_BTRAVEL:XX"
+      ],
+      "configured_backend_role_ids": [
+        "XX:BACKEND_BTRAVEL:XX"
+      ],
+      "supported_task_content_languages": [
+        "Chinese",
+        "German"
+      ],
+      "workflow_capabilities": [
+        {
+          "workflow_id": "BTRAVEL-TRAVEL-EXPENSE-APPROVAL",
+          "workflow_name": "Travel Expense Approval",
+          "supports_substitution": false,
+          "evidence_state": "synthetic_catalogue_entry",
+          "limitations": [
+            "Applies only to this named workflow reference.",
+            "Does not establish capability for other workflows or a real system."
+          ]
+        }
+      ],
+      "catalogue_status": "synthetic_demo_catalogue",
+      "synthetic_data_notice": "Synthetic demo metadata; not verified product behavior."
+    },
+    {
+      "system_id": "HR_ESS",
+      "source_system": "HR ESS",
+      "system_type": "enterprise_application",
+      "description": "Source-system reference for Unified Inbox approval workflows. HR ESS is the workflow source; Unified Inbox is the consuming interface.",
+      "timezone": "Europe/Berlin",
+      "configured_gateway_role_ids": [
+        "XX:GATEWAY_HRESS:XX"
+      ],
+      "configured_backend_role_ids": [
+        "XX:BACKEND_HRESS:XX"
+      ],
+      "supported_task_content_languages": [
+        "English",
+        "German",
+        "Chinese",
+        "French"
+      ],
+      "workflow_capabilities": [
+        {
+          "workflow_id": "HR-LEAVE-APPROVAL",
+          "workflow_name": "Leave Approval",
+          "supports_substitution": false,
+          "evidence_state": "synthetic_catalogue_entry",
+          "limitations": [
+            "Applies only to this named workflow reference.",
+            "Does not establish capability for other workflows or a real system."
+          ]
+        },
+        {
+          "workflow_id": "HR-EMPLOYEE-CHANGE-APPROVAL",
+          "workflow_name": "Employee Change Approval",
+          "supports_substitution": false,
+          "evidence_state": "synthetic_catalogue_entry",
+          "limitations": [
+            "Applies only to this named workflow reference.",
+            "Does not establish capability for other workflows or a real system."
+          ]
+        }
+      ],
+      "catalogue_status": "synthetic_demo_catalogue",
+      "synthetic_data_notice": "Synthetic demo metadata; not verified product behavior."
+    },
+    {
+      "system_id": "SAP_SD",
+      "source_system": "SAP SD",
+      "system_type": "SAP_module",
+      "description": "Source-system reference for Unified Inbox approval workflows. SAP SD is the workflow source; Unified Inbox is the consuming interface.",
+      "timezone": "Europe/Berlin",
+      "configured_gateway_role_ids": [
+        "XX:GATEWAY_SD:XX"
+      ],
+      "configured_backend_role_ids": [
+        "XX:BACKEND_SD:XX"
+      ],
+      "supported_task_content_languages": [
+        "English",
+        "German",
+        "French",
+        "Chinese"
+      ],
+      "workflow_capabilities": [
+        {
+          "workflow_id": "SAPSD-SALES-ORDER-APPROVAL",
+          "workflow_name": "Sales Order Approval",
+          "supports_substitution": false,
+          "evidence_state": "synthetic_catalogue_entry",
+          "limitations": [
+            "Applies only to this named workflow reference.",
+            "Does not establish capability for other workflows or a real system."
+          ]
+        }
+      ],
+      "catalogue_status": "synthetic_demo_catalogue",
+      "synthetic_data_notice": "Synthetic demo metadata; not verified product behavior."
+    }
+  ]
+}

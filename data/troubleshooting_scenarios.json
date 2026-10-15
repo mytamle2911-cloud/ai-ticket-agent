@@ -1,0 +1,1181 @@
+{
+  "simulation_timestamp": "2026-10-14T10:30:00+02:00",
+  "simulation_timezone": "Europe/Berlin",
+  "synthetic_scenarios": [
+    {
+      "scenario_id": "TS01-PM7-01",
+      "scenario_type": "Task Not Visible",
+      "source_status": "synthetic_scenario_expected",
+      "source_system": "PM7",
+      "issue_type": "Task Not Visible",
+      "error_signature": "N/A — No error displayed",
+      "required_ticket_reference": "PR-1001",
+      "scenario_context_key": "Gateway",
+      "expected_missing_role_type": "Gateway",
+      "gateway_role_id": "XX:GATEWAY_PM7:XX",
+      "backend_role_id": "XX:BACKEND_PM7:XX",
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": null,
+      "root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-based expected cause: the required Gateway role may be missing or unavailable for this workflow. The user's current role assignments have not been independently verified.",
+        "verified": false
+      },
+      "recommended_actions": [
+        {
+          "step_id": "TS01-1-1",
+          "instruction": "Confirm source system PM7 and affected task PR-1001 with the reporter.",
+          "expected_observation": "The reporter confirms the source system and exact approval-task reference.",
+          "handling_when_unclear": "Ask for the task reference and source system before proceeding."
+        },
+        {
+          "step_id": "TS01-1-2",
+          "instruction": "Compare the user's current assignments with the configured Gateway role XX:GATEWAY_PM7:XX and Backend role XX:BACKEND_PM7:XX.",
+          "expected_observation": "The authorized access process provides current assignments for comparison.",
+          "handling_when_unclear": "State that assignments are unverified; request an authorized role check."
+        },
+        {
+          "step_id": "TS01-1-3",
+          "instruction": "If the authorized check confirms the scenario-relevant Gateway role is absent, direct the user to request XX:GATEWAY_PM7:XX through the approved access-management process; then retest task PR-1001.",
+          "expected_observation": "The user can see task PR-1001 after an authorized change, if one is approved and completed.",
+          "handling_when_unclear": "Do not request or grant access from this prototype; escalate through the established access process."
+        }
+      ],
+      "verification_instruction": "The user can see task PR-1001 after an authorized change, if one is approved and completed.",
+      "limitations": [
+        "Scenario-defined expectation only; no live system or user assignment was checked.",
+        "Actions are recommendations; no access, system, ticket, or workflow changes are performed."
+      ],
+      "synthetic_data_notice": "Synthetic demo scenario; not verified production behavior."
+    },
+    {
+      "scenario_id": "TS01-SAP_MM-02",
+      "scenario_type": "Task Not Visible",
+      "source_status": "synthetic_scenario_expected",
+      "source_system": "SAP MM",
+      "issue_type": "Task Not Visible",
+      "error_signature": "N/A — No error displayed",
+      "required_ticket_reference": "PO-2045",
+      "scenario_context_key": "Backend",
+      "expected_missing_role_type": "Backend",
+      "gateway_role_id": "XX:GATEWAY_MM:XX",
+      "backend_role_id": "XX:BACKEND_MM:XX",
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": null,
+      "root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-based expected cause: the required Backend role may be missing or unavailable for this workflow. The user's current role assignments have not been independently verified.",
+        "verified": false
+      },
+      "recommended_actions": [
+        {
+          "step_id": "TS01-2-1",
+          "instruction": "Confirm source system SAP MM and affected task PO-2045 with the reporter.",
+          "expected_observation": "The reporter confirms the source system and exact approval-task reference.",
+          "handling_when_unclear": "Ask for the task reference and source system before proceeding."
+        },
+        {
+          "step_id": "TS01-2-2",
+          "instruction": "Compare the user's current assignments with the configured Gateway role XX:GATEWAY_MM:XX and Backend role XX:BACKEND_MM:XX.",
+          "expected_observation": "The authorized access process provides current assignments for comparison.",
+          "handling_when_unclear": "State that assignments are unverified; request an authorized role check."
+        },
+        {
+          "step_id": "TS01-2-3",
+          "instruction": "If the authorized check confirms the scenario-relevant Backend role is absent, direct the user to request XX:BACKEND_MM:XX through the approved access-management process; then retest task PO-2045.",
+          "expected_observation": "The user can see task PO-2045 after an authorized change, if one is approved and completed.",
+          "handling_when_unclear": "Do not request or grant access from this prototype; escalate through the established access process."
+        }
+      ],
+      "verification_instruction": "The user can see task PO-2045 after an authorized change, if one is approved and completed.",
+      "limitations": [
+        "Scenario-defined expectation only; no live system or user assignment was checked.",
+        "Actions are recommendations; no access, system, ticket, or workflow changes are performed."
+      ],
+      "synthetic_data_notice": "Synthetic demo scenario; not verified production behavior."
+    },
+    {
+      "scenario_id": "TS01-SAP_FICO-03",
+      "scenario_type": "Task Not Visible",
+      "source_status": "synthetic_scenario_expected",
+      "source_system": "SAP FI/CO",
+      "issue_type": "Task Not Visible",
+      "error_signature": "N/A — No error displayed",
+      "required_ticket_reference": "EXP-3002",
+      "scenario_context_key": "Gateway",
+      "expected_missing_role_type": "Gateway",
+      "gateway_role_id": "XX:GATEWAY_FICO:XX",
+      "backend_role_id": "XX:BACKEND_FICO:XX",
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": null,
+      "root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-based expected cause: the required Gateway role may be missing or unavailable for this workflow. The user's current role assignments have not been independently verified.",
+        "verified": false
+      },
+      "recommended_actions": [
+        {
+          "step_id": "TS01-3-1",
+          "instruction": "Confirm source system SAP FI/CO and affected task EXP-3002 with the reporter.",
+          "expected_observation": "The reporter confirms the source system and exact approval-task reference.",
+          "handling_when_unclear": "Ask for the task reference and source system before proceeding."
+        },
+        {
+          "step_id": "TS01-3-2",
+          "instruction": "Compare the user's current assignments with the configured Gateway role XX:GATEWAY_FICO:XX and Backend role XX:BACKEND_FICO:XX.",
+          "expected_observation": "The authorized access process provides current assignments for comparison.",
+          "handling_when_unclear": "State that assignments are unverified; request an authorized role check."
+        },
+        {
+          "step_id": "TS01-3-3",
+          "instruction": "If the authorized check confirms the scenario-relevant Gateway role is absent, direct the user to request XX:GATEWAY_FICO:XX through the approved access-management process; then retest task EXP-3002.",
+          "expected_observation": "The user can see task EXP-3002 after an authorized change, if one is approved and completed.",
+          "handling_when_unclear": "Do not request or grant access from this prototype; escalate through the established access process."
+        }
+      ],
+      "verification_instruction": "The user can see task EXP-3002 after an authorized change, if one is approved and completed.",
+      "limitations": [
+        "Scenario-defined expectation only; no live system or user assignment was checked.",
+        "Actions are recommendations; no access, system, ticket, or workflow changes are performed."
+      ],
+      "synthetic_data_notice": "Synthetic demo scenario; not verified production behavior."
+    },
+    {
+      "scenario_id": "TS01-BTRAVEL-04",
+      "scenario_type": "Task Not Visible",
+      "source_status": "synthetic_scenario_expected",
+      "source_system": "bTravel",
+      "issue_type": "Task Not Visible",
+      "error_signature": "N/A — No error displayed",
+      "required_ticket_reference": "TR-4008",
+      "scenario_context_key": "Backend",
+      "expected_missing_role_type": "Backend",
+      "gateway_role_id": "XX:GATEWAY_BTRAVEL:XX",
+      "backend_role_id": "XX:BACKEND_BTRAVEL:XX",
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": null,
+      "root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-based expected cause: the required Backend role may be missing or unavailable for this workflow. The user's current role assignments have not been independently verified.",
+        "verified": false
+      },
+      "recommended_actions": [
+        {
+          "step_id": "TS01-4-1",
+          "instruction": "Confirm source system bTravel and affected task TR-4008 with the reporter.",
+          "expected_observation": "The reporter confirms the source system and exact approval-task reference.",
+          "handling_when_unclear": "Ask for the task reference and source system before proceeding."
+        },
+        {
+          "step_id": "TS01-4-2",
+          "instruction": "Compare the user's current assignments with the configured Gateway role XX:GATEWAY_BTRAVEL:XX and Backend role XX:BACKEND_BTRAVEL:XX.",
+          "expected_observation": "The authorized access process provides current assignments for comparison.",
+          "handling_when_unclear": "State that assignments are unverified; request an authorized role check."
+        },
+        {
+          "step_id": "TS01-4-3",
+          "instruction": "If the authorized check confirms the scenario-relevant Backend role is absent, direct the user to request XX:BACKEND_BTRAVEL:XX through the approved access-management process; then retest task TR-4008.",
+          "expected_observation": "The user can see task TR-4008 after an authorized change, if one is approved and completed.",
+          "handling_when_unclear": "Do not request or grant access from this prototype; escalate through the established access process."
+        }
+      ],
+      "verification_instruction": "The user can see task TR-4008 after an authorized change, if one is approved and completed.",
+      "limitations": [
+        "Scenario-defined expectation only; no live system or user assignment was checked.",
+        "Actions are recommendations; no access, system, ticket, or workflow changes are performed."
+      ],
+      "synthetic_data_notice": "Synthetic demo scenario; not verified production behavior."
+    },
+    {
+      "scenario_id": "TS01-HR_ESS-05",
+      "scenario_type": "Task Not Visible",
+      "source_status": "synthetic_scenario_expected",
+      "source_system": "HR ESS",
+      "issue_type": "Task Not Visible",
+      "error_signature": "N/A — No error displayed",
+      "required_ticket_reference": "LV-5003",
+      "scenario_context_key": "Gateway",
+      "expected_missing_role_type": "Gateway",
+      "gateway_role_id": "XX:GATEWAY_HRESS:XX",
+      "backend_role_id": "XX:BACKEND_HRESS:XX",
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": null,
+      "root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-based expected cause: the required Gateway role may be missing or unavailable for this workflow. The user's current role assignments have not been independently verified.",
+        "verified": false
+      },
+      "recommended_actions": [
+        {
+          "step_id": "TS01-5-1",
+          "instruction": "Confirm source system HR ESS and affected task LV-5003 with the reporter.",
+          "expected_observation": "The reporter confirms the source system and exact approval-task reference.",
+          "handling_when_unclear": "Ask for the task reference and source system before proceeding."
+        },
+        {
+          "step_id": "TS01-5-2",
+          "instruction": "Compare the user's current assignments with the configured Gateway role XX:GATEWAY_HRESS:XX and Backend role XX:BACKEND_HRESS:XX.",
+          "expected_observation": "The authorized access process provides current assignments for comparison.",
+          "handling_when_unclear": "State that assignments are unverified; request an authorized role check."
+        },
+        {
+          "step_id": "TS01-5-3",
+          "instruction": "If the authorized check confirms the scenario-relevant Gateway role is absent, direct the user to request XX:GATEWAY_HRESS:XX through the approved access-management process; then retest task LV-5003.",
+          "expected_observation": "The user can see task LV-5003 after an authorized change, if one is approved and completed.",
+          "handling_when_unclear": "Do not request or grant access from this prototype; escalate through the established access process."
+        }
+      ],
+      "verification_instruction": "The user can see task LV-5003 after an authorized change, if one is approved and completed.",
+      "limitations": [
+        "Scenario-defined expectation only; no live system or user assignment was checked.",
+        "Actions are recommendations; no access, system, ticket, or workflow changes are performed."
+      ],
+      "synthetic_data_notice": "Synthetic demo scenario; not verified production behavior."
+    },
+    {
+      "scenario_id": "TS01-SAP_SD-06",
+      "scenario_type": "Task Not Visible",
+      "source_status": "synthetic_scenario_expected",
+      "source_system": "SAP SD",
+      "issue_type": "Task Not Visible",
+      "error_signature": "N/A — No error displayed",
+      "required_ticket_reference": "SD-6005",
+      "scenario_context_key": "Backend",
+      "expected_missing_role_type": "Backend",
+      "gateway_role_id": "XX:GATEWAY_SD:XX",
+      "backend_role_id": "XX:BACKEND_SD:XX",
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": null,
+      "root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-based expected cause: the required Backend role may be missing or unavailable for this workflow. The user's current role assignments have not been independently verified.",
+        "verified": false
+      },
+      "recommended_actions": [
+        {
+          "step_id": "TS01-6-1",
+          "instruction": "Confirm source system SAP SD and affected task SD-6005 with the reporter.",
+          "expected_observation": "The reporter confirms the source system and exact approval-task reference.",
+          "handling_when_unclear": "Ask for the task reference and source system before proceeding."
+        },
+        {
+          "step_id": "TS01-6-2",
+          "instruction": "Compare the user's current assignments with the configured Gateway role XX:GATEWAY_SD:XX and Backend role XX:BACKEND_SD:XX.",
+          "expected_observation": "The authorized access process provides current assignments for comparison.",
+          "handling_when_unclear": "State that assignments are unverified; request an authorized role check."
+        },
+        {
+          "step_id": "TS01-6-3",
+          "instruction": "If the authorized check confirms the scenario-relevant Backend role is absent, direct the user to request XX:BACKEND_SD:XX through the approved access-management process; then retest task SD-6005.",
+          "expected_observation": "The user can see task SD-6005 after an authorized change, if one is approved and completed.",
+          "handling_when_unclear": "Do not request or grant access from this prototype; escalate through the established access process."
+        }
+      ],
+      "verification_instruction": "The user can see task SD-6005 after an authorized change, if one is approved and completed.",
+      "limitations": [
+        "Scenario-defined expectation only; no live system or user assignment was checked.",
+        "Actions are recommendations; no access, system, ticket, or workflow changes are performed."
+      ],
+      "synthetic_data_notice": "Synthetic demo scenario; not verified production behavior."
+    },
+    {
+      "scenario_id": "TS01-PM7-07",
+      "scenario_type": "Task Not Visible",
+      "source_status": "synthetic_scenario_expected",
+      "source_system": "PM7",
+      "issue_type": "Task Not Visible",
+      "error_signature": "N/A — No error displayed",
+      "required_ticket_reference": "PR-1012",
+      "scenario_context_key": "Gateway",
+      "expected_missing_role_type": "Gateway",
+      "gateway_role_id": "XX:GATEWAY_PM7:XX",
+      "backend_role_id": "XX:BACKEND_PM7:XX",
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": null,
+      "root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-based expected cause: the Gateway role was revoked in this scenario. Current user-role assignments have not been independently verified.",
+        "verified": false
+      },
+      "recommended_actions": [
+        {
+          "step_id": "TS01-7-1",
+          "instruction": "Confirm source system PM7 and affected task PR-1012 with the reporter.",
+          "expected_observation": "The reporter confirms the source system and exact approval-task reference.",
+          "handling_when_unclear": "Ask for the task reference and source system before proceeding."
+        },
+        {
+          "step_id": "TS01-7-2",
+          "instruction": "Compare the user's current assignments with the configured Gateway role XX:GATEWAY_PM7:XX and Backend role XX:BACKEND_PM7:XX.",
+          "expected_observation": "The authorized access process provides current assignments for comparison.",
+          "handling_when_unclear": "State that assignments are unverified; request an authorized role check."
+        },
+        {
+          "step_id": "TS01-7-3",
+          "instruction": "If the authorized check confirms the scenario-relevant Gateway role is absent, direct the user to request XX:GATEWAY_PM7:XX through the approved access-management process; then retest task PR-1012.",
+          "expected_observation": "The user can see task PR-1012 after an authorized change, if one is approved and completed.",
+          "handling_when_unclear": "Do not request or grant access from this prototype; escalate through the established access process."
+        }
+      ],
+      "verification_instruction": "The user can see task PR-1012 after an authorized change, if one is approved and completed.",
+      "limitations": [
+        "Scenario-defined expectation only; no live system or user assignment was checked.",
+        "Actions are recommendations; no access, system, ticket, or workflow changes are performed."
+      ],
+      "synthetic_data_notice": "Synthetic demo scenario; not verified production behavior."
+    },
+    {
+      "scenario_id": "TS01-SAP_MM-08",
+      "scenario_type": "Task Not Visible",
+      "source_status": "synthetic_scenario_expected",
+      "source_system": "SAP MM",
+      "issue_type": "Task Not Visible",
+      "error_signature": "N/A — No error displayed",
+      "required_ticket_reference": "PO-2088",
+      "scenario_context_key": "Backend",
+      "expected_missing_role_type": "Backend",
+      "gateway_role_id": "XX:GATEWAY_MM:XX",
+      "backend_role_id": "XX:BACKEND_MM:XX",
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": null,
+      "root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-based expected cause: the Backend role is not assigned in this scenario. No independent assignment evidence is available.",
+        "verified": false
+      },
+      "recommended_actions": [
+        {
+          "step_id": "TS01-8-1",
+          "instruction": "Confirm source system SAP MM and affected task PO-2088 with the reporter.",
+          "expected_observation": "The reporter confirms the source system and exact approval-task reference.",
+          "handling_when_unclear": "Ask for the task reference and source system before proceeding."
+        },
+        {
+          "step_id": "TS01-8-2",
+          "instruction": "Compare the user's current assignments with the configured Gateway role XX:GATEWAY_MM:XX and Backend role XX:BACKEND_MM:XX.",
+          "expected_observation": "The authorized access process provides current assignments for comparison.",
+          "handling_when_unclear": "State that assignments are unverified; request an authorized role check."
+        },
+        {
+          "step_id": "TS01-8-3",
+          "instruction": "If the authorized check confirms the scenario-relevant Backend role is absent, direct the user to request XX:BACKEND_MM:XX through the approved access-management process; then retest task PO-2088.",
+          "expected_observation": "The user can see task PO-2088 after an authorized change, if one is approved and completed.",
+          "handling_when_unclear": "Do not request or grant access from this prototype; escalate through the established access process."
+        }
+      ],
+      "verification_instruction": "The user can see task PO-2088 after an authorized change, if one is approved and completed.",
+      "limitations": [
+        "Scenario-defined expectation only; no live system or user assignment was checked.",
+        "Actions are recommendations; no access, system, ticket, or workflow changes are performed."
+      ],
+      "synthetic_data_notice": "Synthetic demo scenario; not verified production behavior."
+    },
+    {
+      "scenario_id": "TS02-PM7-09",
+      "scenario_type": "Loading Time Too Slow",
+      "source_status": "synthetic_scenario_expected",
+      "source_system": "PM7",
+      "issue_type": "Loading Time Too Slow",
+      "error_signature": "Request timed out while retrieving workflow data.",
+      "required_ticket_reference": "OPS-PM7-09",
+      "scenario_context_key": "OPS-PM7-09",
+      "expected_missing_role_type": null,
+      "gateway_role_id": "XX:GATEWAY_PM7:XX",
+      "backend_role_id": "XX:BACKEND_PM7:XX",
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": "OPS-PM7-09",
+      "root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-based expected cause: source-system technical outage affecting Unified Inbox data retrieval. The operational record must be checked against its timestamps; this is not proof of a current outage.",
+        "verified": false
+      },
+      "recommended_actions": [
+        {
+          "step_id": "TS02-9-1",
+          "instruction": "Confirm that PM7 is the affected source system and record when the slow load occurred, including timezone.",
+          "expected_observation": "The source system and observation time are recorded.",
+          "handling_when_unclear": "Ask the reporter for an approximate timestamp and timezone."
+        },
+        {
+          "step_id": "TS02-9-2",
+          "instruction": "Check operational incident OPS-PM7-09 and compare its status and time window with the reported delay.",
+          "expected_observation": "The incident record supplies a status as of a timestamp, a scheduled window, and any actual resolution time.",
+          "handling_when_unclear": "Treat a stale or missing status as unconfirmed; check the operational incident owner/process."
+        },
+        {
+          "step_id": "TS02-9-3",
+          "instruction": "If a matching incident is currently active, retry after its confirmed recovery; if the delay persists outside the incident window, collect a fresh timestamp and escalate through the source-system support process.",
+          "expected_observation": "The retry is made after confirmed recovery, or a new report is linked to an active incident.",
+          "handling_when_unclear": "Do not treat a planned end time as confirmed recovery."
+        }
+      ],
+      "verification_instruction": "The retry is made after confirmed recovery, or a new report is linked to an active incident.",
+      "limitations": [
+        "Scenario-defined expectation only; no live system or user assignment was checked.",
+        "Actions are recommendations; no access, system, ticket, or workflow changes are performed."
+      ],
+      "synthetic_data_notice": "Synthetic demo scenario; not verified production behavior."
+    },
+    {
+      "scenario_id": "TS02-SAP_FICO-10",
+      "scenario_type": "Loading Time Too Slow",
+      "source_status": "synthetic_scenario_expected",
+      "source_system": "SAP FI/CO",
+      "issue_type": "Loading Time Too Slow",
+      "error_signature": "Request timed out while retrieving workflow data.",
+      "required_ticket_reference": "OPS-SAP_FICO-10",
+      "scenario_context_key": "OPS-SAP_FICO-10",
+      "expected_missing_role_type": null,
+      "gateway_role_id": "XX:GATEWAY_FICO:XX",
+      "backend_role_id": "XX:BACKEND_FICO:XX",
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": "OPS-SAP_FICO-10",
+      "root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-based expected cause: source-system scheduled maintenance affecting Unified Inbox data retrieval. The operational record must be checked against its timestamps; this is not proof of a current outage.",
+        "verified": false
+      },
+      "recommended_actions": [
+        {
+          "step_id": "TS02-10-1",
+          "instruction": "Confirm that SAP FI/CO is the affected source system and record when the slow load occurred, including timezone.",
+          "expected_observation": "The source system and observation time are recorded.",
+          "handling_when_unclear": "Ask the reporter for an approximate timestamp and timezone."
+        },
+        {
+          "step_id": "TS02-10-2",
+          "instruction": "Check operational incident OPS-SAP_FICO-10 and compare its status and time window with the reported delay.",
+          "expected_observation": "The incident record supplies a status as of a timestamp, a scheduled window, and any actual resolution time.",
+          "handling_when_unclear": "Treat a stale or missing status as unconfirmed; check the operational incident owner/process."
+        },
+        {
+          "step_id": "TS02-10-3",
+          "instruction": "If a matching incident is currently active, retry after its confirmed recovery; if the delay persists outside the incident window, collect a fresh timestamp and escalate through the source-system support process.",
+          "expected_observation": "The retry is made after confirmed recovery, or a new report is linked to an active incident.",
+          "handling_when_unclear": "Do not treat a planned end time as confirmed recovery."
+        }
+      ],
+      "verification_instruction": "The retry is made after confirmed recovery, or a new report is linked to an active incident.",
+      "limitations": [
+        "Scenario-defined expectation only; no live system or user assignment was checked.",
+        "Actions are recommendations; no access, system, ticket, or workflow changes are performed."
+      ],
+      "synthetic_data_notice": "Synthetic demo scenario; not verified production behavior."
+    },
+    {
+      "scenario_id": "TS02-BTRAVEL-11",
+      "scenario_type": "Loading Time Too Slow",
+      "source_status": "synthetic_scenario_expected",
+      "source_system": "bTravel",
+      "issue_type": "Loading Time Too Slow",
+      "error_signature": "Request timed out while retrieving workflow data.",
+      "required_ticket_reference": "OPS-BTRAVEL-11",
+      "scenario_context_key": "OPS-BTRAVEL-11",
+      "expected_missing_role_type": null,
+      "gateway_role_id": "XX:GATEWAY_BTRAVEL:XX",
+      "backend_role_id": "XX:BACKEND_BTRAVEL:XX",
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": "OPS-BTRAVEL-11",
+      "root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-based expected cause: source-system integration service degradation affecting Unified Inbox data retrieval. The operational record must be checked against its timestamps; this is not proof of a current outage.",
+        "verified": false
+      },
+      "recommended_actions": [
+        {
+          "step_id": "TS02-11-1",
+          "instruction": "Confirm that bTravel is the affected source system and record when the slow load occurred, including timezone.",
+          "expected_observation": "The source system and observation time are recorded.",
+          "handling_when_unclear": "Ask the reporter for an approximate timestamp and timezone."
+        },
+        {
+          "step_id": "TS02-11-2",
+          "instruction": "Check operational incident OPS-BTRAVEL-11 and compare its status and time window with the reported delay.",
+          "expected_observation": "The incident record supplies a status as of a timestamp, a scheduled window, and any actual resolution time.",
+          "handling_when_unclear": "Treat a stale or missing status as unconfirmed; check the operational incident owner/process."
+        },
+        {
+          "step_id": "TS02-11-3",
+          "instruction": "If a matching incident is currently active, retry after its confirmed recovery; if the delay persists outside the incident window, collect a fresh timestamp and escalate through the source-system support process.",
+          "expected_observation": "The retry is made after confirmed recovery, or a new report is linked to an active incident.",
+          "handling_when_unclear": "Do not treat a planned end time as confirmed recovery."
+        }
+      ],
+      "verification_instruction": "The retry is made after confirmed recovery, or a new report is linked to an active incident.",
+      "limitations": [
+        "Scenario-defined expectation only; no live system or user assignment was checked.",
+        "Actions are recommendations; no access, system, ticket, or workflow changes are performed."
+      ],
+      "synthetic_data_notice": "Synthetic demo scenario; not verified production behavior."
+    },
+    {
+      "scenario_id": "TS02-HR_ESS-12",
+      "scenario_type": "Loading Time Too Slow",
+      "source_status": "synthetic_scenario_expected",
+      "source_system": "HR ESS",
+      "issue_type": "Loading Time Too Slow",
+      "error_signature": "Request timed out while retrieving workflow data.",
+      "required_ticket_reference": "OPS-HRESS-12",
+      "scenario_context_key": "OPS-HR_ESS-12",
+      "expected_missing_role_type": null,
+      "gateway_role_id": "XX:GATEWAY_HRESS:XX",
+      "backend_role_id": "XX:BACKEND_HRESS:XX",
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": "OPS-HRESS-12",
+      "root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-based expected cause: source-system backend service unavailable affecting Unified Inbox data retrieval. The operational record must be checked against its timestamps; this is not proof of a current outage.",
+        "verified": false
+      },
+      "recommended_actions": [
+        {
+          "step_id": "TS02-12-1",
+          "instruction": "Confirm that HR ESS is the affected source system and record when the slow load occurred, including timezone.",
+          "expected_observation": "The source system and observation time are recorded.",
+          "handling_when_unclear": "Ask the reporter for an approximate timestamp and timezone."
+        },
+        {
+          "step_id": "TS02-12-2",
+          "instruction": "Check operational incident OPS-HR_ESS-12 and compare its status and time window with the reported delay.",
+          "expected_observation": "The incident record supplies a status as of a timestamp, a scheduled window, and any actual resolution time.",
+          "handling_when_unclear": "Treat a stale or missing status as unconfirmed; check the operational incident owner/process."
+        },
+        {
+          "step_id": "TS02-12-3",
+          "instruction": "If a matching incident is currently active, retry after its confirmed recovery; if the delay persists outside the incident window, collect a fresh timestamp and escalate through the source-system support process.",
+          "expected_observation": "The retry is made after confirmed recovery, or a new report is linked to an active incident.",
+          "handling_when_unclear": "Do not treat a planned end time as confirmed recovery."
+        }
+      ],
+      "verification_instruction": "The retry is made after confirmed recovery, or a new report is linked to an active incident.",
+      "limitations": [
+        "Scenario-defined expectation only; no live system or user assignment was checked.",
+        "Actions are recommendations; no access, system, ticket, or workflow changes are performed."
+      ],
+      "synthetic_data_notice": "Synthetic demo scenario; not verified production behavior."
+    },
+    {
+      "scenario_id": "TS02-SAP_MM-13",
+      "scenario_type": "Loading Time Too Slow",
+      "source_status": "synthetic_scenario_expected",
+      "source_system": "SAP MM",
+      "issue_type": "Loading Time Too Slow",
+      "error_signature": "Request timed out while retrieving workflow data.",
+      "required_ticket_reference": "OPS-SAP_MM-13",
+      "scenario_context_key": "OPS-SAP_MM-13",
+      "expected_missing_role_type": null,
+      "gateway_role_id": "XX:GATEWAY_MM:XX",
+      "backend_role_id": "XX:BACKEND_MM:XX",
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": "OPS-SAP_MM-13",
+      "root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-based expected cause: source-system scheduled maintenance affecting Unified Inbox data retrieval. The operational record must be checked against its timestamps; this is not proof of a current outage.",
+        "verified": false
+      },
+      "recommended_actions": [
+        {
+          "step_id": "TS02-13-1",
+          "instruction": "Confirm that SAP MM is the affected source system and record when the slow load occurred, including timezone.",
+          "expected_observation": "The source system and observation time are recorded.",
+          "handling_when_unclear": "Ask the reporter for an approximate timestamp and timezone."
+        },
+        {
+          "step_id": "TS02-13-2",
+          "instruction": "Check operational incident OPS-SAP_MM-13 and compare its status and time window with the reported delay.",
+          "expected_observation": "The incident record supplies a status as of a timestamp, a scheduled window, and any actual resolution time.",
+          "handling_when_unclear": "Treat a stale or missing status as unconfirmed; check the operational incident owner/process."
+        },
+        {
+          "step_id": "TS02-13-3",
+          "instruction": "If a matching incident is currently active, retry after its confirmed recovery; if the delay persists outside the incident window, collect a fresh timestamp and escalate through the source-system support process.",
+          "expected_observation": "The retry is made after confirmed recovery, or a new report is linked to an active incident.",
+          "handling_when_unclear": "Do not treat a planned end time as confirmed recovery."
+        }
+      ],
+      "verification_instruction": "The retry is made after confirmed recovery, or a new report is linked to an active incident.",
+      "limitations": [
+        "Scenario-defined expectation only; no live system or user assignment was checked.",
+        "Actions are recommendations; no access, system, ticket, or workflow changes are performed."
+      ],
+      "synthetic_data_notice": "Synthetic demo scenario; not verified production behavior."
+    },
+    {
+      "scenario_id": "TS02-SAP_SD-14",
+      "scenario_type": "Loading Time Too Slow",
+      "source_status": "synthetic_scenario_expected",
+      "source_system": "SAP SD",
+      "issue_type": "Loading Time Too Slow",
+      "error_signature": "Request timed out while retrieving workflow data.",
+      "required_ticket_reference": "OPS-SAP_SD-14",
+      "scenario_context_key": "OPS-SAP_SD-14",
+      "expected_missing_role_type": null,
+      "gateway_role_id": "XX:GATEWAY_SD:XX",
+      "backend_role_id": "XX:BACKEND_SD:XX",
+      "workflow_id": null,
+      "requested_language": null,
+      "operational_incident_id": "OPS-SAP_SD-14",
+      "root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-based expected cause: source-system technical service interruption affecting Unified Inbox data retrieval. The operational record must be checked against its timestamps; this is not proof of a current outage.",
+        "verified": false
+      },
+      "recommended_actions": [
+        {
+          "step_id": "TS02-14-1",
+          "instruction": "Confirm that SAP SD is the affected source system and record when the slow load occurred, including timezone.",
+          "expected_observation": "The source system and observation time are recorded.",
+          "handling_when_unclear": "Ask the reporter for an approximate timestamp and timezone."
+        },
+        {
+          "step_id": "TS02-14-2",
+          "instruction": "Check operational incident OPS-SAP_SD-14 and compare its status and time window with the reported delay.",
+          "expected_observation": "The incident record supplies a status as of a timestamp, a scheduled window, and any actual resolution time.",
+          "handling_when_unclear": "Treat a stale or missing status as unconfirmed; check the operational incident owner/process."
+        },
+        {
+          "step_id": "TS02-14-3",
+          "instruction": "If a matching incident is currently active, retry after its confirmed recovery; if the delay persists outside the incident window, collect a fresh timestamp and escalate through the source-system support process.",
+          "expected_observation": "The retry is made after confirmed recovery, or a new report is linked to an active incident.",
+          "handling_when_unclear": "Do not treat a planned end time as confirmed recovery."
+        }
+      ],
+      "verification_instruction": "The retry is made after confirmed recovery, or a new report is linked to an active incident.",
+      "limitations": [
+        "Scenario-defined expectation only; no live system or user assignment was checked.",
+        "Actions are recommendations; no access, system, ticket, or workflow changes are performed."
+      ],
+      "synthetic_data_notice": "Synthetic demo scenario; not verified production behavior."
+    },
+    {
+      "scenario_id": "TS03-HR_ESS-15",
+      "scenario_type": "Cannot Set Up Substitution",
+      "source_status": "synthetic_scenario_expected",
+      "source_system": "HR ESS",
+      "issue_type": "Cannot Set Up Substitution",
+      "error_signature": "Substitution is not supported for this workflow.",
+      "required_ticket_reference": "WF-0015",
+      "scenario_context_key": "HR-LEAVE-APPROVAL",
+      "expected_missing_role_type": null,
+      "gateway_role_id": "XX:GATEWAY_HRESS:XX",
+      "backend_role_id": "XX:BACKEND_HRESS:XX",
+      "workflow_id": "HR-LEAVE-APPROVAL",
+      "requested_language": null,
+      "operational_incident_id": null,
+      "root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-based expected cause: substitution is unsupported for workflow Leave Approval (HR-LEAVE-APPROVAL) in the source-system capability reference.",
+        "verified": false
+      },
+      "recommended_actions": [
+        {
+          "step_id": "TS03-15-1",
+          "instruction": "Confirm the source system HR ESS and workflow Leave Approval (HR-LEAVE-APPROVAL).",
+          "expected_observation": "The affected workflow matches the named catalogue entry.",
+          "handling_when_unclear": "Ask the reporter for the task/workflow reference and source system."
+        },
+        {
+          "step_id": "TS03-15-2",
+          "instruction": "Check the source-system catalogue capability for Leave Approval; the source-system reference records substitution as unsupported for this workflow.",
+          "expected_observation": "The exact workflow entry states supports_substitution=false.",
+          "handling_when_unclear": "If the workflow cannot be matched, do not generalize; request source-system support confirmation."
+        },
+        {
+          "step_id": "TS03-15-3",
+          "instruction": "Explain that substitution is not supported for this workflow and refer the user to the source-system support team for an approved alternative.",
+          "expected_observation": "The user receives an authorized support route for alternatives.",
+          "handling_when_unclear": "Do not enable or recommend enabling unsupported functionality."
+        }
+      ],
+      "verification_instruction": "The user receives an authorized support route for alternatives.",
+      "limitations": [
+        "Scenario-defined expectation only; no live system or user assignment was checked.",
+        "Actions are recommendations; no access, system, ticket, or workflow changes are performed."
+      ],
+      "synthetic_data_notice": "Synthetic demo scenario; not verified production behavior."
+    },
+    {
+      "scenario_id": "TS03-PM7-16",
+      "scenario_type": "Cannot Set Up Substitution",
+      "source_status": "synthetic_scenario_expected",
+      "source_system": "PM7",
+      "issue_type": "Cannot Set Up Substitution",
+      "error_signature": "Substitution is not supported for this workflow.",
+      "required_ticket_reference": "WF-0016",
+      "scenario_context_key": "PM7-PURCHASE-REQUEST-APPROVAL",
+      "expected_missing_role_type": null,
+      "gateway_role_id": "XX:GATEWAY_PM7:XX",
+      "backend_role_id": "XX:BACKEND_PM7:XX",
+      "workflow_id": "PM7-PURCHASE-REQUEST-APPROVAL",
+      "requested_language": null,
+      "operational_incident_id": null,
+      "root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-based expected cause: substitution is unsupported for workflow Purchase Request Approval (PM7-PURCHASE-REQUEST-APPROVAL) in the source-system capability reference.",
+        "verified": false
+      },
+      "recommended_actions": [
+        {
+          "step_id": "TS03-16-1",
+          "instruction": "Confirm the source system PM7 and workflow Purchase Request Approval (PM7-PURCHASE-REQUEST-APPROVAL).",
+          "expected_observation": "The affected workflow matches the named catalogue entry.",
+          "handling_when_unclear": "Ask the reporter for the task/workflow reference and source system."
+        },
+        {
+          "step_id": "TS03-16-2",
+          "instruction": "Check the source-system catalogue capability for Purchase Request Approval; the source-system reference records substitution as unsupported for this workflow.",
+          "expected_observation": "The exact workflow entry states supports_substitution=false.",
+          "handling_when_unclear": "If the workflow cannot be matched, do not generalize; request source-system support confirmation."
+        },
+        {
+          "step_id": "TS03-16-3",
+          "instruction": "Explain that substitution is not supported for this workflow and refer the user to the source-system support team for an approved alternative.",
+          "expected_observation": "The user receives an authorized support route for alternatives.",
+          "handling_when_unclear": "Do not enable or recommend enabling unsupported functionality."
+        }
+      ],
+      "verification_instruction": "The user receives an authorized support route for alternatives.",
+      "limitations": [
+        "Scenario-defined expectation only; no live system or user assignment was checked.",
+        "Actions are recommendations; no access, system, ticket, or workflow changes are performed."
+      ],
+      "synthetic_data_notice": "Synthetic demo scenario; not verified production behavior."
+    },
+    {
+      "scenario_id": "TS03-BTRAVEL-17",
+      "scenario_type": "Cannot Set Up Substitution",
+      "source_status": "synthetic_scenario_expected",
+      "source_system": "bTravel",
+      "issue_type": "Cannot Set Up Substitution",
+      "error_signature": "Substitution is not supported for this workflow.",
+      "required_ticket_reference": "WF-0017",
+      "scenario_context_key": "BTRAVEL-TRAVEL-EXPENSE-APPROVAL",
+      "expected_missing_role_type": null,
+      "gateway_role_id": "XX:GATEWAY_BTRAVEL:XX",
+      "backend_role_id": "XX:BACKEND_BTRAVEL:XX",
+      "workflow_id": "BTRAVEL-TRAVEL-EXPENSE-APPROVAL",
+      "requested_language": null,
+      "operational_incident_id": null,
+      "root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-based expected cause: substitution is unsupported for workflow Travel Expense Approval (BTRAVEL-TRAVEL-EXPENSE-APPROVAL) in the source-system capability reference.",
+        "verified": false
+      },
+      "recommended_actions": [
+        {
+          "step_id": "TS03-17-1",
+          "instruction": "Confirm the source system bTravel and workflow Travel Expense Approval (BTRAVEL-TRAVEL-EXPENSE-APPROVAL).",
+          "expected_observation": "The affected workflow matches the named catalogue entry.",
+          "handling_when_unclear": "Ask the reporter for the task/workflow reference and source system."
+        },
+        {
+          "step_id": "TS03-17-2",
+          "instruction": "Check the source-system catalogue capability for Travel Expense Approval; the source-system reference records substitution as unsupported for this workflow.",
+          "expected_observation": "The exact workflow entry states supports_substitution=false.",
+          "handling_when_unclear": "If the workflow cannot be matched, do not generalize; request source-system support confirmation."
+        },
+        {
+          "step_id": "TS03-17-3",
+          "instruction": "Explain that substitution is not supported for this workflow and refer the user to the source-system support team for an approved alternative.",
+          "expected_observation": "The user receives an authorized support route for alternatives.",
+          "handling_when_unclear": "Do not enable or recommend enabling unsupported functionality."
+        }
+      ],
+      "verification_instruction": "The user receives an authorized support route for alternatives.",
+      "limitations": [
+        "Scenario-defined expectation only; no live system or user assignment was checked.",
+        "Actions are recommendations; no access, system, ticket, or workflow changes are performed."
+      ],
+      "synthetic_data_notice": "Synthetic demo scenario; not verified production behavior."
+    },
+    {
+      "scenario_id": "TS03-SAP_SD-18",
+      "scenario_type": "Cannot Set Up Substitution",
+      "source_status": "synthetic_scenario_expected",
+      "source_system": "SAP SD",
+      "issue_type": "Cannot Set Up Substitution",
+      "error_signature": "Substitution is not supported for this workflow.",
+      "required_ticket_reference": "WF-0018",
+      "scenario_context_key": "SAPSD-SALES-ORDER-APPROVAL",
+      "expected_missing_role_type": null,
+      "gateway_role_id": "XX:GATEWAY_SD:XX",
+      "backend_role_id": "XX:BACKEND_SD:XX",
+      "workflow_id": "SAPSD-SALES-ORDER-APPROVAL",
+      "requested_language": null,
+      "operational_incident_id": null,
+      "root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-based expected cause: substitution is unsupported for workflow Sales Order Approval (SAPSD-SALES-ORDER-APPROVAL) in the source-system capability reference.",
+        "verified": false
+      },
+      "recommended_actions": [
+        {
+          "step_id": "TS03-18-1",
+          "instruction": "Confirm the source system SAP SD and workflow Sales Order Approval (SAPSD-SALES-ORDER-APPROVAL).",
+          "expected_observation": "The affected workflow matches the named catalogue entry.",
+          "handling_when_unclear": "Ask the reporter for the task/workflow reference and source system."
+        },
+        {
+          "step_id": "TS03-18-2",
+          "instruction": "Check the source-system catalogue capability for Sales Order Approval; the source-system reference records substitution as unsupported for this workflow.",
+          "expected_observation": "The exact workflow entry states supports_substitution=false.",
+          "handling_when_unclear": "If the workflow cannot be matched, do not generalize; request source-system support confirmation."
+        },
+        {
+          "step_id": "TS03-18-3",
+          "instruction": "Explain that substitution is not supported for this workflow and refer the user to the source-system support team for an approved alternative.",
+          "expected_observation": "The user receives an authorized support route for alternatives.",
+          "handling_when_unclear": "Do not enable or recommend enabling unsupported functionality."
+        }
+      ],
+      "verification_instruction": "The user receives an authorized support route for alternatives.",
+      "limitations": [
+        "Scenario-defined expectation only; no live system or user assignment was checked.",
+        "Actions are recommendations; no access, system, ticket, or workflow changes are performed."
+      ],
+      "synthetic_data_notice": "Synthetic demo scenario; not verified production behavior."
+    },
+    {
+      "scenario_id": "TS03-HR_ESS-19",
+      "scenario_type": "Cannot Set Up Substitution",
+      "source_status": "synthetic_scenario_expected",
+      "source_system": "HR ESS",
+      "issue_type": "Cannot Set Up Substitution",
+      "error_signature": "Substitution is not supported for this workflow.",
+      "required_ticket_reference": "WF-0019",
+      "scenario_context_key": "HR-EMPLOYEE-CHANGE-APPROVAL",
+      "expected_missing_role_type": null,
+      "gateway_role_id": "XX:GATEWAY_HRESS:XX",
+      "backend_role_id": "XX:BACKEND_HRESS:XX",
+      "workflow_id": "HR-EMPLOYEE-CHANGE-APPROVAL",
+      "requested_language": null,
+      "operational_incident_id": null,
+      "root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-based expected cause: substitution is unsupported for workflow Employee Change Approval (HR-EMPLOYEE-CHANGE-APPROVAL) in the source-system capability reference.",
+        "verified": false
+      },
+      "recommended_actions": [
+        {
+          "step_id": "TS03-19-1",
+          "instruction": "Confirm the source system HR ESS and workflow Employee Change Approval (HR-EMPLOYEE-CHANGE-APPROVAL).",
+          "expected_observation": "The affected workflow matches the named catalogue entry.",
+          "handling_when_unclear": "Ask the reporter for the task/workflow reference and source system."
+        },
+        {
+          "step_id": "TS03-19-2",
+          "instruction": "Check the source-system catalogue capability for Employee Change Approval; the source-system reference records substitution as unsupported for this workflow.",
+          "expected_observation": "The exact workflow entry states supports_substitution=false.",
+          "handling_when_unclear": "If the workflow cannot be matched, do not generalize; request source-system support confirmation."
+        },
+        {
+          "step_id": "TS03-19-3",
+          "instruction": "Explain that substitution is not supported for this workflow and refer the user to the source-system support team for an approved alternative.",
+          "expected_observation": "The user receives an authorized support route for alternatives.",
+          "handling_when_unclear": "Do not enable or recommend enabling unsupported functionality."
+        }
+      ],
+      "verification_instruction": "The user receives an authorized support route for alternatives.",
+      "limitations": [
+        "Scenario-defined expectation only; no live system or user assignment was checked.",
+        "Actions are recommendations; no access, system, ticket, or workflow changes are performed."
+      ],
+      "synthetic_data_notice": "Synthetic demo scenario; not verified production behavior."
+    },
+    {
+      "scenario_id": "TS04-BTRAVEL-20",
+      "scenario_type": "Cannot See Specific Language",
+      "source_status": "synthetic_scenario_expected",
+      "source_system": "bTravel",
+      "issue_type": "Cannot See Specific Language",
+      "error_signature": "English translation is not available for this task.",
+      "required_ticket_reference": "TASK-LANG-20",
+      "scenario_context_key": "English",
+      "expected_missing_role_type": null,
+      "gateway_role_id": "XX:GATEWAY_BTRAVEL:XX",
+      "backend_role_id": "XX:BACKEND_BTRAVEL:XX",
+      "workflow_id": null,
+      "requested_language": "English",
+      "operational_incident_id": null,
+      "root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-based expected cause: English is not supported for the source-system task content in this scenario. This does not describe the Unified Inbox interface language.",
+        "verified": false
+      },
+      "recommended_actions": [
+        {
+          "step_id": "TS04-20-1",
+          "instruction": "Confirm source system bTravel, task TASK-LANG-20, and the requested task-content language English.",
+          "expected_observation": "The source task and requested language are identified.",
+          "handling_when_unclear": "Ask which language is requested and confirm whether the concern is task content or the Unified Inbox interface."
+        },
+        {
+          "step_id": "TS04-20-2",
+          "instruction": "Compare English with the supported task-content language list for bTravel; it is excluded in this scenario.",
+          "expected_observation": "The catalogue provides the source-system task-content language list.",
+          "handling_when_unclear": "If no source-system list is available, report the limitation and request source-system confirmation."
+        },
+        {
+          "step_id": "TS04-20-3",
+          "instruction": "Offer a language present in the supported list or refer the user to source-system support for an approved alternative.",
+          "expected_observation": "The user selects a documented supported task-content language or receives an approved support route.",
+          "handling_when_unclear": "Do not imply that changing the Unified Inbox UI language translates source-provided task content."
+        }
+      ],
+      "verification_instruction": "The user selects a documented supported task-content language or receives an approved support route.",
+      "limitations": [
+        "Scenario-defined expectation only; no live system or user assignment was checked.",
+        "Actions are recommendations; no access, system, ticket, or workflow changes are performed."
+      ],
+      "synthetic_data_notice": "Synthetic demo scenario; not verified production behavior."
+    },
+    {
+      "scenario_id": "TS04-SAP_MM-21",
+      "scenario_type": "Cannot See Specific Language",
+      "source_status": "synthetic_scenario_expected",
+      "source_system": "SAP MM",
+      "issue_type": "Cannot See Specific Language",
+      "error_signature": "French translation is not available for this task.",
+      "required_ticket_reference": "TASK-LANG-21",
+      "scenario_context_key": "French",
+      "expected_missing_role_type": null,
+      "gateway_role_id": "XX:GATEWAY_MM:XX",
+      "backend_role_id": "XX:BACKEND_MM:XX",
+      "workflow_id": null,
+      "requested_language": "French",
+      "operational_incident_id": null,
+      "root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-based expected cause: French is not supported for the source-system task content in this scenario. This does not describe the Unified Inbox interface language.",
+        "verified": false
+      },
+      "recommended_actions": [
+        {
+          "step_id": "TS04-21-1",
+          "instruction": "Confirm source system SAP MM, task TASK-LANG-21, and the requested task-content language French.",
+          "expected_observation": "The source task and requested language are identified.",
+          "handling_when_unclear": "Ask which language is requested and confirm whether the concern is task content or the Unified Inbox interface."
+        },
+        {
+          "step_id": "TS04-21-2",
+          "instruction": "Compare French with the supported task-content language list for SAP MM; it is excluded in this scenario.",
+          "expected_observation": "The catalogue provides the source-system task-content language list.",
+          "handling_when_unclear": "If no source-system list is available, report the limitation and request source-system confirmation."
+        },
+        {
+          "step_id": "TS04-21-3",
+          "instruction": "Offer a language present in the supported list or refer the user to source-system support for an approved alternative.",
+          "expected_observation": "The user selects a documented supported task-content language or receives an approved support route.",
+          "handling_when_unclear": "Do not imply that changing the Unified Inbox UI language translates source-provided task content."
+        }
+      ],
+      "verification_instruction": "The user selects a documented supported task-content language or receives an approved support route.",
+      "limitations": [
+        "Scenario-defined expectation only; no live system or user assignment was checked.",
+        "Actions are recommendations; no access, system, ticket, or workflow changes are performed."
+      ],
+      "synthetic_data_notice": "Synthetic demo scenario; not verified production behavior."
+    },
+    {
+      "scenario_id": "TS04-SAP_FICO-22",
+      "scenario_type": "Cannot See Specific Language",
+      "source_status": "synthetic_scenario_expected",
+      "source_system": "SAP FI/CO",
+      "issue_type": "Cannot See Specific Language",
+      "error_signature": "Vietnamese translation is not available for this task.",
+      "required_ticket_reference": "TASK-LANG-22",
+      "scenario_context_key": "Vietnamese",
+      "expected_missing_role_type": null,
+      "gateway_role_id": "XX:GATEWAY_FICO:XX",
+      "backend_role_id": "XX:BACKEND_FICO:XX",
+      "workflow_id": null,
+      "requested_language": "Vietnamese",
+      "operational_incident_id": null,
+      "root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-based expected cause: Vietnamese is not supported for the source-system task content in this scenario. This does not describe the Unified Inbox interface language.",
+        "verified": false
+      },
+      "recommended_actions": [
+        {
+          "step_id": "TS04-22-1",
+          "instruction": "Confirm source system SAP FI/CO, task TASK-LANG-22, and the requested task-content language Vietnamese.",
+          "expected_observation": "The source task and requested language are identified.",
+          "handling_when_unclear": "Ask which language is requested and confirm whether the concern is task content or the Unified Inbox interface."
+        },
+        {
+          "step_id": "TS04-22-2",
+          "instruction": "Compare Vietnamese with the supported task-content language list for SAP FI/CO; it is excluded in this scenario.",
+          "expected_observation": "The catalogue provides the source-system task-content language list.",
+          "handling_when_unclear": "If no source-system list is available, report the limitation and request source-system confirmation."
+        },
+        {
+          "step_id": "TS04-22-3",
+          "instruction": "Offer a language present in the supported list or refer the user to source-system support for an approved alternative.",
+          "expected_observation": "The user selects a documented supported task-content language or receives an approved support route.",
+          "handling_when_unclear": "Do not imply that changing the Unified Inbox UI language translates source-provided task content."
+        }
+      ],
+      "verification_instruction": "The user selects a documented supported task-content language or receives an approved support route.",
+      "limitations": [
+        "Scenario-defined expectation only; no live system or user assignment was checked.",
+        "Actions are recommendations; no access, system, ticket, or workflow changes are performed."
+      ],
+      "synthetic_data_notice": "Synthetic demo scenario; not verified production behavior."
+    },
+    {
+      "scenario_id": "TS04-SAP_SD-23",
+      "scenario_type": "Cannot See Specific Language",
+      "source_status": "synthetic_scenario_expected",
+      "source_system": "SAP SD",
+      "issue_type": "Cannot See Specific Language",
+      "error_signature": "Japanese translation is not available for this task.",
+      "required_ticket_reference": "TASK-LANG-23",
+      "scenario_context_key": "Japanese",
+      "expected_missing_role_type": null,
+      "gateway_role_id": "XX:GATEWAY_SD:XX",
+      "backend_role_id": "XX:BACKEND_SD:XX",
+      "workflow_id": null,
+      "requested_language": "Japanese",
+      "operational_incident_id": null,
+      "root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-based expected cause: Japanese is not supported for the source-system task content in this scenario. This does not describe the Unified Inbox interface language.",
+        "verified": false
+      },
+      "recommended_actions": [
+        {
+          "step_id": "TS04-23-1",
+          "instruction": "Confirm source system SAP SD, task TASK-LANG-23, and the requested task-content language Japanese.",
+          "expected_observation": "The source task and requested language are identified.",
+          "handling_when_unclear": "Ask which language is requested and confirm whether the concern is task content or the Unified Inbox interface."
+        },
+        {
+          "step_id": "TS04-23-2",
+          "instruction": "Compare Japanese with the supported task-content language list for SAP SD; it is excluded in this scenario.",
+          "expected_observation": "The catalogue provides the source-system task-content language list.",
+          "handling_when_unclear": "If no source-system list is available, report the limitation and request source-system confirmation."
+        },
+        {
+          "step_id": "TS04-23-3",
+          "instruction": "Offer a language present in the supported list or refer the user to source-system support for an approved alternative.",
+          "expected_observation": "The user selects a documented supported task-content language or receives an approved support route.",
+          "handling_when_unclear": "Do not imply that changing the Unified Inbox UI language translates source-provided task content."
+        }
+      ],
+      "verification_instruction": "The user selects a documented supported task-content language or receives an approved support route.",
+      "limitations": [
+        "Scenario-defined expectation only; no live system or user assignment was checked.",
+        "Actions are recommendations; no access, system, ticket, or workflow changes are performed."
+      ],
+      "synthetic_data_notice": "Synthetic demo scenario; not verified production behavior."
+    },
+    {
+      "scenario_id": "TS04-PM7-24",
+      "scenario_type": "Cannot See Specific Language",
+      "source_status": "synthetic_scenario_expected",
+      "source_system": "PM7",
+      "issue_type": "Cannot See Specific Language",
+      "error_signature": "Korean translation is not available for this task.",
+      "required_ticket_reference": "TASK-LANG-24",
+      "scenario_context_key": "Korean",
+      "expected_missing_role_type": null,
+      "gateway_role_id": "XX:GATEWAY_PM7:XX",
+      "backend_role_id": "XX:BACKEND_PM7:XX",
+      "workflow_id": null,
+      "requested_language": "Korean",
+      "operational_incident_id": null,
+      "root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-based expected cause: Korean is not supported for the source-system task content in this scenario. This does not describe the Unified Inbox interface language.",
+        "verified": false
+      },
+      "recommended_actions": [
+        {
+          "step_id": "TS04-24-1",
+          "instruction": "Confirm source system PM7, task TASK-LANG-24, and the requested task-content language Korean.",
+          "expected_observation": "The source task and requested language are identified.",
+          "handling_when_unclear": "Ask which language is requested and confirm whether the concern is task content or the Unified Inbox interface."
+        },
+        {
+          "step_id": "TS04-24-2",
+          "instruction": "Compare Korean with the supported task-content language list for PM7; it is excluded in this scenario.",
+          "expected_observation": "The catalogue provides the source-system task-content language list.",
+          "handling_when_unclear": "If no source-system list is available, report the limitation and request source-system confirmation."
+        },
+        {
+          "step_id": "TS04-24-3",
+          "instruction": "Offer a language present in the supported list or refer the user to source-system support for an approved alternative.",
+          "expected_observation": "The user selects a documented supported task-content language or receives an approved support route.",
+          "handling_when_unclear": "Do not imply that changing the Unified Inbox UI language translates source-provided task content."
+        }
+      ],
+      "verification_instruction": "The user selects a documented supported task-content language or receives an approved support route.",
+      "limitations": [
+        "Scenario-defined expectation only; no live system or user assignment was checked.",
+        "Actions are recommendations; no access, system, ticket, or workflow changes are performed."
+      ],
+      "synthetic_data_notice": "Synthetic demo scenario; not verified production behavior."
+    },
+    {
+      "scenario_id": "TS04-HR_ESS-25",
+      "scenario_type": "Cannot See Specific Language",
+      "source_status": "synthetic_scenario_expected",
+      "source_system": "HR ESS",
+      "issue_type": "Cannot See Specific Language",
+      "error_signature": "Spanish translation is not available for this task.",
+      "required_ticket_reference": "TASK-LANG-25",
+      "scenario_context_key": "Spanish",
+      "expected_missing_role_type": null,
+      "gateway_role_id": "XX:GATEWAY_HRESS:XX",
+      "backend_role_id": "XX:BACKEND_HRESS:XX",
+      "workflow_id": null,
+      "requested_language": "Spanish",
+      "operational_incident_id": null,
+      "root_cause": {
+        "state": "scenario_expected_unverified",
+        "statement": "Scenario-based expected cause: Spanish is not supported for the source-system task content in this scenario. This does not describe the Unified Inbox interface language.",
+        "verified": false
+      },
+      "recommended_actions": [
+        {
+          "step_id": "TS04-25-1",
+          "instruction": "Confirm source system HR ESS, task TASK-LANG-25, and the requested task-content language Spanish.",
+          "expected_observation": "The source task and requested language are identified.",
+          "handling_when_unclear": "Ask which language is requested and confirm whether the concern is task content or the Unified Inbox interface."
+        },
+        {
+          "step_id": "TS04-25-2",
+          "instruction": "Compare Spanish with the supported task-content language list for HR ESS; it is excluded in this scenario.",
+          "expected_observation": "The catalogue provides the source-system task-content language list.",
+          "handling_when_unclear": "If no source-system list is available, report the limitation and request source-system confirmation."
+        },
+        {
+          "step_id": "TS04-25-3",
+          "instruction": "Offer a language present in the supported list or refer the user to source-system support for an approved alternative.",
+          "expected_observation": "The user selects a documented supported task-content language or receives an approved support route.",
+          "handling_when_unclear": "Do not imply that changing the Unified Inbox UI language translates source-provided task content."
+        }
+      ],
+      "verification_instruction": "The user selects a documented supported task-content language or receives an approved support route.",
+      "limitations": [
+        "Scenario-defined expectation only; no live system or user assignment was checked.",
+        "Actions are recommendations; no access, system, ticket, or workflow changes are performed."
+      ],
+      "synthetic_data_notice": "Synthetic demo scenario; not verified production behavior."
+    }
+  ]
+}

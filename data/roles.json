@@ -1,65 +1,119 @@
 {
-    "roles": [
-      {
-        "source_system": "PM7",
-        "gateway_roles": [
-          {
-            "role_id": "SYNTH_PM7_GATEWAY_01",
-            "role_name": "PM7 Workflow Gateway Access",
-            "description": "Synthetic Gateway Role for PM7 workflow access"
-          },
-          {
-            "role_id": "SYNTH_PM7_GATEWAY_02",
-            "role_name": "PM7 Workflow Approval Access",
-            "description": "Synthetic Gateway Role for PM7 approval-related access"
-          }
-        ],
-        "backend_roles": [
-          {
-            "role_id": "SYNTH_PM7_BACKEND_01",
-            "role_name": "PM7 Request Viewer",
-            "description": "Synthetic Backend Role for viewing PM7 requests"
-          },
-          {
-            "role_id": "SYNTH_PM7_BACKEND_02",
-            "role_name": "PM7 Request Processor",
-            "description": "Synthetic Backend Role for processing PM7 requests"
-          }
-        ]
-      },
-      {
-        "source_system": "SYNTH_SYSTEM_A",
-        "gateway_roles": [
-          {
-            "role_id": "SYNTH_A_GATEWAY_01",
-            "role_name": "System A Workflow Gateway Access",
-            "description": "Synthetic Gateway Role for System A"
-          }
-        ],
-        "backend_roles": [
-          {
-            "role_id": "SYNTH_A_BACKEND_01",
-            "role_name": "System A Request Viewer",
-            "description": "Synthetic Backend Role for viewing requests in System A"
-          }
-        ]
-      },
-      {
-        "source_system": "SYNTH_SYSTEM_B",
-        "gateway_roles": [
-          {
-            "role_id": "SYNTH_B_GATEWAY_01",
-            "role_name": "System B Workflow Gateway Access",
-            "description": "Synthetic Gateway Role for System B"
-          }
-        ],
-        "backend_roles": [
-          {
-            "role_id": "SYNTH_B_BACKEND_01",
-            "role_name": "System B Request Viewer",
-            "description": "Synthetic Backend Role for viewing requests in System B"
-          }
-        ]
-      }
-    ]
-  }
+  "synthetic_data_notice": "All role identifiers are synthetic demo references, not production SAP roles or user assignments.",
+  "roles": [
+    {
+      "source_system": "PM7",
+      "business_roles": [],
+      "gateway_roles": [
+        {
+          "role_id": "XX:GATEWAY_PM7:XX",
+          "role_name": "PM7 Gateway Role",
+          "description": "Role catalogue reference only; this does not establish a user's current assignment."
+        }
+      ],
+      "backend_roles": [
+        {
+          "role_id": "XX:BACKEND_PM7:XX",
+          "role_name": "PM7 Backend Role",
+          "description": "Role catalogue reference only; this does not establish a user's current assignment."
+        }
+      ],
+      "synthetic_data_notice": "Synthetic demo catalogue only. Role presence does not establish any reporter assignment or missing access."
+    },
+    {
+      "source_system": "SAP MM",
+      "business_roles": [],
+      "gateway_roles": [
+        {
+          "role_id": "XX:GATEWAY_MM:XX",
+          "role_name": "SAP MM Gateway Role",
+          "description": "Role catalogue reference only; this does not establish a user's current assignment."
+        }
+      ],
+      "backend_roles": [
+        {
+          "role_id": "XX:BACKEND_MM:XX",
+          "role_name": "SAP MM Backend Role",
+          "description": "Role catalogue reference only; this does not establish a user's current assignment."
+        }
+      ],
+      "synthetic_data_notice": "Synthetic demo catalogue only. Role presence does not establish any reporter assignment or missing access."
+    },
+    {
+      "source_system": "SAP FI/CO",
+      "business_roles": [],
+      "gateway_roles": [
+        {
+          "role_id": "XX:GATEWAY_FICO:XX",
+          "role_name": "SAP FI/CO Gateway Role",
+          "description": "Role catalogue reference only; this does not establish a user's current assignment."
+        }
+      ],
+      "backend_roles": [
+        {
+          "role_id": "XX:BACKEND_FICO:XX",
+          "role_name": "SAP FI/CO Backend Role",
+          "description": "Role catalogue reference only; this does not establish a user's current assignment."
+        }
+      ],
+      "synthetic_data_notice": "Synthetic demo catalogue only. Role presence does not establish any reporter assignment or missing access."
+    },
+    {
+      "source_system": "bTravel",
+      "business_roles": [],
+      "gateway_roles": [
+        {
+          "role_id": "XX:GATEWAY_BTRAVEL:XX",
+          "role_name": "bTravel Gateway Role",
+          "description": "Role catalogue reference only; this does not establish a user's current assignment."
+        }
+      ],
+      "backend_roles": [
+        {
+          "role_id": "XX:BACKEND_BTRAVEL:XX",
+          "role_name": "bTravel Backend Role",
+          "description": "Role catalogue reference only; this does not establish a user's current assignment."
+        }
+      ],
+      "synthetic_data_notice": "Synthetic demo catalogue only. Role presence does not establish any reporter assignment or missing access."
+    },
+    {
+      "source_system": "HR ESS",
+      "business_roles": [],
+      "gateway_roles": [
+        {
+          "role_id": "XX:GATEWAY_HRESS:XX",
+          "role_name": "HR ESS Gateway Role",
+          "description": "Role catalogue reference only; this does not establish a user's current assignment."
+        }
+      ],
+      "backend_roles": [
+        {
+          "role_id": "XX:BACKEND_HRESS:XX",
+          "role_name": "HR ESS Backend Role",
+          "description": "Role catalogue reference only; this does not establish a user's current assignment."
+        }
+      ],
+      "synthetic_data_notice": "Synthetic demo catalogue only. Role presence does not establish any reporter assignment or missing access."
+    },
+    {
+      "source_system": "SAP SD",
+      "business_roles": [],
+      "gateway_roles": [
+        {
+          "role_id": "XX:GATEWAY_SD:XX",
+          "role_name": "SAP SD Gateway Role",
+          "description": "Role catalogue reference only; this does not establish a user's current assignment."
+        }
+      ],
+      "backend_roles": [
+        {
+          "role_id": "XX:BACKEND_SD:XX",
+          "role_name": "SAP SD Backend Role",
+          "description": "Role catalogue reference only; this does not establish a user's current assignment."
+        }
+      ],
+      "synthetic_data_notice": "Synthetic demo catalogue only. Role presence does not establish any reporter assignment or missing access."
+    }
+  ]
+}
