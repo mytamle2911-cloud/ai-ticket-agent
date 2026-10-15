@@ -7,7 +7,7 @@ import {
 } from 'lucide-react'
 import { buildEditableResolutionForm, buildResolutionPrefill, canSaveVerifiedResolution } from './resolutionPrefill'
 import { canContactCustomer, formatEmailDraftForCopy, isCustomerCommunicationOpen, updateEmailDraft, updateTicketCommunicationState } from './customerCommunication'
-import { createBrowserDemoApi } from './demoApi'
+import { createBrowserDemoApi, serializeChatHistory } from './demoApi'
 
 const browserDemoApi = createBrowserDemoApi({
   fetchImpl:(...args) => fetch(...args),
@@ -377,7 +377,7 @@ function App() {
     setMessages([...prior, { role:'user', content:message }]); setDraftMessage(''); setBusy(true); setError(''); setStatusFeedback('')
     try {
       const result = await api(`/api/tickets/${selected.incident_number}/chat`, {
-        method:'POST', body:JSON.stringify({ message, history:prior, request_investigation:!answer }),
+        method:'POST', body:JSON.stringify({ message, history:serializeChatHistory(prior), request_investigation:!answer }),
       })
       if (result.status_update) {
         setCaptureOffer(null)

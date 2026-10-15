@@ -1,5 +1,11 @@
 export const DEMO_STATE_KEY = 'ticket-agent-demo-state-v1'
 
+// The UI keeps provenance and display metadata on assistant message objects.
+// Only the chat API's strict role/content contract belongs in conversation history.
+export function serializeChatHistory(messages) {
+  return messages.slice(-12).map(({ role, content }) => ({ role, content }))
+}
+
 export function createBrowserDemoApi({ fetchImpl, storage, locks, onUnauthorized }) {
   let queue = Promise.resolve()
 

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { createBrowserDemoApi, DEMO_STATE_KEY } from '../src/demoApi.js'
+import { createBrowserDemoApi, DEMO_STATE_KEY, serializeChatHistory } from '../src/demoApi.js'
 
 function response(result, state, statusCode = 200, httpStatus = 200) {
   return {
@@ -115,4 +115,17 @@ test('hosted requests send same-origin cookies and notify the app when a session
   assert.equal(request.credentials, 'same-origin')
   assert.equal(unauthorized, 1)
   assert.equal(storage.getItem(DEMO_STATE_KEY), 'signed-demo-state')
+})
+
+test('chat history drops assistant presentation metadata and sends only role and content', () => {
+  const history = serializeChatHistory([
+    { role:'user', content:'Troubleshoot this incident.' },
+    { role:'assistant', content:'The reported task is unavailable.', ai_provenance:'live_gpt', model:'gpt-5.6-luna' },
+    { role:'assistant', content:'Previous request failed.', error:'request timed out', status:503 },
+  ])
+  assert.deepEqual(history, [
+    { role:'user', content:'Troubleshoot this incident.' },
+    { role:'assistant', content:'The reported task is unavailable.' },
+    { role:'assistant', content:'Previous request failed.' },
+  ])
 })

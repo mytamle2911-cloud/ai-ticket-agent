@@ -134,6 +134,43 @@ class DemoAuthTests(unittest.TestCase):
         self.assertEqual(result.status_code, 413)
         self.assertIn("too large", result.get_json()["error"].lower())
 
+    def test_dispatch_returns_outer_success_while_chat_rejects_assistant_metadata(self):
+        self.login()
+        state = demo_state.encode_state(demo_state.initial_state())
+        response = self.dispatch(
+            "/api/tickets/INC100004/chat", state=state, method="POST", payload={
+                "message": "Set this ticket to On Hold.",
+                "history": [
+                    {"role": "user", "content": "Troubleshoot this ticket."},
+                    {"role": "assistant", "content": "The issue is not resolved.",
+                     "ai_provenance": "deterministic_fallback", "model": None},
+                ],
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        wrapped = response.get_json()
+        self.assertEqual(wrapped["status_code"], 400)
+        self.assertEqual(
+            wrapped["result"]["error"],
+            "Chat history is invalid or too long. Start a new message and retry.",
+        )
+
+    def test_projected_chat_history_reaches_deterministic_status_confirmation(self):
+        self.login()
+        state = demo_state.encode_state(demo_state.initial_state())
+        response = self.dispatch(
+            "/api/tickets/INC100004/chat", state=state, method="POST", payload={
+                "message": "Set this ticket to On Hold.",
+                "history": [
+                    {"role": "assistant", "content": "The issue remains under investigation."},
+                ],
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        wrapped = response.get_json()
+        self.assertEqual(wrapped["status_code"], 200)
+        self.assertEqual(wrapped["result"]["status_update"]["state"], "pending_confirmation")
+
 
 if __name__ == "__main__":
     unittest.main()
