@@ -91,7 +91,7 @@ class KnowledgeReuseTests(unittest.TestCase):
             ))
             with patch.object(llm_agent, "_validate_incident_number", side_effect=lambda value: value), \
                  patch.object(llm_agent, "get_ticket", return_value=self.ticket), \
-                 patch.object(llm_agent, "client", fake_client), \
+                 patch.object(llm_agent, "_get_client", return_value=fake_client), \
                  patch.object(captured_knowledge.requests, "get", side_effect=lambda url, **kwargs: self._local_get(client, url, **kwargs)):
                 result = llm_agent.run_investigation("INC_TEST_001", use_llm=True)
 

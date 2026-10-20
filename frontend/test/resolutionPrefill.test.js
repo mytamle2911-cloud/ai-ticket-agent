@@ -99,3 +99,12 @@ test('saving requires actual verification evidence and explicit consultant affir
   assert.equal(canSaveVerifiedResolution(complete, false), false)
   assert.equal(canSaveVerifiedResolution(complete, true), true)
 })
+
+test('knowledge conflict or missing evidence cannot prefill an expected cause or resolution', () => {
+  const ticket = ticketById.get('INC100001')
+  const investigation = { ...investigationFor(ticket), warnings:[{ code:'potential_knowledge_conflict' }] }
+  const form = buildEditableResolutionForm(buildResolutionPrefill({ ticket, investigation, messages:[] }))
+  assert.equal(form.confirmed_root_cause, '')
+  assert.equal(form.actions_performed, '')
+  assert.equal(canSaveVerifiedResolution(form, true), false)
+})

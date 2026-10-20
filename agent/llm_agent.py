@@ -11,6 +11,8 @@ from typing import Any
 import requests
 from dotenv import load_dotenv
 from openai import OpenAI
+from agent.knowledge_governance import is_active
+from agent.investigation_validation import investigation_warnings, apply_evidence_guard
 from agent import demo_auth
 from agent import internal_api
 from agent.unified_inbox import investigation_guidance
@@ -161,7 +163,7 @@ def _structured_retrieval(source_system: str, issue_type: str = "", ticket_field
     normalized_text = _normalise(all_text)
     hits = []
     for doc in _load_json("product_docs.json", "documents"):
-        if not isinstance(doc, dict) or _normalise(str(doc.get("source_system", ""))) != _normalise(source_system):
+        if not isinstance(doc, dict) or not is_active(doc) or _normalise(str(doc.get("source_system", ""))) != _normalise(source_system):
             continue
         signatures = doc.get("error_signatures", [])
         if not isinstance(signatures, list):
@@ -404,8 +406,13 @@ def _item_value(item: Any, key: str, default: Any = None) -> Any:
     return getattr(item, key, default)
 
 
+def _response_complete(response: Any) -> bool:
+    """Mocks may omit status; explicit unsuccessful API status is never success."""
+    return _item_value(response, "status") in (None, "completed")
+
+
 _MODEL_INTERNAL_KEYS = {
-    "scenario_id", "source_status", "synthetic_data_notice", "review_metadata",
+    "version_history", "scenario_id", "source_status", "synthetic_data_notice", "review_metadata",
     "review_scope", "catalogue_status", "evidence_state", "mapping_status",
     "operational_incident_id", "document_id", "step_id",
 }
@@ -838,7 +845,7 @@ def _preflight(incident_number: str) -> tuple[dict, list[dict], dict, list[dict]
     fields = _ticket_search_fields(ticket)
     error_message = fields.get("error", "")
     if not isinstance(source_system, str) or not source_system.strip():
-        raise RuntimeError("The ticket is missing a valid source system; a human must investigate it.")
+        return ticket, [], {}, [{"name": "get_ticket", "arguments": {"incident_number": incident_number}, "result": ticket}], []
     retrievals = _structured_retrieval(source_system, str(ticket.get("issue", "")), fields)
     docs = [hit["document"] for hit in retrievals]
     gateway, backend = _tool_candidates(docs)
@@ -883,6 +890,7 @@ def run_investigation(incident_number: str, *, use_llm: bool = True) -> dict:
     result["captured_knowledge_matches"] = captured
     result["captured_knowledge_error"] = captured_error
 
+    warnings = investigation_warnings(ticket, retrievals, captured)
     result["ticket"] = ticket
     result["steps"].append({"iteration": 1, "tool_calls": calls})
     candidate = ""
@@ -929,7 +937,7 @@ def run_investigation(incident_number: str, *, use_llm: bool = True) -> dict:
     )
 
     api = None
-    if use_llm:
+    if use_llm and not warnings:
         try:
             api = _get_client()
         except RuntimeError as exc:
@@ -942,6 +950,9 @@ def run_investigation(incident_number: str, *, use_llm: bool = True) -> dict:
                                                 input=input_items, max_output_tokens=MAX_OUTPUT_TOKENS)
             except Exception as exc:
                 model_error = _safe_openai_error(exc)
+                break
+            if not _response_complete(response):
+                model_error = "OpenAI returned an incomplete or failed response. Retry or investigate manually."
                 break
             output = _item_value(response, "output")
             if not isinstance(output, (list, tuple)):
@@ -1043,6 +1054,7 @@ def run_investigation(incident_number: str, *, use_llm: bool = True) -> dict:
                 "the current user's role assignments, cause, and outcome remain unverified."
             )
         result["final_analysis"] += "\n\n" + "\n\n".join(citations)
+    apply_evidence_guard(result, warnings)
     result["error"] = model_error
     return result
 

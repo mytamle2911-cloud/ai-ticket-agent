@@ -7,6 +7,8 @@ Local development continues to use the existing JSON read/write functions.
 
 from __future__ import annotations
 
+from agent.knowledge_governance import METADATA_KEYS, validate_metadata
+
 import base64
 import hashlib
 import hmac
@@ -156,7 +158,7 @@ def validate_state(value: Any) -> dict:
     article_ids: set[str] = set()
     resolutions_by_id = {row["resolution_id"]: row for row in resolutions}
     for row in articles:
-        if not isinstance(row, dict) or set(row) != _ARTICLE_KEYS:
+        if not isinstance(row, dict) or (not _ARTICLE_KEYS.issubset(row) or set(row) - (_ARTICLE_KEYS | METADATA_KEYS) or not validate_metadata(row)):
             raise DemoStateError("A knowledge article has an unsupported structure.")
         article_id = row.get("article_id")
         resolution = resolutions_by_id.get(row.get("source_resolution_id"))

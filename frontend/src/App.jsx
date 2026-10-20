@@ -10,7 +10,7 @@ import { canContactCustomer, formatEmailDraftForCopy, isCustomerCommunicationOpe
 import { createBrowserDemoApi, serializeChatHistory } from './demoApi'
 
 const browserDemoApi = createBrowserDemoApi({
-  fetchImpl:(...args) => fetch(...args),
+  fetchImpl:(url, options) => fetch(url, { ...options, signal:AbortSignal.timeout(60000) }),
   storage:window.localStorage,
   locks:window.navigator?.locks,
   onUnauthorized:() => window.dispatchEvent(new Event('ticket-agent-auth-required')),
@@ -18,12 +18,13 @@ const browserDemoApi = createBrowserDemoApi({
 
 const requestDirectApi = async (url, options = {}) => {
   const response = await fetch(url, {
+    signal:AbortSignal.timeout(60000),
     cache: options.cache ?? 'no-store',
     credentials:'same-origin',
     ...options,
     headers: { ...(options.body ? { 'Content-Type': 'application/json' } : {}), ...options.headers },
   })
-  const payload = await response.json().catch(() => ({}))
+  const payload = await response.json().catch(() => { throw new Error('The service returned an invalid response. Retry; the operation could not be confirmed.') })
   if (!response.ok) {
     const error = new Error(payload.error || `Request failed (${response.status})`)
     error.payload = payload
@@ -155,6 +156,8 @@ function InvestigationResult({ ticket, investigation, aiProvenance, aiModel, onC
     }
   }
 
+  if (investigation?.warnings?.length) return <article className="investigation-card"><header className="investigation-header"><h3>Investigation requires L2 review</h3></header><p>{assessment.statement}</p><p>{investigation.decision_reason}</p><ul>{(investigation.recommended_next_steps || []).map((step,index)=><li key={index}>{step}</li>)}</ul><button className="secondary-button" onClick={onContactCustomer}>Request additional information</button><small>Deterministic evidence check · No action executed</small></article>
+
   return <article className="investigation-card">
     <header className="investigation-header">
       <h3><Sparkles size={24} aria-hidden="true"/>AI Investigation</h3>
@@ -281,6 +284,9 @@ function App() {
   const [resolutionForm, setResolutionForm] = useState({ confirmed_root_cause:'', actions_performed:'', verification_evidence:'', consultant_id:'' })
   const [article, setArticle] = useState(null)
   const [reviewer, setReviewer] = useState('')
+  const [governanceReview, setGovernanceReview] = useState(null)
+  const [inspectedArticle, setInspectedArticle] = useState(null)
+  const [retryRequest, setRetryRequest] = useState(null)
   const [workflowBusy, setWorkflowBusy] = useState(false)
   const [notice, setNotice] = useState('')
   const [statusFeedback, setStatusFeedback] = useState('')
@@ -320,6 +326,7 @@ function App() {
 
   const loadTicketWorkflow = useCallback(async (incident) => {
     if (!incident) return
+    setGovernanceReview(null); setInspectedArticle(null); setRetryRequest(null)
     try {
       const [resolutionResult, articleResult] = await Promise.all([
         api(`/api/tickets/${incident}/resolutions`),
@@ -358,22 +365,24 @@ function App() {
   const runTroubleshooting = async () => {
     if (!selected || aiRequestInFlight.current) return
     aiRequestInFlight.current = true
-    setBusy(true); setError(''); setNotice('')
+    setBusy(true); setError(''); setNotice(''); setRetryRequest({ kind:'investigation' })
     try {
       const result = await api(`/api/tickets/${selected.incident_number}/investigation`, { method:'POST', body:JSON.stringify({}) })
       setAnswer(result)
       if (result.reply) setMessages([{ role:'assistant', content:result.reply, ai_provenance:result.ai_provenance, model:result.model }])
       if (result.error) setError(result.error)
+      else setRetryRequest(null)
     } catch (err) { if (err.payload?.investigation) setAnswer({ investigation:err.payload.investigation, error:err.message }); setError(err.message) }
     finally { aiRequestInFlight.current = false; setBusy(false) }
   }
 
-  const sendMessage = async (event) => {
+  const sendMessage = async (event, retry = null) => {
     event?.preventDefault()
-    const message = draftMessage.trim()
+    const message = retry?.message || draftMessage.trim()
     if (!message || !selected || busy || aiRequestInFlight.current) return
     aiRequestInFlight.current = true
-    const prior = messages.slice(-12)
+    const prior = retry?.history || messages.slice(-12)
+    setRetryRequest({ kind:'chat', message, history:prior })
     setMessages([...prior, { role:'user', content:message }]); setDraftMessage(''); setBusy(true); setError(''); setStatusFeedback('')
     try {
       const result = await api(`/api/tickets/${selected.incident_number}/chat`, {
@@ -386,6 +395,7 @@ function App() {
       if (result.investigation) setAnswer((old) => ({ ...(old || {}), investigation:result.investigation }))
       setMessages((old) => [...old, { role:'assistant', content:result.reply || 'I could not produce a response.', ai_provenance:result.ai_provenance, model:result.model }])
       if (result.error) setError(result.error)
+      else setRetryRequest(null)
     } catch (err) {
       if (err.payload?.investigation) setAnswer((old) => ({ ...(old || {}), investigation:err.payload.investigation }))
       setMessages((old) => [...old, { role:'assistant', content:'The request could not be completed.' }]); setError(err.message)
@@ -502,20 +512,33 @@ function App() {
       const result = await api(`/api/tickets/${selected.incident_number}/knowledge-articles/generate`, { method:'POST', body:JSON.stringify({ resolution_id:resolution.resolution_id }) })
       setArticle({ ...result.article, ai_provenance:result.ai_provenance }); setArticles((old) => old.some((item) => item.article_id === result.article.article_id) ? old : [...old, result.article])
       setNotice('AI draft created from the consultant-verified resolution. Review it before approval.')
-    } catch (err) { setError(err.message) }
+    } catch (err) { setError(err.message); if (err.payload?.governance_review_required) setGovernanceReview({ ...err.payload, kind:'create' }) }
     finally { setWorkflowBusy(false) }
   }
-  const saveArticle = async (approve = false) => {
+  const saveArticle = async (approve = false, acknowledged = false, lifecycle = null) => {
     if (!article) return
     setWorkflowBusy(true); setError(''); setNotice('')
     try {
-      const payload = { title:article.title, symptoms:article.symptoms }
+      const payload = { expected_version:article.version || 1, review_acknowledged:acknowledged, ...(lifecycle ? { lifecycle_status:lifecycle } : { title:article.title, symptoms:article.symptoms, lifecycle_status:article.lifecycle_status || 'active' }) }
       if (approve) { payload.approve = true; payload.approved_by = reviewer }
       const result = await api(`/api/knowledge-articles/${article.article_id}`, { method:'PATCH', body:JSON.stringify(payload) })
       setArticle(result.article); setArticles((old) => old.map((item) => item.article_id === article.article_id ? result.article : item))
-      setNotice(approve ? 'Article approved and published to the reusable knowledge store.' : 'Draft edits saved.')
-    } catch (err) { setError(err.message) }
+      setGovernanceReview(null)
+      setNotice(approve ? 'Article approved and published to the reusable knowledge store.' : 'Article changes saved.')
+    } catch (err) { setError(err.message); if (err.payload?.governance_review_required) setGovernanceReview({ ...err.payload, kind:'update', approve, lifecycle }) }
     finally { setWorkflowBusy(false) }
+  }
+  const reviewKnowledge = async () => {
+    if (governanceReview.kind === 'update') return saveArticle(governanceReview.approve, true, governanceReview.lifecycle)
+    setWorkflowBusy(true); setError('')
+    try {
+      const result = await api(`/api/tickets/${selected.incident_number}/knowledge-articles`, { method:'POST', body:JSON.stringify({ ...governanceReview.proposed_article, review_acknowledged:true }) })
+      setArticle(result.article); setArticles((old)=>[...old.filter((row)=>row.article_id !== result.article.article_id), result.article]); setGovernanceReview(null); setNotice('Draft saved after your review.')
+    } catch (err) { setError(err.message) } finally { setWorkflowBusy(false) }
+  }
+  const inspectArticle = async (id) => {
+    try { setInspectedArticle((await api(`/api/knowledge-articles/${encodeURIComponent(id)}`)).article) }
+    catch (err) { setError(err.message) }
   }
   const searchApprovedKnowledge = async () => {
     if (!selected) return
@@ -670,7 +693,8 @@ function App() {
         {selected ? <>
           <div className="agent-intro"><div className="eyebrow">TICKET ASSISTANCE</div><h2>Let’s work through this incident.</h2><p>I’ll use the selected ticket, relevant knowledge, history, and source-system role catalogue to suggest next steps.</p></div>
           {!answer && <button className="troubleshoot-button" disabled={busy} onClick={runTroubleshooting}>{busy ? <LoaderCircle className="spin" size={18}/> : <Sparkles size={18}/>} {busy ? 'Investigating…' : 'Troubleshoot this ticket'} <ArrowRight size={17}/></button>}
-          {error && <div className="inline-error agent-error"><AlertCircle size={16}/><span>{error}</span></div>}
+          {error && <div className="inline-error agent-error"><AlertCircle size={16}/><span>{error}</span>{retryRequest && <button className="secondary-button" disabled={busy} onClick={()=>retryRequest.kind === 'chat' ? sendMessage(null, retryRequest) : runTroubleshooting()}>Retry request</button>}</div>}
+          {!!answer?.investigation?.warnings?.length && <div className="locked-note" role="alert"><div>{answer.investigation.warnings.map((warning,index)=><p key={index}>{warning.message}{warning.sources?.map((item)=><span key={item.record_id}> · {item.record_id}: {item.title}</span>)}{warning.details?.map((item,i)=><span key={i}> “{item.instruction}” / “{item.conflicting_instruction}”</span>)}</p>)}</div></div>}
           {canContactCustomer(selected.incident_number, answer) && <>
             <InvestigationResult ticket={selected} investigation={investigation} aiProvenance={answer.ai_provenance} aiModel={answer.model} onContactCustomer={contactCustomer} communicationOpen={customerCommunicationOpen}/>
             {customerCommunicationOpen && <CustomerCommunicationPanel
@@ -726,13 +750,19 @@ function App() {
           <div className="workflow-section-title"><span className="step-marker">2</span><div><h3>Knowledge Article</h3><p>Generate a draft from the saved, consultant-verified resolution.</p></div></div>
           {!resolutions.some((item)=>item.verified) ? <div className="locked-note"><ShieldCheck size={16}/> Save a consultant-verified resolution before drafting an article.</div> : <>
             {!article && <button className="secondary-button wide-button" onClick={generateArticle} disabled={workflowBusy}><Sparkles size={16}/>{workflowBusy ? 'Generating draft…' : 'Generate AI knowledge draft'}</button>}
-            {article && <div className="article-editor"><div className="article-status"><FileCheck2 size={16}/><span>{article.review_status === 'Approved' ? 'Approved & published' : 'Draft · review required'}</span>{article.ai_provenance === 'live_gpt' && <span className="ai-provenance live">Generated by Live GPT</span>}</div>
+            {article && <div className="article-editor"><div className="article-status"><FileCheck2 size={16}/><span>{article.review_status === 'Approved' ? 'Approved & published' : 'Draft · review required'} · v{article.version || 1} · {article.lifecycle_status || 'active'}</span>{article.ai_provenance === 'live_gpt' && <span className="ai-provenance live">Generated by Live GPT</span>}</div>
+              <label>Knowledge lifecycle<select value={article.lifecycle_status || 'active'} onChange={(e)=>setArticle({...article,lifecycle_status:e.target.value})} disabled={workflowBusy}><option value="active">Active</option><option value="expired">Expired</option><option value="superseded">Superseded</option></select></label>
+              {article.review_status !== 'Draft' && <button className="secondary-button" onClick={()=>saveArticle(false, false, article.lifecycle_status || 'active')} disabled={workflowBusy}>Save lifecycle status</button>}
+              {!!article.version_history?.length && <details><summary>Previous versions ({article.version_history.length})</summary>{article.version_history.map((old)=><div key={old.version}><strong>v{old.version} · {old.title} · {old.lifecycle_status}</strong><p>{old.symptoms}</p><p>{old.confirmed_root_cause}</p><p>{old.verified_troubleshooting_steps?.join(' · ')}</p><p>{old.verification_method}</p></div>)}</details>}
               <label>Article title<input value={article.title} disabled={article.review_status !== 'Draft'} onChange={(e)=>setArticle({...article,title:e.target.value})}/></label>
               <label>Symptoms<textarea rows="3" value={article.symptoms} disabled={article.review_status !== 'Draft'} onChange={(e)=>setArticle({...article,symptoms:e.target.value})}/></label>
               <div className="article-facts"><div><span>Confirmed cause</span><p>{article.confirmed_root_cause}</p></div><div><span>Verified actions</span><p>{(article.verified_troubleshooting_steps || []).join(' · ')}</p></div><div><span>Verification</span><p>{article.verification_method}</p></div></div>
-              {article.review_status === 'Draft' ? <><button className="secondary-button wide-button" onClick={()=>saveArticle(false)} disabled={workflowBusy}>Save draft edits</button><label>Reviewer identifier<input value={reviewer} onChange={(e)=>setReviewer(e.target.value)} placeholder="Reviewer ID"/></label><button className="primary-button wide-button" onClick={()=>saveArticle(true)} disabled={workflowBusy || !reviewer.trim()}><CheckCircle2 size={16}/>{workflowBusy ? 'Publishing…' : 'Approve and publish article'}</button></> : <div className="published-note"><CheckCircle2 size={16}/> Approved articles are available to future matching investigations.</div>}
+              {article.review_status === 'Draft' ? <><button className="secondary-button wide-button" onClick={()=>saveArticle(false)} disabled={workflowBusy}>Save draft edits</button><label>Reviewer identifier<input value={reviewer} onChange={(e)=>setReviewer(e.target.value)} placeholder="Reviewer ID"/></label><button className="primary-button wide-button" onClick={()=>saveArticle(true)} disabled={workflowBusy || !reviewer.trim()}><CheckCircle2 size={16}/>{workflowBusy ? 'Publishing…' : 'Approve and publish article'}</button></> : <div className="published-note"><CheckCircle2 size={16}/> Only active, approved articles are available to future matching investigations.</div>}
             </div>}
           </>}
+          {governanceReview && <div className="locked-note" role="alert"><div>{governanceReview.warnings.map((warning,index)=><div key={index}><strong>{warning.message}</strong>{warning.sources?.map((item)=><p key={item.record_id}>{item.proposed ? <span>Proposed article · {item.title}</span> : <button className="secondary-button" onClick={()=>inspectArticle(item.record_id)}>{item.record_id} · {item.title}</button>}</p>)}{warning.details?.map((item,i)=><p key={i}>“{item.instruction}” / “{item.conflicting_instruction}”</p>)}</div>)}<button className="secondary-button" disabled={workflowBusy} onClick={reviewKnowledge}>I reviewed the sources — proceed</button><button className="secondary-button" onClick={()=>setGovernanceReview(null)}>Cancel</button></div></div>}
+          {inspectedArticle && <details open><summary>Existing article · {inspectedArticle.article_id} · v{inspectedArticle.version || 1}</summary><h4>{inspectedArticle.title}</h4><p>{inspectedArticle.symptoms}</p><p>{inspectedArticle.confirmed_root_cause}</p><p>{inspectedArticle.verified_troubleshooting_steps?.join(' · ')}</p><p>{inspectedArticle.verification_method}</p><p>{inspectedArticle.review_status} · {inspectedArticle.lifecycle_status || 'active'}</p><details><summary>Version history</summary><pre>{JSON.stringify(inspectedArticle.version_history || [], null, 2)}</pre></details><button className="secondary-button" onClick={()=>{setArticle(inspectedArticle);setInspectedArticle(null)}} disabled={article?.review_status === 'Draft'}>Manage article</button></details>}
+          {articles.map((item)=><button className="secondary-button" key={item.article_id} onClick={()=>inspectArticle(item.article_id)}>{item.article_id} · {item.lifecycle_status || 'active'}</button>)}
           {!!articles.length && <div className="article-history"><BookOpen size={15}/>{articles.length} article record{articles.length===1?'':'s'} linked to this incident</div>}
         </section>}
       </div>

@@ -7,6 +7,7 @@ import re
 import requests
 
 from agent import internal_api
+from agent.knowledge_governance import is_active
 
 
 def search_approved_articles(ticket: dict) -> tuple[list[dict], str | None]:
@@ -44,7 +45,7 @@ def search_approved_articles(ticket: dict) -> tuple[list[dict], str | None]:
     query_terms = set(normalise(query).split()) - {"the", "a", "an", "in", "to", "my", "is", "of", "and", "cannot", "can", "not"}
     matches = []
     for article in articles:
-        if not isinstance(article, dict) or article.get("review_status") != "Approved":
+        if not isinstance(article, dict) or article.get("review_status") != "Approved" or not is_active(article):
             continue
         if normalise(article.get("source_system")) != normalise(source_system):
             continue
@@ -59,7 +60,7 @@ def search_approved_articles(ticket: dict) -> tuple[list[dict], str | None]:
         # narrower overlap test here: it can discard valid API matches when
         # the symptom is represented by a signature or a short phrase.
         matches.append({
-            **article,
+            **{key: value for key, value in article.items() if key != "version_history"},
             "retrieval_match": {
                 "source_system": "exact",
                 "issue_category": "exact",

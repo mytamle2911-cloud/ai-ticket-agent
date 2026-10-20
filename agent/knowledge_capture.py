@@ -8,6 +8,7 @@ from typing import Any
 
 import requests
 
+from agent.knowledge_governance import is_active
 from agent import llm_agent
 from agent import internal_api
 
@@ -42,7 +43,7 @@ def _article_seed(ticket: dict[str, Any], resolution: dict[str, Any]) -> dict[st
         with open(llm_agent.get_data_path("product_docs.json"), "r", encoding="utf-8") as file:
             docs = json.load(file).get("documents", [])
         for document in docs:
-            if isinstance(document, dict) and document.get("document_id") in linked_ids:
+            if isinstance(document, dict) and is_active(document) and document.get("document_id") in linked_ids:
                 kb_context.append({key: document[key] for key in ("document_id", "title", "issue_type", "symptoms") if key in document})
     except (OSError, json.JSONDecodeError, AttributeError):
         # The verified outcome remains sufficient to draft; absent context is not fabricated.
@@ -95,6 +96,8 @@ def _model_draft(seed: dict[str, Any], client: Any = None) -> dict[str, str]:
         )
     except Exception as exc:
         raise KnowledgeCaptureError(llm_agent._safe_openai_error(exc).replace("investigation", "knowledge draft generation")) from None
+    if not llm_agent._response_complete(response):
+        raise KnowledgeCaptureError("The AI knowledge response was incomplete or failed. No article was saved.")
     output_text = llm_agent._item_value(response, "output_text", "")
     if not isinstance(output_text, str) or not output_text.strip():
         raise KnowledgeCaptureError("OpenAI returned an empty knowledge draft. No article was saved.")

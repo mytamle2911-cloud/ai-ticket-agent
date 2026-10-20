@@ -332,6 +332,8 @@ def generate_customer_email_draft(
             input=json.dumps(context, ensure_ascii=False),
             max_output_tokens=llm_agent.MAX_OUTPUT_TOKENS,
         )
+        if not llm_agent._response_complete(response):
+            raise CustomerCommunicationError("The AI email response was incomplete or failed. Retry; no email was saved.")
         output = llm_agent._item_value(response, "output_text", "")
         if not isinstance(output, str) or not output.strip():
             raise CustomerCommunicationError("GPT Luna returned an empty email draft. Please retry.")

@@ -88,7 +88,7 @@ def _document_context(investigation: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 _INTERNAL_CONTEXT_KEYS = {
-    "scenario_id", "source_status", "synthetic_data_notice", "catalogue_notice",
+    "version_history", "scenario_id", "source_status", "synthetic_data_notice", "catalogue_notice",
     "role_catalogue_notice", "catalogue_status", "evidence_state", "mapping_status",
     "review_metadata", "document_id", "step_id",
 }
@@ -559,6 +559,10 @@ def chat_with_incident(
             "investigation": result,
         }
 
+    if result.get("warnings"):
+        return {"reply": result.get("final_analysis", "L2 review is required before a resolution can be confirmed."),
+                "error": None, "investigation": result, "ai_provenance": "deterministic_guardrail"}
+
     context = {
         "ticket_facts": _ticket_context(ticket),
         "investigation_findings": _investigation_context(result),
@@ -596,6 +600,8 @@ def chat_with_incident(
             input=messages,
             max_output_tokens=llm_agent.MAX_OUTPUT_TOKENS,
         )
+        if not llm_agent._response_complete(response):
+            raise ValueError("Incomplete model response")
         reply = llm_agent._item_value(response, "output_text", "")
         if not isinstance(reply, str) or not reply.strip():
             fallback = _deterministic_troubleshooting_reply(ticket, result) if "troubleshoot" in user_message.casefold() or "troubleshooting" in user_message.casefold() else ""

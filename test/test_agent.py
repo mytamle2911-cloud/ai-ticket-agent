@@ -126,7 +126,7 @@ class AgentTests(unittest.TestCase):
         docs = docs
         fake_client = SimpleNamespace(responses=FakeResponses(response or fake_response()))
         with patch.object(agent, "get_ticket", return_value=ticket), \
-             patch.object(agent, "client", fake_client):
+             patch.object(agent, "_get_client", return_value=fake_client):
             return agent.run_investigation(ticket["incident_number"])
 
     def test_matching_draft_kb_is_retrieval_not_resolution(self):
@@ -299,7 +299,7 @@ class AgentTests(unittest.TestCase):
     def test_invalid_json_tool_call_is_recorded_without_crashing(self):
         tool_call = SimpleNamespace(type="function_call", name="get_ticket", arguments="{bad", call_id="call-1")
         fake_client = SimpleNamespace(responses=FakeResponses(fake_response([tool_call], ""), fake_response([], "candidate only")))
-        with patch.object(agent, "get_ticket", return_value=self.ticket), patch.object(agent, "client", fake_client):
+        with patch.object(agent, "get_ticket", return_value=self.ticket), patch.object(agent, "_get_client", return_value=fake_client):
             result = agent.run_investigation("INC100002")
         self.assertEqual(result["candidate_findings"], "candidate only")
         call_result = result["steps"][1]["tool_calls"][0]["result"]
@@ -308,7 +308,7 @@ class AgentTests(unittest.TestCase):
     def test_unexpected_model_response_fails_closed(self):
         malformed = SimpleNamespace(output="unexpected", output_text="claim access is missing")
         fake_client = SimpleNamespace(responses=FakeResponses(malformed))
-        with patch.object(agent, "get_ticket", return_value=self.ticket), patch.object(agent, "client", fake_client):
+        with patch.object(agent, "get_ticket", return_value=self.ticket), patch.object(agent, "_get_client", return_value=fake_client):
             result = agent.run_investigation("INC100002")
         self.assertFalse(result["approval_needed"])
         self.assertEqual(result["evidence_status"], "confirmed")
@@ -317,14 +317,14 @@ class AgentTests(unittest.TestCase):
     def test_malformed_function_call_response_fails_closed(self):
         malformed_call = SimpleNamespace(type="function_call", name="get_ticket", arguments="{}")
         fake_client = SimpleNamespace(responses=FakeResponses(fake_response([malformed_call], "")))
-        with patch.object(agent, "get_ticket", return_value=self.ticket), patch.object(agent, "client", fake_client):
+        with patch.object(agent, "get_ticket", return_value=self.ticket), patch.object(agent, "_get_client", return_value=fake_client):
             result = agent.run_investigation("INC100002")
         self.assertFalse(result["approval_needed"])
         self.assertIn("malformed tool response", result["error"])
 
     def test_openai_timeout_fails_closed_without_exposing_exception(self):
         fake_client = SimpleNamespace(responses=SimpleNamespace(create=Mock(side_effect=TimeoutError("secret request details"))))
-        with patch.object(agent, "get_ticket", return_value=self.ticket), patch.object(agent, "client", fake_client):
+        with patch.object(agent, "get_ticket", return_value=self.ticket), patch.object(agent, "_get_client", return_value=fake_client):
             result = agent.run_investigation("INC100002")
         self.assertFalse(result["approval_needed"])
         self.assertIn("timed out", result["error"])
@@ -332,7 +332,7 @@ class AgentTests(unittest.TestCase):
 
     def test_openai_api_error_is_sanitized(self):
         fake_client = SimpleNamespace(responses=SimpleNamespace(create=Mock(side_effect=RuntimeError("secret request payload"))))
-        with patch.object(agent, "get_ticket", return_value=self.ticket), patch.object(agent, "client", fake_client):
+        with patch.object(agent, "get_ticket", return_value=self.ticket), patch.object(agent, "_get_client", return_value=fake_client):
             result = agent.run_investigation("INC100002")
         self.assertFalse(result["approval_needed"])
         self.assertEqual(result["error"], "The OpenAI investigation request failed. Check the OpenAI service and app configuration, then retry.")
@@ -340,7 +340,7 @@ class AgentTests(unittest.TestCase):
 
     def test_ai_investigation_never_updates_status(self):
         patcher = patch.object(agent, "requests", wraps=agent.requests)
-        with patch.object(agent, "get_ticket", return_value=self.ticket), patch.object(agent, "client", SimpleNamespace(responses=FakeResponses(fake_response()))), patcher as requests_mock:
+        with patch.object(agent, "get_ticket", return_value=self.ticket), patch.object(agent, "_get_client", return_value=SimpleNamespace(responses=FakeResponses(fake_response()))), patcher as requests_mock:
             result = agent.run_investigation("INC100002")
         self.assertFalse(result["approval_needed"])
         self.assertEqual(result["resolution_path"], "HUMAN_SUPPORT")

@@ -10,6 +10,10 @@ function explicitChatFact(messages, pattern) {
 }
 
 export function buildResolutionPrefill(ticket, investigation = {}, messages = [], savedRecord = null) {
+  if (investigation.warnings?.length) return {
+    proposals: { root_cause:'', resolution:'' },
+    confirmed: { confirmed_root_cause:'', actions_performed:'', verification_evidence:'', consultant_id:'' },
+  }
   const verifiedRecord = savedRecord?.verified === true
     ? savedRecord
     : investigation.verified_resolution_record?.verified === true

@@ -1,10 +1,14 @@
 from flask import Flask, jsonify, make_response, request
 from datetime import datetime, timezone
+from functools import wraps
 import json
 import os
 import re
 import threading
 import uuid
+import copy
+import tempfile
+from agent import knowledge_governance as governance
 from urllib.parse import parse_qsl, urlsplit
 
 from agent.history import search_historical_cases
@@ -37,6 +41,16 @@ STATUS_VALUES = {label: code for code, label in STATUS_CODES.items()}
 ALLOWED_STATUSES = set(STATUS_VALUES)
 IMPACT_URGENCY_LABELS = {1: "Critical", 2: "High", 3: "Medium", 4: "Low"}
 _ticket_status_lock = threading.Lock()
+_knowledge_write_lock = threading.RLock()
+
+
+def _serialize_knowledge_write(function):
+    """Keep read/validate/version/write atomic within this JSON-backed process."""
+    @wraps(function)
+    def guarded(*args, **kwargs):
+        with _knowledge_write_lock:
+            return function(*args, **kwargs)
+    return guarded
 
 
 @app.before_request
@@ -187,7 +201,7 @@ def save_resolution_records(data):
 def load_knowledge_articles():
     state = demo_state.active_state()
     if state is not None:
-        return {"articles": state["articles"]}
+        return {"articles": copy.deepcopy(state["articles"])}
     if os.getenv("VERCEL") == "1":
         raise RuntimeError("A browser demo-state context is required for knowledge articles.")
     if not os.path.exists(KNOWLEDGE_ARTICLES_FILE):
@@ -208,8 +222,24 @@ def save_knowledge_articles(data):
         return
     if os.getenv("VERCEL") == "1":
         raise OSError("Refusing to write knowledge articles to the Vercel filesystem.")
-    with open(KNOWLEDGE_ARTICLES_FILE, "w", encoding="utf-8") as file:
-        json.dump(data, file, indent=2, ensure_ascii=False)
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=os.path.dirname(KNOWLEDGE_ARTICLES_FILE), delete=False) as file:
+            temporary = file.name
+            json.dump(data, file, indent=2, ensure_ascii=False)
+        os.replace(temporary, KNOWLEDGE_ARTICLES_FILE)
+    finally:
+        if temporary and os.path.exists(temporary):
+            os.unlink(temporary)
+
+
+def _knowledge_review(candidate, records, payload):
+    warnings = governance.article_warnings(candidate, records)
+    if warnings and payload.get("review_acknowledged") is not True:
+        return jsonify({"error": "Review the knowledge warnings before proceeding.",
+                        "governance_review_required": True, "warnings": warnings,
+                        "proposed_article": {key: candidate[key] for key in ("source_resolution_id", "title", "symptoms")}}), 409
+    return None
 
 
 def _resolution_by_id(incident_number, resolution_id):
@@ -628,6 +658,7 @@ def chat_about_ticket(incident_number):
 
 
 @app.route("/api/tickets/<incident_number>/knowledge-articles/generate", methods=["POST"])
+@_serialize_knowledge_write
 def generate_ticket_knowledge_draft(incident_number):
     incident_number = incident_number.strip().upper()
     if not re.fullmatch(r"INC\d{6}", incident_number):
@@ -672,6 +703,10 @@ def generate_ticket_knowledge_draft(incident_number):
             "published_at": None,
             "knowledge_source": "consultant_verified_resolution",
         }
+        article.update(governance.new_metadata())
+        review = _knowledge_review(article, data["articles"], payload)
+        if review:
+            return review
         data["articles"].append(article)
         save_knowledge_articles(data)
     except knowledge_capture.KnowledgeCaptureError as exc:
@@ -813,12 +848,13 @@ def _documented_roles(ticket):
 
 
 @app.route("/api/tickets/<incident_number>/knowledge-articles", methods=["POST"])
+@_serialize_knowledge_write
 def create_knowledge_article_draft(incident_number):
     incident_number = incident_number.strip().upper()
     if not re.fullmatch(r"INC\d{6}", incident_number):
         return jsonify({"error": "Enter a valid incident number such as INC100001."}), 400
     payload = request.get_json(silent=True)
-    if not isinstance(payload, dict) or set(payload) != {"source_resolution_id", "title", "symptoms"}:
+    if not isinstance(payload, dict) or not {"source_resolution_id", "title", "symptoms"}.issubset(payload) or set(payload) - {"source_resolution_id", "title", "symptoms", "review_acknowledged"}:
         return jsonify({"error": "Provide a source resolution ID, generated title, and symptoms."}), 400
     if not all(isinstance(payload.get(key), str) and payload[key].strip()
                for key in ("source_resolution_id", "title", "symptoms")):
@@ -863,6 +899,10 @@ def create_knowledge_article_draft(incident_number):
         "published_at": None,
         "knowledge_source": "consultant_verified_resolution",
     }
+    article.update(governance.new_metadata())
+    review = _knowledge_review(article, data["articles"], payload)
+    if review:
+        return review
     data["articles"].append(article)
     try:
         save_knowledge_articles(data)
@@ -871,49 +911,72 @@ def create_knowledge_article_draft(incident_number):
     return jsonify({"message": "Knowledge draft saved for human review.", "article": article, "created": True}), 201
 
 
+@app.route("/api/knowledge-articles/<article_id>", methods=["GET"])
+def get_knowledge_article(article_id):
+    try:
+        article = next((row for row in load_knowledge_articles()["articles"] if row.get("article_id") == article_id), None)
+    except RuntimeError:
+        return jsonify({"error": "Knowledge article storage is unavailable."}), 500
+    if not article:
+        return jsonify({"error": "Knowledge article not found."}), 404
+    return jsonify({"article": {**governance.new_metadata(), **article}})
+
+
 @app.route("/api/knowledge-articles/<article_id>", methods=["PATCH"])
+@_serialize_knowledge_write
 def update_knowledge_article(article_id):
     payload = request.get_json(silent=True)
-    if not isinstance(payload, dict) or not payload:
-        return jsonify({"error": "Provide article edits or an explicit approval action."}), 400
-    allowed = {"title", "symptoms", "confirmed_root_cause", "verified_troubleshooting_steps", "verification_method", "approve", "approved_by"}
-    if set(payload) - allowed:
-        return jsonify({"error": "Unsupported article fields cannot be changed."}), 400
+    content_fields = {"title", "symptoms", "confirmed_root_cause", "verified_troubleshooting_steps", "verification_method"}
+    allowed = content_fields | {"approve", "approved_by", "lifecycle_status", "expected_version", "review_acknowledged"}
+    if not isinstance(payload, dict) or not payload or set(payload) - allowed:
+        return jsonify({"error": "Provide supported article edits or an explicit approval action."}), 400
     try:
         data = load_knowledge_articles()
     except RuntimeError:
         return jsonify({"error": "Knowledge article storage is unavailable."}), 500
-    article = next((item for item in data["articles"] if isinstance(item, dict) and item.get("article_id") == article_id), None)
-    if not article:
+    previous = next((row for row in data["articles"] if row.get("article_id") == article_id), None)
+    if not previous:
         return jsonify({"error": "Knowledge article not found."}), 404
-    if article.get("review_status") != "Draft":
-        return jsonify({"error": "Only Draft articles can be edited or approved."}), 409
+    if "expected_version" in payload and (type(payload["expected_version"]) is not int or payload["expected_version"] != previous.get("version", 1)):
+        return jsonify({"error": "The article changed after review. Reload it before saving; your edits have not been saved."}), 409
+    if previous.get("review_status") != "Draft" and (content_fields.intersection(payload) or "approve" in payload):
+        return jsonify({"error": "Only Draft articles can be edited or approved. Published articles support lifecycle changes only."}), 409
+    article = copy.deepcopy(previous)
+    for key in content_fields.intersection(payload):
+        value = payload[key]
+        if key == "verified_troubleshooting_steps":
+            valid = isinstance(value, list) and bool(value) and all(isinstance(v, str) and v.strip() for v in value)
+        else:
+            valid = isinstance(value, str) and bool(value.strip())
+        if not valid:
+            return jsonify({"error": f"'{key}' must contain non-empty text."}), 400
+        article[key] = value
+    if "lifecycle_status" in payload:
+        if not isinstance(payload["lifecycle_status"], str) or payload["lifecycle_status"] not in governance.LIFECYCLE_STATUSES:
+            return jsonify({"error": "Lifecycle must be active, expired, or superseded."}), 400
+        article["lifecycle_status"] = payload["lifecycle_status"]
     approval = payload.get("approve") is True
-    if "approve" in payload and payload.get("approve") is not True:
+    if "approve" in payload and not approval:
         return jsonify({"error": "Approval must be an explicit true value."}), 400
-    if approval and (not isinstance(payload.get("approved_by"), str) or not payload["approved_by"].strip()):
-        return jsonify({"error": "A reviewer identifier is required for approval."}), 400
-    fields = {"title": str, "symptoms": str, "confirmed_root_cause": str, "verification_method": str}
-    for key, value in payload.items():
-        if key in {"approve", "approved_by"}:
-            continue
-        if key in fields and (not isinstance(value, str) or not value.strip()):
-            return jsonify({"error": f"'{key}' must be a non-empty string."}), 400
-        if key == "verified_troubleshooting_steps" and (not isinstance(value, list) or not value or not all(isinstance(row, str) and row.strip() for row in value)):
-            return jsonify({"error": "Troubleshooting steps must be a non-empty list of strings."}), 400
-        if key in fields or key == "verified_troubleshooting_steps":
-            article[key] = value
     if approval:
-        article["review_status"] = "Approved"
-        article["approved_by"] = payload["approved_by"].strip()
-        timestamp = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
-        article["approved_at"] = timestamp
-        article["published_at"] = timestamp
-    try:
-        save_knowledge_articles(data)
-    except OSError:
-        return jsonify({"error": "Could not persist the article update."}), 500
-    return jsonify({"article": article, "message": "Article approved and published." if approval else "Draft updated."})
+        if not isinstance(payload.get("approved_by"), str) or not payload["approved_by"].strip():
+            return jsonify({"error": "A reviewer identifier is required for approval."}), 400
+        article.update(review_status="Approved", approved_by=payload["approved_by"].strip())
+        article["approved_at"] = article["published_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    if content_fields.intersection(payload) or approval or payload.get("lifecycle_status") == "active":
+        review = _knowledge_review(article, data["articles"], payload)
+        if review:
+            return review
+    if article != previous:
+        if len(previous.get("version_history", [])) >= 100:
+            return jsonify({"error": "Version history limit reached. Export and review history before further updates; nothing was saved."}), 409
+        article = governance.version_update(previous, article, datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z"))
+        data["articles"] = [article if row.get("article_id") == article_id else row for row in data["articles"]]
+        try:
+            save_knowledge_articles(data)
+        except (OSError, RuntimeError):
+            return jsonify({"error": "Could not persist the article update. Your edits have not been saved; retry when storage is available."}), 500
+    return jsonify({"article": article, "message": "Article approved and published." if approval else "Article updated."})
 
 
 @app.route("/api/knowledge-articles/search", methods=["GET"])
@@ -930,7 +993,7 @@ def search_knowledge_articles():
     tokens = set(norm(query).split())
     matches = []
     for article in records:
-        if not isinstance(article, dict) or article.get("review_status") != "Approved":
+        if not isinstance(article, dict) or article.get("review_status") != "Approved" or not governance.is_active(article):
             continue
         if source_system and norm(article.get("source_system")) != norm(source_system):
             continue
@@ -940,7 +1003,7 @@ def search_knowledge_articles():
                            ("title", "issue_category", "error_signature", "symptoms", "confirmed_root_cause")))
         if query and not (norm(query) in haystack or tokens.intersection(haystack.split())):
             continue
-        matches.append({**article, "knowledge_source": "approved_captured_article"})
+        matches.append({**{key: value for key, value in article.items() if key != "version_history"}, "knowledge_source": "approved_captured_article"})
     return jsonify({"count": len(matches), "articles": matches})
 
 
