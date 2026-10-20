@@ -102,6 +102,16 @@ class BrowserDemoStateTests(unittest.TestCase):
                 "symptoms": "An approver cannot see the reported sales document task.",
             }, token,
         )
+        self.assertEqual(article_result["status_code"], 409)
+        self.assertEqual(article_result["result"]["error_info"]["code"], "DUPLICATE_KNOWLEDGE")
+        _, article_result = self.dispatch(
+            "/api/tickets/INC100006/knowledge-articles", "POST", {
+                "source_resolution_id": resolution["resolution_id"],
+                "title": "SAP SD approval task visibility checks",
+                "symptoms": "An approver cannot see the reported sales document task.",
+                "review_acknowledged": True,
+            }, article_result["demo_state"],
+        )
         self.assertEqual(article_result["status_code"], 201)
         article = article_result["result"]["article"]
         self.assertEqual(article["review_status"], "Draft")

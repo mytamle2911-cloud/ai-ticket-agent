@@ -54,7 +54,7 @@ class KnowledgeGovernanceTests(unittest.TestCase):
         server.save_resolution_records({'verified_resolutions': [self.resolution, second]})
         response = self.create(source_resolution_id='RES-CONFLICT', title='Alternative guidance')
         self.assertEqual(response.status_code, 409)
-        warnings = response.get_json()['warnings']
+        warnings = [warning for warning in response.get_json()['warnings'] if warning['code'] == 'potential_knowledge_conflict']
         self.assertEqual(warnings[0]['code'], 'potential_knowledge_conflict')
         self.assertEqual(len(warnings[0]['sources']), 2)
         self.assertIn('Do not enable substitution.', str(warnings[0]['details']))
@@ -202,16 +202,14 @@ class KnowledgeGovernanceTests(unittest.TestCase):
         self.assertNotIn('article', response.get_json())
         self.assertEqual(server.load_knowledge_articles()['articles'], [])
 
-    def test_duplicate_approval_requires_review_and_does_not_publish_automatically(self):
+    def test_existing_article_approval_does_not_repeat_duplicate_scope_warning(self):
         first = self.create().get_json()['article']
         second = {**first, 'article_id': 'KBA-OTHER', 'source_resolution_id': 'RES-OTHER'}
         server.save_knowledge_articles({'articles': [first, second]})
         path = '/api/knowledge-articles/' + first['article_id']
         response = self.client.patch(path, json={'approve': True, 'approved_by': 'Reviewer'})
-        self.assertEqual(response.status_code, 409)
-        self.assertEqual(server.load_knowledge_articles()['articles'][0], first)
-        response = self.client.patch(path, json={'approve': True, 'approved_by': 'Reviewer', 'review_acknowledged': True})
         self.assertEqual(response.status_code, 200)
+        self.assertNotIn('governance_review_required', response.get_json())
         self.assertEqual(response.get_json()['article']['review_status'], 'Approved')
 
     def test_incomplete_generation_drafts_are_rejected_even_if_text_looks_valid(self):
@@ -261,3 +259,106 @@ class KnowledgeGovernanceTests(unittest.TestCase):
         self.assertNotIn('version_history', matches[0])
         self.assertNotIn('version_history', llm_agent._professional_model_text(review))
         self.assertNotIn('version_history', chat_agent._professional_context(review))
+
+    def test_two_tickets_same_scope_cancel_continue_and_repeated_submit(self):
+        first = self.create().get_json()['article']
+        second_ticket = {**self.ticket, 'incident_number': 'INC990002'}
+        second_resolution = {**self.resolution, 'resolution_id': 'RES-TICKET-B', 'incident_number': 'INC990002'}
+        server.save_resolution_records({'verified_resolutions': [self.resolution, second_resolution]})
+        payload = {'source_resolution_id': 'RES-TICKET-B', 'title': 'A completely different title', 'symptoms': 'Different symptom report'}
+        with patch.object(server, 'load_tickets', return_value={'tickets': [self.ticket, second_ticket]}):
+            response = self.client.post('/api/tickets/INC990002/knowledge-articles', json=payload)
+            body = response.get_json()
+            self.assertEqual(response.status_code, 409)
+            self.assertFalse(body['success'])
+            self.assertEqual(body['error_info']['code'], 'DUPLICATE_KNOWLEDGE')
+            reference = body['error_info']['details']['sources'][0]
+            self.assertEqual(reference['record_id'], first['article_id'])
+            self.assertEqual(reference['source_incident'], 'INC990001')
+            self.assertEqual(reference['source_system'], 'SAP MM')
+            self.assertEqual(reference['issue_category'], 'Approval Action')
+            # Cancel sends no confirming request, so the first article is the only persisted one.
+            self.assertEqual(len(server.load_knowledge_articles()['articles']), 1)
+            self.assertEqual(self.client.get('/api/knowledge-articles/' + first['article_id']).status_code, 200)
+            saved = self.client.post('/api/tickets/INC990002/knowledge-articles', json={**payload, 'review_acknowledged': True})
+            self.assertEqual(saved.status_code, 201)
+            repeated = self.client.post('/api/tickets/INC990002/knowledge-articles', json={**payload, 'review_acknowledged': True})
+            self.assertEqual(repeated.status_code, 200)
+            self.assertEqual(repeated.get_json()['article']['article_id'], saved.get_json()['article']['article_id'])
+            self.assertEqual(len(server.load_knowledge_articles()['articles']), 2)
+
+    def test_different_scope_or_inactive_article_does_not_warn_for_duplicate(self):
+        candidate = {'article_id': 'B', 'title': 'Any title', 'source_system': ' SAP--MM ', 'issue_category': ' Approval Action '}
+        existing = {'article_id': 'A', 'title': 'Another title', 'source_system': 'sap mm', 'issue_category': 'approval action'}
+        self.assertEqual(kg.article_warnings(candidate, [existing])[0]['code'], 'potential_duplicate')
+        for changed in [dict(existing, source_system='SAP SD'), dict(existing, issue_category='Performance'),
+                        dict(existing, lifecycle_status='expired'), dict(existing, lifecycle_status='superseded'),
+                        dict(existing, article_id='B')]:
+            self.assertEqual(kg.article_warnings(candidate, [changed]), [])
+
+    def test_existing_edit_and_open_do_not_raise_duplicate_warning(self):
+        original = self.create().get_json()['article']
+        server.save_knowledge_articles({'articles': [original, {**original, 'article_id': 'KBA-OTHER'}]})
+        path = '/api/knowledge-articles/' + original['article_id']
+        self.assertNotIn('warnings', self.client.get(path).get_json())
+        edited = self.client.patch(path, json={'title': 'Changed title', 'symptoms': 'Updated symptoms'})
+        self.assertEqual(edited.status_code, 200)
+        self.assertNotIn('governance_review_required', edited.get_json())
+        # Matching scope is immutable in the current editing workflow.
+        self.assertEqual(self.client.patch(path, json={'source_system': 'SAP SD'}).status_code, 400)
+
+    def test_api_failure_is_structured_even_when_safe_fallback_is_available(self):
+        fallback = {'error': 'The OpenAI request timed out. Retry the investigation.', 'reply': 'Deterministic guidance only.',
+                    'ai_provenance': 'deterministic_fallback', 'investigation': {'ticket': self.ticket}}
+        with patch.object(chat_agent, 'chat_with_incident', return_value=fallback):
+            response = self.client.post('/api/tickets/INC990001/chat', json={'message': 'Troubleshoot this ticket'})
+        self.assertEqual(response.status_code, 503)
+        body = response.get_json()
+        self.assertFalse(body['success'])
+        self.assertEqual(body['error_info']['code'], 'AI_API_FAILURE')
+        self.assertTrue(body['error_info']['retryable'])
+        self.assertEqual(body['ai_provenance'], 'deterministic_fallback')
+        self.assertEqual(body['reply'], 'Deterministic guidance only.')
+
+    def test_missing_docs_and_fields_are_nonfatal_structured_notices(self):
+        ticket = {'incident_number': 'INC990001', 'source_system': 'Unknown', 'category': '', 'short_description': ''}
+        with patch.object(llm_agent, 'get_ticket', return_value=ticket), patch('agent.captured_knowledge.search_approved_articles', return_value=([], None)), patch.object(llm_agent, '_get_client') as model:
+            response = self.client.post('/api/tickets/INC990001/investigation', json={})
+        self.assertEqual(response.status_code, 200)
+        body = response.get_json()
+        self.assertTrue(body['success'])
+        self.assertEqual({n['code'] for n in body['notices']}, {'INCOMPLETE_TICKET', 'MISSING_DOCUMENTATION'})
+        incomplete = next(n for n in body['notices'] if n['code'] == 'INCOMPLETE_TICKET')
+        self.assertEqual(incomplete['details']['missing_fields'], ['category', 'short_description'])
+        self.assertFalse(incomplete['blocking'])
+        self.assertEqual(body['investigation']['resolution_path'], 'HUMAN_SUPPORT')
+        model.assert_not_called()
+
+    def test_optional_comments_are_not_new_mandatory_fields(self):
+        ticket = dict(self.ticket)
+        ticket.pop('additional_comments')
+        doc = {'source_system': 'SAP MM', 'issue_type': 'Approval Action', 'diagnostic_steps': [{'instruction': 'Request a task reference.'}]}
+        warnings = investigation_warnings(ticket, [{'document': doc}], [])
+        self.assertFalse(any(w['code'] == 'missing_incident_information' for w in warnings))
+        self.assertEqual(investigation_warnings(ticket, [{'document': {'title': 'Empty shell'}}], [])[0]['code'], 'missing_documentation')
+
+    def test_knowledge_conflict_popup_contract_contains_both_sources(self):
+        from agent.api_errors import warning_notice
+        docs = [{'article_id': identity, 'source_system': 'SAP MM', 'issue_category': 'Approval Action',
+                 'verified_troubleshooting_steps': [instruction]} for identity, instruction in [('A', 'Enable substitution.'), ('B', 'Disable substitution.')]]
+        warning = warning_notice(kg.knowledge_conflicts(docs)[0])
+        self.assertEqual(warning['code'], 'KNOWLEDGE_CONFLICT')
+        self.assertEqual([s['record_id'] for s in warning['details']['sources']], ['A', 'B'])
+        self.assertTrue(warning['details']['details'])
+        self.assertFalse(warning['blocking'])
+
+    def test_save_failed_code_hides_storage_exception_and_preserves_original(self):
+        original = self.create().get_json()['article']
+        with patch.object(server, 'save_knowledge_articles', side_effect=OSError('sensitive disk path')):
+            response = self.client.patch('/api/knowledge-articles/' + original['article_id'], json={'title': 'Unsaved edit'})
+        self.assertEqual(response.status_code, 500)
+        body = response.get_json()
+        self.assertFalse(body['success'])
+        self.assertEqual(body['error_info']['code'], 'SAVE_FAILED')
+        self.assertNotIn('sensitive disk path', json.dumps(body))
+        self.assertEqual(server.load_knowledge_articles()['articles'][0], original)

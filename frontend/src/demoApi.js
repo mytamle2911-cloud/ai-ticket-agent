@@ -35,7 +35,7 @@ export function createBrowserDemoApi({ fetchImpl, storage, locks, onUnauthorized
     const responsePayload = await response.json().catch(() => ({}))
     if (!response.ok) {
       if (response.status === 401) onUnauthorized?.()
-      const error = new Error(responsePayload.error || `Request failed (${response.status})`)
+      const error = new Error(responsePayload.error_info?.message || responsePayload.error || `Request failed (${response.status})`)
       error.payload = responsePayload
       error.status = response.status
       throw error
@@ -45,7 +45,7 @@ export function createBrowserDemoApi({ fetchImpl, storage, locks, onUnauthorized
     }
     storage.setItem(DEMO_STATE_KEY, responsePayload.demo_state)
     if (responsePayload.status_code < 200 || responsePayload.status_code >= 300) {
-      const error = new Error(responsePayload.result?.error || `Request failed (${responsePayload.status_code})`)
+      const error = new Error(responsePayload.result?.error_info?.message || responsePayload.result?.error || `Request failed (${responsePayload.status_code})`)
       error.payload = responsePayload.result || {}
       error.status = responsePayload.status_code
       throw error

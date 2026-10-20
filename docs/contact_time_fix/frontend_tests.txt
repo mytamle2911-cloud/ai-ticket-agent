@@ -1,0 +1,42 @@
+(node:15684) ExperimentalWarning: CommonJS module /opt/homebrew/lib/node_modules/npm/node_modules/debug/src/node.js is loading ES Module /opt/homebrew/lib/node_modules/npm/node_modules/supports-color/index.js using require().
+Support for loading ES Module in require() is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> ticket-agent-frontend@1.0.0 test
+> node --test
+
+✔ email draft fields remain editable independently (0.750458ms)
+✔ copy action formats the current edited subject and body (0.131625ms)
+✔ communication is only available after a completed matching investigation (0.082875ms)
+✔ per-ticket drafts and edits survive ticket switches without crossing records (0.072ms)
+✔ contact display includes both dates, full thirty-minute ranges and seasonal UTC offsets (48.093834ms)
+✔ contact display does not shift local dates according to the host timezone (152.894917ms)
+✔ contact display retains individual local dates and never invents an unavailable slot (0.238875ms)
+✔ normal successful operation does not open any popup (0.600167ms)
+✔ duplicate warning retains source reference and delegates to confirmation modal (0.333375ms)
+✔ timeout popup Retry sends the same failed request again only on user action (0.588334ms)
+✔ nonfatal missing evidence notices open a popup without discarding investigation (0.097208ms)
+✔ save failure rejects success path while preserving unsaved form content (0.118375ms)
+✔ browser state is sent on later requests and survives an app refresh (0.874334ms)
+✔ resolution and article write requests share the updated state token (0.180875ms)
+✔ reset request omits the previous browser token and saves the fresh snapshot (0.159292ms)
+✔ backend error status is preserved and the returned signed snapshot is retained (0.888125ms)
+✔ hosted requests send same-origin cookies and notify the app when a session expires (0.295916ms)
+✔ chat history drops assistant presentation metadata and sends only role and content (0.401917ms)
+✔ actual duplicate dialog renders matching title, system, category, ticket and working actions (6.692ms)
+✔ error dialog renders missing fields and next action; no raw exception details (0.493291ms)
+✔ INC100001 offers editable scenario guidance without treating it as completed evidence (1.106125ms)
+✔ INC100003 offers editable scenario guidance without treating it as completed evidence (0.189417ms)
+✔ INC100004 offers editable scenario guidance without treating it as completed evidence (0.102583ms)
+✔ only explicit consultant statements or an existing verified record fill confirmed fields (0.317208ms)
+✔ unverified saved data is not copied into the confirmation form (0.403584ms)
+✔ saving requires actual verification evidence and explicit consultant affirmation (0.05825ms)
+✔ knowledge conflict or missing evidence cannot prefill an expected cause or resolution (0.148042ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 274.715667

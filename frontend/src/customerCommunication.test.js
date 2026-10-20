@@ -37,3 +37,37 @@ test('per-ticket drafts and edits survive ticket switches without crossing recor
   assert.equal(states.INC100006.draft.subject, 'Edited')
   assert.equal(states.INC100001.draft.subject, 'Other')
 })
+
+test('contact display includes both dates, full thirty-minute ranges and seasonal UTC offsets', async () => {
+  const { formatContactSlot } = await import('./customerCommunication.js')
+  const vietnam = formatContactSlot({ date:'2026-07-20', time:'14:00', end_time:'14:30', end_date:'2026-07-20', timezone:'Asia/Ho_Chi_Minh', utc_offset:'UTC+07:00' })
+  const munich = formatContactSlot({ date:'2026-07-20', time:'09:00', end_time:'09:30', end_date:'2026-07-20', timezone:'Europe/Berlin', utc_offset:'UTC+02:00' })
+  assert.equal(vietnam.date, 'Monday, 20 Jul 2026')
+  assert.equal(vietnam.timeRange, '14:00–14:30')
+  assert.equal(vietnam.zone, 'Vietnam Time, UTC+07:00')
+  assert.equal(munich.date, 'Monday, 20 Jul 2026')
+  assert.equal(munich.timeRange, '09:00–09:30')
+  assert.equal(munich.zone, 'Munich Time, UTC+02:00')
+  const winter = formatContactSlot({ date:'2026-10-26', time:'09:00', end_time:'09:30', end_date:'2026-10-26', timezone:'Europe/Berlin', utc_offset:'UTC+01:00' })
+  assert.equal(winter.zone, 'Munich Time, UTC+01:00')
+  assert.equal(winter.date, 'Monday, 26 Oct 2026')
+})
+
+test('contact display does not shift local dates according to the host timezone', async () => {
+  const { execFileSync } = await import('node:child_process')
+  const moduleUrl = new URL('./customerCommunication.js', import.meta.url).href
+  const script = `import { formatContactSlot } from ${JSON.stringify(moduleUrl)}; process.stdout.write(JSON.stringify(formatContactSlot({date:'2026-07-20', time:'09:00', end_time:'09:30', timezone:'Europe/Berlin', utc_offset:'UTC+02:00'})))`
+  for (const timezone of ['Pacific/Honolulu', 'Asia/Tokyo', 'UTC']) {
+    const actual = JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', script], { env:{ ...process.env, TZ:timezone }, encoding:'utf8' }))
+    assert.equal(actual.date, 'Monday, 20 Jul 2026')
+    assert.equal(actual.timeRange, '09:00–09:30')
+  }
+})
+
+test('contact display retains individual local dates and never invents an unavailable slot', async () => {
+  const { formatContactSlot } = await import('./customerCommunication.js')
+  assert.equal(formatContactSlot(null), null)
+  const customer = formatContactSlot({ date:'2026-07-13', end_date:'2026-07-13', time:'16:00', end_time:'16:30', timezone:'Pacific/Honolulu', label:'Hawaii', utc_offset:'UTC-10:00' })
+  assert.equal(customer.date, 'Monday, 13 Jul 2026')
+  assert.equal(customer.zone, 'Hawaii, UTC-10:00')
+})

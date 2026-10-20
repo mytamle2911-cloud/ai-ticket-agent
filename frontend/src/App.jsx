@@ -6,8 +6,10 @@ import {
   X,
 } from 'lucide-react'
 import { buildEditableResolutionForm, buildResolutionPrefill, canSaveVerifiedResolution } from './resolutionPrefill'
-import { canContactCustomer, formatEmailDraftForCopy, isCustomerCommunicationOpen, updateEmailDraft, updateTicketCommunicationState } from './customerCommunication'
+import { canContactCustomer, formatContactSlot, formatEmailDraftForCopy, isCustomerCommunicationOpen, updateEmailDraft, updateTicketCommunicationState } from './customerCommunication'
 import { createBrowserDemoApi, serializeChatHistory } from './demoApi'
+import { createFeedbackApi } from './apiFeedback'
+import { FeedbackDialog, KnowledgeReviewDialog } from './FeedbackDialog'
 
 const browserDemoApi = createBrowserDemoApi({
   fetchImpl:(url, options) => fetch(url, { ...options, signal:AbortSignal.timeout(60000) }),
@@ -26,7 +28,7 @@ const requestDirectApi = async (url, options = {}) => {
   })
   const payload = await response.json().catch(() => { throw new Error('The service returned an invalid response. Retry; the operation could not be confirmed.') })
   if (!response.ok) {
-    const error = new Error(payload.error || `Request failed (${response.status})`)
+    const error = new Error(payload.error_info?.message || payload.error || `Request failed (${response.status})`)
     error.payload = payload
     error.status = response.status
     throw error
@@ -34,10 +36,10 @@ const requestDirectApi = async (url, options = {}) => {
   return payload
 }
 
-const api = (url, options = {}) => {
+const api = createFeedbackApi((url, options = {}) => {
   if (!import.meta.env.PROD) return requestDirectApi(url, options)
   return browserDemoApi(url, options)
-}
+}, (feedback)=>window.dispatchEvent(new CustomEvent('ticket-agent-feedback', { detail:feedback })))
 const statusLabel = (ticket) => ticket.status_label || (typeof ticket.status === 'number' ? ({ 1:'New',2:'In Progress',3:'On Hold',4:'Resolved',5:'Closed',6:'Cancelled' }[ticket.status] || 'Unknown') : ticket.status)
 const summary = (ticket) => ticket.short_description || ticket.summary || 'Incident details unavailable'
 const source = (ticket) => ticket.source_system || ticket.system || 'Unknown system'
@@ -214,6 +216,8 @@ function CustomerCommunicationPanel({
   const customer = communication?.customer
   const contact = communication?.contact_time
   const slot = contact?.suggested_slot
+  const consultantSlot = formatContactSlot(slot?.consultant)
+  const customerSlot = formatContactSlot(slot?.customer)
   return <section className="customer-communication" aria-labelledby="customer-communication-title">
     <div className="communication-heading">
       <div className="communication-heading-title"><Mail size={16}/><h3 id="customer-communication-title">CUSTOMER COMMUNICATION</h3></div>
@@ -230,8 +234,8 @@ function CustomerCommunicationPanel({
           <div className="contact-time-card">
             <div className="contact-time-title"><Clock3 size={15}/><strong>Suggested Contact Time</strong></div>
             {slot ? <div className="contact-times">
-              <div><strong>{slot.consultant.time}</strong><span>{slot.consultant.label} · {slot.consultant.date}</span></div>
-              <div><strong>{slot.customer.time}</strong><span>{slot.customer.label} · {slot.customer.date}</span></div>
+              <div><strong>{consultantSlot.timeRange}</strong><span>{consultantSlot.date}</span><span>{consultantSlot.zone}</span></div>
+              <div><strong>{customerSlot.timeRange}</strong><span>{customerSlot.date}</span><span>{customerSlot.zone}</span></div>
             </div> : <p className="no-contact-slot">{contact?.reason || 'No future 30-minute slot was found.'}</p>}
             {contact?.overlap_found && <span className="working-overlap-badge"><CheckCircle2 size={12}/> Working-hour overlap</span>}
             {slot && <span className="contact-time-note">Suggested only · subject to availability · not a booking</span>}
@@ -284,6 +288,7 @@ function App() {
   const [resolutionForm, setResolutionForm] = useState({ confirmed_root_cause:'', actions_performed:'', verification_evidence:'', consultant_id:'' })
   const [article, setArticle] = useState(null)
   const [reviewer, setReviewer] = useState('')
+  const [feedback, setFeedback] = useState(null)
   const [governanceReview, setGovernanceReview] = useState(null)
   const [inspectedArticle, setInspectedArticle] = useState(null)
   const [retryRequest, setRetryRequest] = useState(null)
@@ -296,6 +301,16 @@ function App() {
   const communicationRequests = useRef(new Set())
   const emailRequests = useRef(new Set())
 
+  useEffect(() => {
+    const showFeedback = (event) => {
+      setNotice('')
+      const detail = event.detail
+      setFeedback({ ...detail, retry:detail.retry ? async () => { setFeedback(null); await detail.retry() } : null })
+    }
+    window.addEventListener('ticket-agent-feedback', showFeedback)
+    return () => window.removeEventListener('ticket-agent-feedback', showFeedback)
+  }, [])
+  useEffect(() => { setFeedback(null) }, [selectedId])
   const selected = useMemo(() => tickets.find((ticket) => ticket.incident_number === selectedId), [tickets, selectedId])
   const communicationState = communicationByTicket[selectedId] || {}
   const customerCommunication = communicationState.communication || null
@@ -367,12 +382,16 @@ function App() {
     aiRequestInFlight.current = true
     setBusy(true); setError(''); setNotice(''); setRetryRequest({ kind:'investigation' })
     try {
-      const result = await api(`/api/tickets/${selected.incident_number}/investigation`, { method:'POST', body:JSON.stringify({}) })
+      const result = await api(`/api/tickets/${selected.incident_number}/investigation`, { method:'POST', body:JSON.stringify({}), onRetry:runTroubleshooting })
       setAnswer(result)
       if (result.reply) setMessages([{ role:'assistant', content:result.reply, ai_provenance:result.ai_provenance, model:result.model }])
       if (result.error) setError(result.error)
       else setRetryRequest(null)
-    } catch (err) { if (err.payload?.investigation) setAnswer({ investigation:err.payload.investigation, error:err.message }); setError(err.message) }
+    } catch (err) {
+      if (err.payload?.investigation) setAnswer({ ...err.payload, error:err.message })
+      if (err.payload?.reply) setMessages([{ role:'assistant', content:err.payload.reply, ai_provenance:err.payload.ai_provenance, model:err.payload.model }])
+      setError(err.message)
+    }
     finally { aiRequestInFlight.current = false; setBusy(false) }
   }
 
@@ -386,7 +405,7 @@ function App() {
     setMessages([...prior, { role:'user', content:message }]); setDraftMessage(''); setBusy(true); setError(''); setStatusFeedback('')
     try {
       const result = await api(`/api/tickets/${selected.incident_number}/chat`, {
-        method:'POST', body:JSON.stringify({ message, history:serializeChatHistory(prior), request_investigation:!answer }),
+        method:'POST', body:JSON.stringify({ message, history:serializeChatHistory(prior), request_investigation:!answer }), onRetry:()=>sendMessage(null, { message, history:prior }),
       })
       if (result.status_update) {
         setCaptureOffer(null)
@@ -398,7 +417,7 @@ function App() {
       else setRetryRequest(null)
     } catch (err) {
       if (err.payload?.investigation) setAnswer((old) => ({ ...(old || {}), investigation:err.payload.investigation }))
-      setMessages((old) => [...old, { role:'assistant', content:'The request could not be completed.' }]); setError(err.message)
+      setMessages((old) => [...old, { role:'assistant', content:err.payload?.reply || 'The request could not be completed.', ai_provenance:err.payload?.ai_provenance, model:err.payload?.model }]); setError(err.message)
     }
     finally { aiRequestInFlight.current = false; setBusy(false) }
   }
@@ -490,8 +509,8 @@ function App() {
     setMessages((old) => [...old, { role:'assistant', content:'No problem. You can capture a verified resolution later from this ticket.' }])
   }
   const saveResolution = async (event) => {
-    event.preventDefault()
-    if (!selected) return
+    event?.preventDefault()
+    if (!selected || workflowBusy) return
     const actions = resolutionForm.actions_performed.split('\n').map((line) => line.trim()).filter(Boolean)
     if (!actions.length || !canSaveVerifiedResolution(resolutionForm, resolutionConfirmed)) {
       setError('Complete the cause, actions, actual retest evidence, and consultant ID, then confirm the statement below.')
@@ -499,7 +518,7 @@ function App() {
     }
     setWorkflowBusy(true); setError('')
     try {
-      const saved = await api(`/api/tickets/${selected.incident_number}/resolutions`, { method:'POST', body:JSON.stringify({ ...resolutionForm, actions_performed:actions, consultant_confirmed:true }) })
+      const saved = await api(`/api/tickets/${selected.incident_number}/resolutions`, { method:'POST', body:JSON.stringify({ ...resolutionForm, actions_performed:actions, consultant_confirmed:true }), onRetry:()=>saveResolution() })
       setResolutions((old) => [...old, saved.resolution]); setWorkflowStep(2); setNotice('Verified resolution saved for this incident. Ticket status was not changed.')
     } catch (err) { setError(err.message) }
     finally { setWorkflowBusy(false) }
@@ -509,30 +528,31 @@ function App() {
     if (!resolution || !selected) return
     setWorkflowBusy(true); setError(''); setNotice('')
     try {
-      const result = await api(`/api/tickets/${selected.incident_number}/knowledge-articles/generate`, { method:'POST', body:JSON.stringify({ resolution_id:resolution.resolution_id }) })
+      const result = await api(`/api/tickets/${selected.incident_number}/knowledge-articles/generate`, { method:'POST', body:JSON.stringify({ resolution_id:resolution.resolution_id }), onRetry:generateArticle })
       setArticle({ ...result.article, ai_provenance:result.ai_provenance }); setArticles((old) => old.some((item) => item.article_id === result.article.article_id) ? old : [...old, result.article])
       setNotice('AI draft created from the consultant-verified resolution. Review it before approval.')
-    } catch (err) { setError(err.message); if (err.payload?.governance_review_required) setGovernanceReview({ ...err.payload, kind:'create' }) }
+    } catch (err) { setError(err.message); if (err.payload?.governance_review_required) { setInspectedArticle(null); setGovernanceReview({ ...err.payload, kind:'create' }) } }
     finally { setWorkflowBusy(false) }
   }
-  const saveArticle = async (approve = false, acknowledged = false, lifecycle = null) => {
-    if (!article) return
+  const saveArticle = async (approve = false, acknowledged = false) => {
+    if (!article || workflowBusy) return
     setWorkflowBusy(true); setError(''); setNotice('')
     try {
-      const payload = { expected_version:article.version || 1, review_acknowledged:acknowledged, ...(lifecycle ? { lifecycle_status:lifecycle } : { title:article.title, symptoms:article.symptoms, lifecycle_status:article.lifecycle_status || 'active' }) }
+      const payload = { expected_version:article.version || 1, review_acknowledged:acknowledged, title:article.title, symptoms:article.symptoms }
       if (approve) { payload.approve = true; payload.approved_by = reviewer }
-      const result = await api(`/api/knowledge-articles/${article.article_id}`, { method:'PATCH', body:JSON.stringify(payload) })
+      const result = await api(`/api/knowledge-articles/${article.article_id}`, { method:'PATCH', body:JSON.stringify(payload), onRetry:()=>saveArticle(approve, acknowledged) })
       setArticle(result.article); setArticles((old) => old.map((item) => item.article_id === article.article_id ? result.article : item))
       setGovernanceReview(null)
       setNotice(approve ? 'Article approved and published to the reusable knowledge store.' : 'Article changes saved.')
-    } catch (err) { setError(err.message); if (err.payload?.governance_review_required) setGovernanceReview({ ...err.payload, kind:'update', approve, lifecycle }) }
+    } catch (err) { setError(err.message); if (err.payload?.governance_review_required) { setInspectedArticle(null); setGovernanceReview({ ...err.payload, kind:'update', approve }) } }
     finally { setWorkflowBusy(false) }
   }
   const reviewKnowledge = async () => {
-    if (governanceReview.kind === 'update') return saveArticle(governanceReview.approve, true, governanceReview.lifecycle)
-    setWorkflowBusy(true); setError('')
+    if (governanceReview.kind === 'update') return saveArticle(governanceReview.approve, true)
+    if (workflowBusy) return
+    setWorkflowBusy(true); setError(''); setNotice('')
     try {
-      const result = await api(`/api/tickets/${selected.incident_number}/knowledge-articles`, { method:'POST', body:JSON.stringify({ ...governanceReview.proposed_article, review_acknowledged:true }) })
+      const result = await api(`/api/tickets/${selected.incident_number}/knowledge-articles`, { method:'POST', body:JSON.stringify({ ...governanceReview.proposed_article, review_acknowledged:true }), onRetry:reviewKnowledge })
       setArticle(result.article); setArticles((old)=>[...old.filter((row)=>row.article_id !== result.article.article_id), result.article]); setGovernanceReview(null); setNotice('Draft saved after your review.')
     } catch (err) { setError(err.message) } finally { setWorkflowBusy(false) }
   }
@@ -578,6 +598,7 @@ function App() {
       const result = await api('/api/tickets/' + incident + '/customer-email-draft', {
         method: 'POST',
         body: JSON.stringify({ investigation:answer.investigation, date:communication.contact_time?.selected_date }),
+        onRetry:()=>generateCustomerReply(incident, true, communication),
       })
       setCommunicationByTicket((old) => updateTicketCommunicationState(old, incident, {
         draft:{ subject:result.subject, body:result.body, ai_provenance:result.ai_provenance, model:result.generated_by },
@@ -750,24 +771,23 @@ function App() {
           <div className="workflow-section-title"><span className="step-marker">2</span><div><h3>Knowledge Article</h3><p>Generate a draft from the saved, consultant-verified resolution.</p></div></div>
           {!resolutions.some((item)=>item.verified) ? <div className="locked-note"><ShieldCheck size={16}/> Save a consultant-verified resolution before drafting an article.</div> : <>
             {!article && <button className="secondary-button wide-button" onClick={generateArticle} disabled={workflowBusy}><Sparkles size={16}/>{workflowBusy ? 'Generating draft…' : 'Generate AI knowledge draft'}</button>}
-            {article && <div className="article-editor"><div className="article-status"><FileCheck2 size={16}/><span>{article.review_status === 'Approved' ? 'Approved & published' : 'Draft · review required'} · v{article.version || 1} · {article.lifecycle_status || 'active'}</span>{article.ai_provenance === 'live_gpt' && <span className="ai-provenance live">Generated by Live GPT</span>}</div>
-              <label>Knowledge lifecycle<select value={article.lifecycle_status || 'active'} onChange={(e)=>setArticle({...article,lifecycle_status:e.target.value})} disabled={workflowBusy}><option value="active">Active</option><option value="expired">Expired</option><option value="superseded">Superseded</option></select></label>
-              {article.review_status !== 'Draft' && <button className="secondary-button" onClick={()=>saveArticle(false, false, article.lifecycle_status || 'active')} disabled={workflowBusy}>Save lifecycle status</button>}
-              {!!article.version_history?.length && <details><summary>Previous versions ({article.version_history.length})</summary>{article.version_history.map((old)=><div key={old.version}><strong>v{old.version} · {old.title} · {old.lifecycle_status}</strong><p>{old.symptoms}</p><p>{old.confirmed_root_cause}</p><p>{old.verified_troubleshooting_steps?.join(' · ')}</p><p>{old.verification_method}</p></div>)}</details>}
+            {article && <div className="article-editor"><div className="article-status"><FileCheck2 size={16}/><span>{article.review_status === 'Approved' ? 'Approved & published' : 'Draft · review required'}</span>{article.ai_provenance === 'live_gpt' && <span className="ai-provenance live">Generated by Live GPT</span>}</div>
               <label>Article title<input value={article.title} disabled={article.review_status !== 'Draft'} onChange={(e)=>setArticle({...article,title:e.target.value})}/></label>
               <label>Symptoms<textarea rows="3" value={article.symptoms} disabled={article.review_status !== 'Draft'} onChange={(e)=>setArticle({...article,symptoms:e.target.value})}/></label>
               <div className="article-facts"><div><span>Confirmed cause</span><p>{article.confirmed_root_cause}</p></div><div><span>Verified actions</span><p>{(article.verified_troubleshooting_steps || []).join(' · ')}</p></div><div><span>Verification</span><p>{article.verification_method}</p></div></div>
               {article.review_status === 'Draft' ? <><button className="secondary-button wide-button" onClick={()=>saveArticle(false)} disabled={workflowBusy}>Save draft edits</button><label>Reviewer identifier<input value={reviewer} onChange={(e)=>setReviewer(e.target.value)} placeholder="Reviewer ID"/></label><button className="primary-button wide-button" onClick={()=>saveArticle(true)} disabled={workflowBusy || !reviewer.trim()}><CheckCircle2 size={16}/>{workflowBusy ? 'Publishing…' : 'Approve and publish article'}</button></> : <div className="published-note"><CheckCircle2 size={16}/> Only active, approved articles are available to future matching investigations.</div>}
             </div>}
           </>}
-          {governanceReview && <div className="locked-note" role="alert"><div>{governanceReview.warnings.map((warning,index)=><div key={index}><strong>{warning.message}</strong>{warning.sources?.map((item)=><p key={item.record_id}>{item.proposed ? <span>Proposed article · {item.title}</span> : <button className="secondary-button" onClick={()=>inspectArticle(item.record_id)}>{item.record_id} · {item.title}</button>}</p>)}{warning.details?.map((item,i)=><p key={i}>“{item.instruction}” / “{item.conflicting_instruction}”</p>)}</div>)}<button className="secondary-button" disabled={workflowBusy} onClick={reviewKnowledge}>I reviewed the sources — proceed</button><button className="secondary-button" onClick={()=>setGovernanceReview(null)}>Cancel</button></div></div>}
-          {inspectedArticle && <details open><summary>Existing article · {inspectedArticle.article_id} · v{inspectedArticle.version || 1}</summary><h4>{inspectedArticle.title}</h4><p>{inspectedArticle.symptoms}</p><p>{inspectedArticle.confirmed_root_cause}</p><p>{inspectedArticle.verified_troubleshooting_steps?.join(' · ')}</p><p>{inspectedArticle.verification_method}</p><p>{inspectedArticle.review_status} · {inspectedArticle.lifecycle_status || 'active'}</p><details><summary>Version history</summary><pre>{JSON.stringify(inspectedArticle.version_history || [], null, 2)}</pre></details><button className="secondary-button" onClick={()=>{setArticle(inspectedArticle);setInspectedArticle(null)}} disabled={article?.review_status === 'Draft'}>Manage article</button></details>}
-          {articles.map((item)=><button className="secondary-button" key={item.article_id} onClick={()=>inspectArticle(item.article_id)}>{item.article_id} · {item.lifecycle_status || 'active'}</button>)}
+          {inspectedArticle && !governanceReview && <details open><summary>Existing article · {inspectedArticle.article_id}</summary><h4>{inspectedArticle.title}</h4><p>{inspectedArticle.symptoms}</p><p>{inspectedArticle.confirmed_root_cause}</p><p>{inspectedArticle.verified_troubleshooting_steps?.join(' · ')}</p><p>{inspectedArticle.verification_method}</p><button className="secondary-button" onClick={()=>setInspectedArticle(null)}>Close article</button></details>}
+          {articles.map((item)=><button className="secondary-button" key={item.article_id} onClick={()=>inspectArticle(item.article_id)}>{item.title}</button>)}
           {!!articles.length && <div className="article-history"><BookOpen size={15}/>{articles.length} article record{articles.length===1?'':'s'} linked to this incident</div>}
         </section>}
       </div>
       {notice && <div className="success-toast"><CheckCircle2 size={16}/>{notice}</div>}{error && <div className="inline-error modal-error"><AlertCircle size={16}/>{error}</div>}
     </section></div>}
+    {governanceReview && <KnowledgeReviewDialog review={governanceReview} busy={workflowBusy} inspectedArticle={inspectedArticle} onView={inspectArticle} onCancel={()=>{setGovernanceReview(null);setInspectedArticle(null);setError('')}} onContinue={reviewKnowledge}/>}
+    {feedback && <FeedbackDialog key={feedback.notices.map((item)=>item.code).join('-')} feedback={feedback} onClose={()=>setFeedback(null)} sourceRecords={[...(answer?.investigation?.retrieved_facts?.matching_documents || []), ...(answer?.investigation?.captured_knowledge_matches || [])]}/>}
+
   </div>
 }
 

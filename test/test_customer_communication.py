@@ -2,7 +2,7 @@
 
 import json
 import unittest
-from datetime import date, datetime
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
@@ -91,8 +91,10 @@ class CustomerCommunicationTests(unittest.TestCase):
         )
         self.assertEqual(result["selected_date"], "2026-07-15")
         self.assertTrue(result["overlap_found"])
-        self.assertFalse(result["available"])
-        self.assertIn("No future 30-minute slot", result["reason"])
+        self.assertTrue(result["available"])
+        self.assertIsNone(result["reason"])
+        self.assertEqual(result["suggested_slot"]["consultant"]["date"], "2026-07-16")
+        self.assertEqual(result["suggested_slot"]["consultant"]["time"], "14:00")
 
     def test_mocked_gpt_email_uses_language_and_sanitized_evidence(self):
         fake = SimpleNamespace(responses=SimpleNamespace(create=Mock(return_value=SimpleNamespace(
@@ -236,3 +238,139 @@ class CustomerCommunicationApiTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ContactSchedulingRegressionTests(unittest.TestCase):
+    def suggest(self, now, **kwargs):
+        return communication.suggest_contact_time(
+            dict(GERMAN_CUSTOMER, location="Munich, Germany"), CONSULTANT, now=now, **kwargs,
+        )
+
+    def test_remaining_overlap_today_is_full_thirty_minutes_in_both_zones(self):
+        result = self.suggest(datetime(2026, 7, 15, 15, 10, tzinfo=ZoneInfo("Asia/Ho_Chi_Minh")))
+        slot = result["suggested_slot"]
+        self.assertEqual(slot["consultant"]["date"], "2026-07-15")
+        self.assertEqual((slot["consultant"]["time"], slot["consultant"]["end_time"]), ("15:30", "16:00"))
+        self.assertEqual((slot["customer"]["time"], slot["customer"]["end_time"]), ("10:30", "11:00"))
+        self.assertEqual(slot["customer"]["utc_offset"], "UTC+02:00")
+        self.assertEqual(slot["consultant"]["utc_offset"], "UTC+07:00")
+        self.assertEqual(datetime.fromisoformat(slot["end_utc"].replace("Z", "+00:00")) - datetime.fromisoformat(slot["start_utc"].replace("Z", "+00:00")), timedelta(minutes=30))
+        self.assertFalse(slot["is_confirmed_booking"])
+
+    def test_last_full_slot_is_allowed_but_not_a_partial_slot(self):
+        before = self.suggest(datetime(2026, 7, 15, 17, 30, tzinfo=ZoneInfo("Asia/Ho_Chi_Minh")))
+        after = self.suggest(datetime(2026, 7, 15, 17, 30, 1, tzinfo=ZoneInfo("Asia/Ho_Chi_Minh")))
+        self.assertEqual(before["suggested_slot"]["consultant"]["end_time"], "18:00")
+        self.assertEqual(after["suggested_slot"]["consultant"]["date"], "2026-07-16")
+        self.assertEqual(after["selected_date"], "2026-07-15")
+
+    def test_after_friday_overlap_searches_monday_skipping_both_weekends(self):
+        for day in (17, 18, 19):
+            result = self.suggest(datetime(2026, 7, day, 18, 0, tzinfo=ZoneInfo("Asia/Ho_Chi_Minh")))
+            self.assertEqual(result["suggested_slot"]["consultant"]["date"], "2026-07-20")
+            self.assertEqual(result["suggested_slot"]["customer"]["date"], "2026-07-20")
+
+    def test_berlin_dst_transition_weekends_search_forward_with_actual_new_offset(self):
+        for selected, expected_day, vn_time, offset in [
+            ("2026-03-27", "2026-03-30", "14:00", "UTC+02:00"),
+            ("2026-10-23", "2026-10-26", "15:00", "UTC+01:00"),
+        ]:
+            now = datetime.fromisoformat(selected + "T18:00:00").replace(tzinfo=ZoneInfo("Asia/Ho_Chi_Minh"))
+            slot = self.suggest(now)["suggested_slot"]
+            self.assertEqual(slot["consultant"]["date"], expected_day)
+            self.assertEqual(slot["consultant"]["time"], vn_time)
+            self.assertEqual(slot["customer"]["time"], "09:00")
+            self.assertEqual(slot["customer"]["utc_offset"], offset)
+
+    def test_no_overlap_any_day_within_horizon_never_invents_a_slot(self):
+        customer = dict(GERMAN_CUSTOMER, timezone="America/Los_Angeles")
+        result = communication.suggest_contact_time(customer, CONSULTANT,
+            now=datetime(2026, 7, 15, 8, 0, tzinfo=ZoneInfo("Asia/Ho_Chi_Minh")), search_horizon_days=7)
+        self.assertFalse(result["available"])
+        self.assertIsNone(result["suggested_slot"])
+        self.assertFalse(result["overlap_found"])
+        self.assertEqual(result["search_end_date"], "2026-07-21")
+        self.assertIn("7-calendar-day search horizon", result["reason"])
+
+    def test_calendar_day_horizon_is_bounded_and_configurable_without_changing_hours(self):
+        now = datetime(2026, 7, 17, 17, 31, tzinfo=ZoneInfo("Asia/Ho_Chi_Minh"))
+        bounded = self.suggest(now, search_horizon_days=3)
+        self.assertFalse(bounded["available"])
+        self.assertEqual(bounded["searched_days"], 3)
+        self.assertIn("No future 30-minute slot", bounded["reason"])
+        longer = communication.suggest_contact_time(GERMAN_CUSTOMER, dict(CONSULTANT, contact_search_horizon_days=4), now=now)
+        self.assertEqual(longer["suggested_slot"]["customer"]["date"], "2026-07-20")
+        for invalid in (0, 367, True, "14"):
+            with self.assertRaises(communication.CustomerCommunicationError):
+                self.suggest(now, search_horizon_days=invalid)
+
+    def test_default_clock_and_selected_date_ignore_server_timezone(self):
+        # UTC server date is July 14; Vietnam's working day is already July 15.
+        with patch.object(communication, "datetime", wraps=datetime) as clock:
+            clock.now.return_value = datetime(2026, 7, 14, 23, 30, tzinfo=timezone.utc)
+            result = communication.suggest_contact_time(GERMAN_CUSTOMER, CONSULTANT)
+            clock.now.assert_called_once_with(timezone.utc)
+        self.assertEqual(result["selected_date"], "2026-07-15")
+        self.assertEqual(result["suggested_slot"]["consultant"]["date"], "2026-07-15")
+        now = datetime(2026, 7, 14, 16, 30, tzinfo=ZoneInfo("America/Los_Angeles"))
+        self.assertEqual(self.suggest(now)["suggested_slot"], result["suggested_slot"])
+
+    def test_past_selected_date_starts_search_from_today_and_future_date_is_respected(self):
+        now = datetime(2026, 7, 15, 8, 0, tzinfo=ZoneInfo("Asia/Ho_Chi_Minh"))
+        past = self.suggest(now, selected_date="2026-01-01")
+        self.assertEqual(past["search_start_date"], "2026-07-15")
+        self.assertEqual(past["suggested_slot"]["customer"]["date"], "2026-07-15")
+        future = self.suggest(now, selected_date="2026-07-21")
+        self.assertEqual(future["suggested_slot"]["consultant"]["date"], "2026-07-21")
+
+    def test_local_dates_are_preserved_when_overlap_spans_different_calendar_dates(self):
+        customer = dict(GERMAN_CUSTOMER, timezone="Pacific/Honolulu")
+        result = communication.suggest_contact_time(customer, CONSULTANT,
+            now=datetime(2026, 7, 14, 7, 0, tzinfo=ZoneInfo("Asia/Ho_Chi_Minh")))
+        slot = result["suggested_slot"]
+        self.assertEqual((slot["consultant"]["date"], slot["consultant"]["time"]), ("2026-07-14", "09:00"))
+        self.assertEqual((slot["customer"]["date"], slot["customer"]["time"]), ("2026-07-13", "16:00"))
+        self.assertEqual(slot["customer"]["end_date"], "2026-07-13")
+
+    def test_mocked_email_receives_the_deterministic_future_slot_with_both_dates(self):
+        contact = self.suggest(datetime(2026, 7, 17, 18, 0, tzinfo=ZoneInfo("Asia/Ho_Chi_Minh")))
+        fake = SimpleNamespace(responses=SimpleNamespace(create=Mock(return_value=SimpleNamespace(
+            output_text='{"subject":"Follow-up","body":"Please confirm your availability."}',
+        ))))
+        ticket = {"incident_number":"INC100006", "issue_type":"Performance"}
+        with patch.object(communication, "_verified_resolution_for_ticket", return_value=None):
+            communication.generate_customer_email_draft(ticket, GERMAN_CUSTOMER, contact, investigation={}, client=fake)
+        prompt = json.loads(fake.responses.create.call_args.kwargs["input"])
+        self.assertEqual(prompt["suggested_contact_slot"]["consultant"]["date"], "2026-07-20")
+        self.assertEqual(prompt["suggested_contact_slot"]["customer"]["time"], "09:00")
+
+
+    def test_customer_route_and_email_route_share_forward_searched_backend_slot(self):
+        fake = SimpleNamespace(responses=SimpleNamespace(create=Mock(return_value=SimpleNamespace(
+            output_text='{"subject":"Follow-up","body":"Please confirm availability."}',
+        ))))
+        client = server.app.test_client()
+        with patch.object(communication, "datetime", wraps=datetime) as clock, patch.object(
+            llm_agent, "_get_client", return_value=fake,
+        ), patch.object(communication, "_verified_resolution_for_ticket", return_value=None):
+            clock.now.return_value = datetime(2026, 7, 17, 17, 31, tzinfo=ZoneInfo("Asia/Ho_Chi_Minh"))
+            contact = client.get("/api/tickets/INC100006/customer-communication?date=2026-07-17")
+            email = client.post("/api/tickets/INC100006/customer-email-draft", json={
+                "date": "2026-07-17", "investigation": {
+                    "ticket": {"incident_number": "INC100006"}, "resolution_path": "HUMAN_SUPPORT",
+                },
+            })
+        self.assertEqual(contact.status_code, 200)
+        self.assertEqual(email.status_code, 200)
+        slot = contact.get_json()["contact_time"]["suggested_slot"]
+        self.assertEqual(slot["customer"]["date"], "2026-07-20")
+        self.assertEqual(slot["consultant"]["time"], "14:00")
+        self.assertEqual(slot["customer"]["end_time"], "09:30")
+        self.assertEqual(email.get_json()["contact_time"]["suggested_slot"], slot)
+        fake.responses.create.assert_called_once()
+
+    def test_slot_does_not_extend_beyond_a_configured_subminute_closing_time(self):
+        consultant = dict(CONSULTANT, working_hours_end="17:59:30")
+        result = communication.suggest_contact_time(GERMAN_CUSTOMER, consultant,
+            now=datetime(2026, 7, 15, 17, 30, tzinfo=ZoneInfo("Asia/Ho_Chi_Minh")))
+        self.assertEqual(result["suggested_slot"]["consultant"]["date"], "2026-07-16")

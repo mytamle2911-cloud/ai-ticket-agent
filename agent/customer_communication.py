@@ -77,11 +77,13 @@ def suggest_contact_time(
     now: datetime | None = None,
     selected_date: date | str | None = None,
     duration_minutes: int = 30,
+    search_horizon_days: int | None = None,
 ) -> dict:
     """Find the first future half-hour slot aligned to consultant local time.
 
-    Iterating real UTC instants and converting them to each local zone handles
-    daylight-saving gaps and repeated hours without inventing a wall-clock slot.
+    Search the selected date (or today when it is past) and the next eligible
+    working days within a bounded calendar-day horizon. Real UTC instants handle
+    DST gaps/repeated hours without inventing local wall-clock appointments.
     """
     consultant = consultant or get_consultant_config()
     if not isinstance(duration_minutes, int) or duration_minutes != 30:
@@ -112,68 +114,87 @@ def suggest_contact_time(
     if not isinstance(selected_date, date):
         raise CustomerCommunicationError("The selected contact date is invalid.")
 
-    day_start = datetime.combine(selected_date, time.min, consultant_zone).astimezone(timezone.utc)
-    day_end = datetime.combine(selected_date + timedelta(days=1), time.min, consultant_zone).astimezone(timezone.utc)
+    if search_horizon_days is None:
+        search_horizon_days = consultant.get("contact_search_horizon_days", 14)
+    if type(search_horizon_days) is not int or not 1 <= search_horizon_days <= 366:
+        raise CustomerCommunicationError("Contact search horizon must be between 1 and 366 calendar days.")
+
+    def working_days(record):
+        days = record.get("working_days", [0, 1, 2, 3, 4])
+        if not isinstance(days, list) or not days or any(type(day) is not int or day not in range(7) for day in days):
+            raise CustomerCommunicationError("Configured working days must be weekday numbers from 0 (Monday) to 6 (Sunday).")
+        return set(days)
+
+    customer_days, consultant_days = working_days(customer), working_days(consultant)
+    search_start = max(selected_date, current_utc.astimezone(consultant_zone).date())
+    search_end = search_start + timedelta(days=search_horizon_days - 1)
     duration = timedelta(minutes=duration_minutes)
     has_overlap = False
     candidate = None
-    instant = day_start
-    while instant < day_end:
+    searched_days = 0
+
+    def common_hours(instant):
         customer_local = instant.astimezone(customer_zone)
         consultant_local = instant.astimezone(consultant_zone)
-        overlap = _within_hours(customer_local, customer_start, customer_end) and _within_hours(consultant_local, consultant_start, consultant_end)
-        has_overlap = has_overlap or overlap
-        aligned = consultant_local.minute in (0, 30) and consultant_local.second == 0
-        if overlap and aligned and instant >= current_utc and instant + duration <= day_end:
-            valid_slot = True
-            for minute in range(duration_minutes):
-                check = instant + timedelta(minutes=minute)
-                if not (
-                    _within_hours(check.astimezone(customer_zone), customer_start, customer_end)
-                    and _within_hours(check.astimezone(consultant_zone), consultant_start, consultant_end)
-                ):
-                    valid_slot = False
-                    break
-            if valid_slot:
-                candidate = instant
-                break
-        instant += timedelta(minutes=1)
+        return (customer_local.weekday() in customer_days and consultant_local.weekday() in consultant_days
+                and _within_hours(customer_local, customer_start, customer_end)
+                and _within_hours(consultant_local, consultant_start, consultant_end))
 
-    customer_country = customer.get("location", "Customer local time").rsplit(",", 1)[-1].strip()
-    consultant_country = consultant.get("location", "Consultant local time").rsplit(",", 1)[-1].strip()
+    for offset in range(search_horizon_days):
+        day = search_start + timedelta(days=offset)
+        searched_days += 1
+        if day.weekday() not in consultant_days:
+            continue
+        instant = datetime.combine(day, time.min, consultant_zone).astimezone(timezone.utc)
+        day_end = datetime.combine(day + timedelta(days=1), time.min, consultant_zone).astimezone(timezone.utc)
+        while instant < day_end:
+            overlap = common_hours(instant)
+            has_overlap = has_overlap or overlap
+            consultant_local = instant.astimezone(consultant_zone)
+            aligned = consultant_local.minute in (0, 30) and consultant_local.second == 0
+            if overlap and aligned and instant >= current_utc and instant + duration <= day_end:
+                if (all(common_hours(instant + timedelta(minutes=minute)) for minute in range(duration_minutes))
+                        and common_hours(instant + duration - timedelta(microseconds=1))):
+                    candidate = instant
+                    break
+            instant += timedelta(minutes=1)
+        if candidate is not None:
+            break
+
+    def local_slot(zone, record):
+        start = candidate.astimezone(zone)
+        end = (candidate + duration).astimezone(zone)
+        offset_minutes = int(start.utcoffset().total_seconds() / 60)
+        sign = '+' if offset_minutes >= 0 else '-'
+        hours, minutes = divmod(abs(offset_minutes), 60)
+        return {
+            "time": start.strftime("%H:%M"), "end_time": end.strftime("%H:%M"),
+            "date": start.date().isoformat(), "end_date": end.date().isoformat(),
+            "timezone": record["timezone"], "timezone_abbreviation": start.tzname(),
+            "utc_offset": f"UTC{sign}{hours:02d}:{minutes:02d}",
+            "label": record.get("location", "Local time").rsplit(",", 1)[-1].strip(),
+        }
+
     slot = None
-    if candidate:
-        end = candidate + duration
-        customer_local = candidate.astimezone(customer_zone)
-        consultant_local = candidate.astimezone(consultant_zone)
+    if candidate is not None:
         slot = {
             "start_utc": candidate.isoformat().replace("+00:00", "Z"),
-            "end_utc": end.isoformat().replace("+00:00", "Z"),
+            "end_utc": (candidate + duration).isoformat().replace("+00:00", "Z"),
             "duration_minutes": duration_minutes,
-            "customer": {
-                "time": customer_local.strftime("%H:%M"),
-                "date": customer_local.date().isoformat(),
-                "timezone": customer["timezone"],
-                "timezone_abbreviation": customer_local.tzname(),
-                "label": customer_country,
-            },
-            "consultant": {
-                "time": consultant_local.strftime("%H:%M"),
-                "date": consultant_local.date().isoformat(),
-                "timezone": consultant["timezone"],
-                "timezone_abbreviation": consultant_local.tzname(),
-                "label": consultant_country,
-            },
+            "customer": local_slot(customer_zone, customer),
+            "consultant": local_slot(consultant_zone, consultant),
             "is_confirmed_booking": False,
         }
-    if not has_overlap:
-        reason = "No common working-hours overlap was found on the selected date."
-    elif not candidate:
-        reason = "No future 30-minute slot remains in the working-hours overlap on the selected date."
-    else:
-        reason = None
+    reason = None
+    if candidate is None:
+        problem = "No common working-hours overlap" if not has_overlap else "No future 30-minute slot"
+        reason = (f"{problem} was found within the {search_horizon_days}-calendar-day search horizon "
+                  f"({search_start.isoformat()} to {search_end.isoformat()}). "
+                  "Ask the customer and L2 Support to agree an alternative time.")
     return {
         "selected_date": selected_date.isoformat(),
+        "search_start_date": search_start.isoformat(), "search_end_date": search_end.isoformat(),
+        "search_horizon_days": search_horizon_days, "searched_days": searched_days,
         "overlap_found": has_overlap,
         "available": candidate is not None,
         "duration_minutes": duration_minutes,

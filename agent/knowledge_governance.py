@@ -19,7 +19,9 @@ def is_active(record: dict) -> bool:
 
 def source_ref(record: dict) -> dict:
     return {'record_id': record.get('article_id') or record.get('document_id'),
-            'title': record.get('title', ''), 'source_incident': record.get('source_incident')}
+            'title': record.get('title', ''), 'source_incident': record.get('source_incident'),
+            'source_system': record.get('source_system', ''),
+            'issue_category': record.get('issue_category') or record.get('issue_type', '')}
 
 
 def _scope(record: dict) -> tuple[str, str]:
@@ -90,16 +92,15 @@ def knowledge_conflicts(records: list[dict]) -> list[dict]:
     return conflicts
 
 
-def article_warnings(candidate: dict, existing: list[dict]) -> list[dict]:
+def article_warnings(candidate: dict, existing: list[dict], *, check_duplicates: bool = True) -> list[dict]:
     peers = [row for row in existing if isinstance(row, dict)
              and row.get('article_id') != candidate.get('article_id')]
-    duplicates = [source_ref(row) for row in peers if all(_scope(candidate))
-                  and _scope(row) == _scope(candidate)
-                  and normalise(row.get('title')) == normalise(candidate.get('title'))]
+    duplicates = [source_ref(row) for row in peers if check_duplicates and is_active(row) and all(_scope(candidate))
+                  and _scope(row) == _scope(candidate)]
     warnings = []
     if duplicates:
         warnings.append({'code': 'potential_duplicate',
-            'message': 'Potential duplicate knowledge: review the existing article before proceeding.',
+            'message': 'An active article already covers this source system and issue category. This is a potential duplicate; review before saving.',
             'sources': duplicates})
     warnings.extend(knowledge_conflicts([candidate, *peers]))
     for warning in warnings:

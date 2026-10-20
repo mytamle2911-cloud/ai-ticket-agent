@@ -9,6 +9,7 @@ import uuid
 import copy
 import tempfile
 from agent import knowledge_governance as governance
+from agent.api_errors import notice, warning_notice
 from urllib.parse import parse_qsl, urlsplit
 
 from agent.history import search_historical_cases
@@ -51,6 +52,42 @@ def _serialize_knowledge_write(function):
         with _knowledge_write_lock:
             return function(*args, **kwargs)
     return guarded
+
+
+@app.after_request
+def public_api_notices(response):
+    if not request.path.startswith('/api/') or not response.is_json:
+        return response
+    body = response.get_json(silent=True)
+    if not isinstance(body, dict):
+        return response
+    # Dispatch's nested API result is normalized by its own inner Flask request.
+    if request.path == '/api/demo/dispatch' and 'result' in body:
+        return response
+    error = body.get('error')
+    if error:
+        body['success'] = False
+        if not body.get('error_info'):
+            path = request.path
+            ai_route = any(path.endswith(end) for end in ('/investigation', '/chat', '/customer-email-draft', '/knowledge-articles/generate'))
+            if (response.status_code >= 500 or body.get("ai_provenance") in {"deterministic_fallback", "unavailable"}) and ai_route and not any(word in str(error).lower() for word in ('storage', 'persist', 'data is unavailable', 'data.')):
+                code = 'AI_API_FAILURE'
+            elif response.status_code >= 500 and request.method in ('POST', 'PATCH'):
+                code = 'SAVE_FAILED' if not path.endswith(('/investigation', '/chat')) else 'MISSING_DOCUMENTATION'
+            else:
+                code = 'REQUEST_FAILED'
+            body['error_info'] = notice(code, str(error), blocking=True)
+            if code == 'REQUEST_FAILED' and response.status_code >= 500:
+                body['error_info']['retryable'] = True
+        if response.status_code < 400:
+            response.status_code = 503
+    else:
+        body.setdefault('success', True)
+        warnings = body.get('investigation', {}).get('warnings', []) if isinstance(body.get('investigation'), dict) else []
+        if warnings:
+            body['notices'] = [warning_notice(warning) for warning in warnings]
+    response.set_data(app.json.dumps(body))
+    return response
 
 
 @app.before_request
@@ -233,10 +270,11 @@ def save_knowledge_articles(data):
             os.unlink(temporary)
 
 
-def _knowledge_review(candidate, records, payload):
-    warnings = governance.article_warnings(candidate, records)
+def _knowledge_review(candidate, records, payload, *, check_duplicates=True):
+    warnings = governance.article_warnings(candidate, records, check_duplicates=check_duplicates)
     if warnings and payload.get("review_acknowledged") is not True:
-        return jsonify({"error": "Review the knowledge warnings before proceeding.",
+        normalized = [warning_notice(warning) for warning in warnings]
+        return jsonify({"success": False, "error": normalized[0]["message"], "error_info": normalized[0],
                         "governance_review_required": True, "warnings": warnings,
                         "proposed_article": {key: candidate[key] for key in ("source_resolution_id", "title", "symptoms")}}), 409
     return None
@@ -375,7 +413,7 @@ def dispatch_demo_state():
         status = 503 if "DEMO_STATE_SECRET" in str(exc) else 400
         return jsonify({"error": str(exc)}), status
     except (OSError, RuntimeError, ValueError) as exc:
-        return jsonify({"error": f"Could not process browser demo state: {exc}"}), 400
+        return jsonify({"error": "Could not process browser demo state. Reload the current record and retry."}), 400
 
 @app.route("/health", methods=["GET"])
 def health_check():
@@ -782,7 +820,7 @@ def create_ticket_resolution(incident_number):
     try:
         data = load_resolution_records()
     except (RuntimeError, OSError) as exc:
-        return jsonify({"error": str(exc) + " No resolution was saved."}), 500
+        return jsonify({"error": "Resolution storage is unavailable. No resolution was saved."}), 500
 
     record = {
         "resolution_id": "RES-" + uuid.uuid4().hex,
@@ -964,7 +1002,7 @@ def update_knowledge_article(article_id):
         article.update(review_status="Approved", approved_by=payload["approved_by"].strip())
         article["approved_at"] = article["published_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
     if content_fields.intersection(payload) or approval or payload.get("lifecycle_status") == "active":
-        review = _knowledge_review(article, data["articles"], payload)
+        review = _knowledge_review(article, data["articles"], payload, check_duplicates=False)
         if review:
             return review
     if article != previous:
